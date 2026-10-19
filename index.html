@@ -1,0 +1,1452 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SINGULARITY</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout : le générateur occupe la scène (colonne gauche, fixe sur grand écran), les commandes en onglets à droite. Thème sombre assumé. */
+:root {
+  --bg: #05070e;
+  --panel: #0b0f1d;
+  --panel-2: #10162b;
+  --line: #1b2340;
+  --fg: #e9edf8;
+  --muted: #8790ab;
+  --cyan: #52e4f0;
+  --violet: #9b6bff;
+  --good: #6ee7a8;
+  --warn: #f2c46b;
+  --bad: #ff8a8a;
+  --f-display: "Michroma", "Eurostile", "Arial Black", sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); color: var(--fg); }
+body {
+  font-family: var(--f-body); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 40px;
+  background: radial-gradient(ellipse 60% 45% at 30% 10%, rgba(82, 228, 240, 0.06), transparent 70%), var(--bg);
+}
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 16px; }
+.label { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+header h1 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 16px; letter-spacing: 0.26em; }
+header .meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
+header .meta b { color: var(--fg); font-weight: 500; font-family: var(--f-mono); }
+header .meta .spd b { color: var(--cyan); }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 10px; justify-items: center; }
+@media (max-width: 900px) { .stage { position: static; } }
+.readout { text-align: center; display: grid; gap: 2px; }
+.readout .energy { font-family: var(--f-mono); font-weight: 600; font-size: clamp(32px, 7.5vw, 52px); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.readout .rate { font-family: var(--f-mono); color: var(--cyan); font-size: 15px; }
+.canvas-box { width: min(100%, 520px); aspect-ratio: 1; max-width: 100%; position: relative; }
+canvas { width: 100%; height: 100%; display: block; }
+.box { width: min(100%, 480px); display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--panel) 82%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.box .row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+.box .row span:last-child { font-family: var(--f-mono); color: var(--muted); }
+.box.challenge { border-color: color-mix(in srgb, var(--warn) 60%, var(--line)); }
+.bar { height: 5px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--cyan); transition: width .3s linear; }
+.box.challenge .bar > i { background: var(--warn); }
+.track { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.track span { height: 6px; border-radius: 3px; background: var(--line); }
+.track span.done { background: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
+.track span.cur { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.small { font-size: 12px; color: var(--muted); margin: 0; }
+.small b { color: var(--fg); font-weight: 500; }
+
+.console { display: grid; gap: 12px; min-width: 0; }
+.tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.tab { appearance: none; border: 0; background: transparent; padding: 9px 2px; border-radius: 7px; cursor: pointer; color: var(--muted); font-size: 12.5px; position: relative; }
+.tab[aria-selected="true"] { background: var(--panel-2); color: var(--fg); }
+.tab.locked { opacity: .45; }
+.tab:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+.tab .ping { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+.panel { display: grid; gap: 10px; }
+.card { background: color-mix(in srgb, var(--panel) 84%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.card h2 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; }
+.card .head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lock { text-align: center; padding: 26px 14px; color: var(--muted); display: grid; gap: 6px; }
+.lock b { color: var(--fg); font-family: var(--f-display); font-weight: 400; letter-spacing: 0.12em; font-size: 12px; text-transform: uppercase; }
+
+.upg { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.upg:first-of-type { border-top: 0; }
+.upg .info { display: grid; gap: 1px; min-width: 0; }
+.upg .info b { font-weight: 600; }
+.upg .info small { color: var(--muted); font-size: 12px; }
+.upg .info .val { font-family: var(--f-mono); color: var(--cyan); font-size: 12.5px; }
+.btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn { appearance: none; cursor: pointer; background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 7px 11px; font-size: 12.5px; display: grid; justify-items: center; line-height: 1.25; min-width: 64px; transition: border-color .15s, background .15s, transform .08s; }
+.btn small { font-family: var(--f-mono); color: var(--muted); font-size: 11px; }
+.btn.ok { border-color: color-mix(in srgb, var(--cyan) 65%, var(--line)); background: color-mix(in srgb, var(--cyan) 12%, var(--panel-2)); }
+.btn.ok small { color: var(--fg); }
+.btn:active:not(:disabled) { transform: scale(0.96); }
+.btn:disabled { opacity: .38; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.btn.warn { border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); color: var(--bad); }
+.btn.big { padding: 11px 16px; font-size: 14px; width: 100%; }
+.btn.sing.ok { border-color: var(--violet); background: color-mix(in srgb, var(--violet) 22%, var(--panel-2)); box-shadow: 0 0 22px color-mix(in srgb, var(--violet) 35%, transparent); }
+
+.breakdown { display: grid; font-size: 12.5px; }
+.breakdown div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 5px 0; border-top: 1px solid var(--line); }
+.breakdown div span:last-child { font-family: var(--f-mono); }
+.breakdown .re span:first-child { color: var(--cyan); }
+.breakdown .tot { color: var(--cyan); font-weight: 600; }
+details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+
+.gauge { display: grid; gap: 6px; }
+.gauge .row { display: flex; justify-content: space-between; font-size: 12.5px; }
+.gauge .row b { font-family: var(--f-mono); font-weight: 500; }
+.gauge .bar > i { background: var(--warn); }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.slot { display: grid; justify-items: center; gap: 4px; min-width: 56px; }
+.orb { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--c, var(--line)); display: grid; place-items: center; font-family: var(--f-display); font-size: 11.5px; color: var(--c, var(--muted)); box-shadow: 0 0 14px color-mix(in srgb, var(--c, transparent) 45%, transparent); background: var(--panel); }
+.slot.core .orb { width: 56px; height: 56px; font-size: 13px; }
+.slot.free .orb { border-style: dashed; box-shadow: none; }
+.slot small { font-size: 10.5px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.plus { color: var(--muted); font-family: var(--f-mono); }
+.els { display: grid; gap: 8px; }
+.el { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); }
+.el .orb { width: 40px; height: 40px; }
+.el .body { display: grid; gap: 6px; min-width: 0; }
+.el .title { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.el .title b { font-weight: 600; }
+.el .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c); }
+.el .fx { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 12px; }
+.el .fx span:nth-child(odd) { color: var(--muted); }
+.el .state { font-size: 11.5px; color: var(--cyan); }
+.el.lockedEl { opacity: .5; }
+
+.branches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .branches { grid-template-columns: minmax(0, 1fr); } }
+.branch { display: grid; gap: 6px; align-content: start; }
+.branch h3 { margin: 0 0 2px; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.law { appearance: none; text-align: left; cursor: pointer; display: grid; gap: 2px; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12px; }
+.law b { font-size: 12.5px; }
+.law .c { font-family: var(--f-mono); color: var(--muted); font-size: 11px; }
+.law.have { border-color: var(--violet); background: color-mix(in srgb, var(--violet) 16%, var(--panel-2)); }
+.law.have .c { color: var(--violet); }
+.law.can { border-color: color-mix(in srgb, var(--cyan) 60%, var(--line)); }
+.law:disabled { cursor: not-allowed; opacity: .5; }
+.law.have:disabled { opacity: 1; }
+
+.chal { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); }
+.chal .top { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.chal .top b { font-weight: 600; }
+.chal .st { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.chal .st.done { color: var(--good); } .chal .st.run { color: var(--warn); } .chal .st.lock { color: var(--muted); }
+.chal .fx { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 12px; }
+.chal .fx span:nth-child(odd) { color: var(--muted); }
+
+.rx { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 480px) { .rx { grid-template-columns: minmax(0, 1fr); } }
+.rx .r { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); display: grid; gap: 3px; font-size: 12px; }
+.rx .r b { font-size: 13px; }
+.rx .r.unk b { color: var(--muted); font-family: var(--f-mono); }
+.rx .r .pair { color: var(--muted); }
+.pals { display: grid; gap: 6px; }
+.pals div { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; font-size: 12.5px; align-items: baseline; }
+.pals div span:first-child { font-family: var(--f-mono); color: var(--muted); }
+.pals div.done span:first-child { color: var(--cyan); }
+.pals div.cur { color: var(--cyan); }
+.pals small { color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.stats div { display: grid; gap: 2px; } .stats b { font-family: var(--f-mono); font-weight: 500; }
+
+.settings { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1px dashed var(--line); border-radius: 10px; }
+.settings .grp { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { appearance: none; background: transparent; border: 0; color: var(--muted); padding: 6px 11px; cursor: pointer; font-size: 12.5px; }
+.seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--cyan) 16%, transparent); color: var(--cyan); }
+.seg button:focus-visible { outline: 2px solid var(--cyan); outline-offset: -2px; }
+
+.toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; z-index: 30; width: min(440px, calc(100% - 32px)); pointer-events: none; }
+.toast { background: var(--panel-2); border: 1px solid var(--c, var(--cyan)); border-radius: 9px; padding: 10px 14px; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,.5); animation: tin .25s ease-out; }
+.toast b { color: var(--c, var(--cyan)); }
+@keyframes tin { from { transform: translateY(8px); opacity: 0; } }
+.win { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(3, 4, 9, 0.84); padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.win .wbox { max-width: 460px; text-align: center; display: grid; gap: 14px; padding: 28px; border: 1px solid var(--violet); border-radius: 14px; background: var(--panel); box-shadow: 0 0 60px rgba(155, 107, 255, 0.35); }
+.win h2 { margin: 0; font-family: var(--f-display); font-weight: 400; letter-spacing: 0.2em; font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } .bar > i { transition: none; } }
+@media (max-width: 480px) { .upg { grid-template-columns: minmax(0, 1fr); } .upg .btns .btn.fill { flex: 1; } }
+.comet-btn { position: absolute; right: 4%; top: 4%; appearance: none; cursor: pointer; border: 1px solid color-mix(in srgb, #9fe8ff 70%, transparent); background: color-mix(in srgb, #0b1a2a 80%, transparent); color: #d9f6ff; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; box-shadow: 0 0 18px rgba(159, 232, 255, 0.35); animation: ready 1.8s ease-in-out infinite; --fc: #9fe8ff; }
+.comet-btn:focus-visible { outline: 2px solid #9fe8ff; outline-offset: 2px; }
+.boost-chip { position: absolute; left: 4%; top: 4%; border-radius: 999px; padding: 5px 11px; font-size: 12px; font-family: var(--f-mono); color: #d9f6ff; background: color-mix(in srgb, #0b1a2a 80%, transparent); border: 1px solid #9fe8ff; }
+.box.bank { border-color: color-mix(in srgb, var(--violet) 55%, var(--line)); }
+.box.bank .row span:last-child { color: var(--violet); }
+.cat { display: grid; gap: 6px; }
+.cat .line { display: grid; grid-template-columns: 34px repeat(4, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+.cat .line.done .orb { box-shadow: 0 0 16px var(--c); }
+.cat .orb { width: 30px; height: 30px; font-size: 10px; align-self: center; }
+.cat .star { border: 1px solid var(--line); border-radius: 7px; padding: 6px 7px; font-size: 11.5px; line-height: 1.25; background: var(--panel-2); min-width: 0; display: grid; gap: 1px; align-content: center; }
+.cat .star.found { border-color: color-mix(in srgb, var(--c) 60%, var(--line)); background: color-mix(in srgb, var(--c) 12%, var(--panel-2)); }
+.cat .star b { font-weight: 600; font-size: 11.5px; overflow-wrap: anywhere; }
+.cat .star span { color: var(--muted); font-size: 10.5px; }
+.cat .star.unk b { color: var(--muted); font-family: var(--f-mono); }
+@media (max-width: 480px) { .cat .line { grid-template-columns: 26px repeat(4, minmax(0, 1fr)); gap: 4px; } .cat .orb { width: 24px; height: 24px; font-size: 9px; } .cat .star { padding: 5px; } .cat .star span { display: none; } }
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.wrap { position: relative; z-index: 1; }
+.tabs, .settings { background: color-mix(in srgb, var(--panel) 84%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+/* Boutons qui se remplissent à l'approche du prix */
+.btn.fill { --fc: var(--cyan); background: linear-gradient(90deg, color-mix(in srgb, var(--fc) 26%, var(--panel-2)) var(--p, 0%), var(--panel-2) var(--p, 0%)); }
+.btn.fill:disabled { opacity: .62; }
+.btn.fill.ok { background: color-mix(in srgb, var(--fc) 18%, var(--panel-2)); border-color: var(--fc); box-shadow: 0 0 14px color-mix(in srgb, var(--fc) 35%, transparent); }
+.btn.sing.fill { --fc: var(--violet); }
+.btn.sing.ok { animation: ready 1.8s ease-in-out infinite; }
+@keyframes ready { 50% { box-shadow: 0 0 30px color-mix(in srgb, var(--fc, var(--cyan)) 60%, transparent); } }
+/* Jauge vers le prochain palier de niveau */
+.msbar { height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 3px; max-width: 220px; }
+.msbar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--violet)); }
+/* Tuiles des améliorations de run */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 1060px) and (min-width: 901px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { appearance: none; cursor: pointer; text-align: left; display: grid; gap: 4px; align-content: start; padding: 10px; border-radius: 10px; border: 1px solid var(--line); min-width: 0; color: var(--fg);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--violet) 24%, var(--panel-2)) var(--p, 0%), var(--panel-2) var(--p, 0%)); transition: border-color .2s, transform .08s; }
+.tile .ic { width: 30px; height: 30px; color: var(--muted); }
+.tile .ic svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tile b { font-size: 12.5px; font-weight: 600; line-height: 1.25; }
+.tile small { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
+.tile .cost { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.tile:disabled { cursor: default; }
+.tile.ok { border-color: var(--violet); animation: ready 1.8s ease-in-out infinite; --fc: var(--violet); }
+.tile.ok .ic, .tile.have .ic { color: var(--violet); }
+.tile.ok .cost { color: var(--fg); }
+.tile.have { border-color: color-mix(in srgb, var(--violet) 55%, var(--line)); background: color-mix(in srgb, var(--violet) 14%, var(--panel-2)); }
+.tile.have .cost { color: var(--violet); }
+.tile:active:not(:disabled) { transform: scale(0.97); }
+.tile:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+/* Gains qui s'envolent */
+.floatGain { position: fixed; z-index: 50; pointer-events: none; translate: -50% 0; font-family: var(--f-mono); font-weight: 600; font-size: 13px; color: var(--cyan); text-shadow: 0 0 12px currentColor; animation: rise 1.1s ease-out forwards; white-space: nowrap; }
+@keyframes rise { to { transform: translateY(-52px); opacity: 0; } }
+.energy.bump { animation: bump .5s ease-out; }
+@keyframes bump { 35% { transform: scale(1.07); text-shadow: 0 0 26px var(--cyan); } }
+@media (prefers-reduced-motion: reduce) { .floatGain, .energy.bump, .btn.sing.ok, .tile.ok { animation: none; } }
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header>
+    <h1>SINGULARITY</h1>
+    <div class="meta">
+      <span>Palier <b id="hPal">0</b></span>
+      <span class="spd">Vitesse <b id="hSpeed">×1</b></span>
+      <span>Singularités <b id="hSing">0</b></span>
+      <span>Run <b id="hTime">0:00</b></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <div class="readout">
+        <span class="label">Énergie</span>
+        <span class="energy" id="energy">0</span>
+        <span class="rate" id="rate">0 /s</span>
+      </div>
+      <div class="canvas-box"><canvas id="gen" role="img" aria-label="L'étoile, son cœur et ses anneaux"></canvas>
+        <button class="comet-btn" type="button" id="cometBtn" hidden></button>
+        <span class="boost-chip" id="boostChip" hidden></span>
+      </div>
+
+      <div class="box" id="objBox">
+        <div class="row"><span id="objLabel">Objectif de la run</span><span id="objValue"></span></div>
+        <div class="bar"><i id="objBar"></i></div>
+        <p class="small" id="objNote"></p>
+        <button class="btn big sing" type="button" id="singBtn">Déclencher la singularité</button>
+        <button class="btn" type="button" id="abandonBtn" hidden>Abandonner le défi</button>
+      </div>
+      <div class="box bank" id="bankBox" hidden>
+        <div class="row"><span>Réserve de temps</span><span id="bankValue"></span></div>
+        <p class="small">Le temps d'absence au-delà d'une heure s'accumule ici. Dépense-le quand tu veux : le jeu avance d'un coup.</p>
+        <div class="btns" id="bankBtns">
+          <button class="btn" type="button" data-bank="600">+10 min</button>
+          <button class="btn" type="button" data-bank="3600">+1 h</button>
+          <button class="btn" type="button" data-bank="all">Tout</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="track" id="track"></div>
+        <p class="small" id="palNow"></p>
+        <p class="small" id="palNext"></p>
+      </div>
+    </div>
+
+    <div class="console">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="t-gen" data-tab="gen" aria-selected="true">Générateur</button>
+        <button class="tab" role="tab" id="t-el" data-tab="el" aria-selected="false">Éléments</button>
+        <button class="tab" role="tab" id="t-law" data-tab="law" aria-selected="false">Lois</button>
+        <button class="tab" role="tab" id="t-ch" data-tab="ch" aria-selected="false">Défis</button>
+        <button class="tab" role="tab" id="t-log" data-tab="log" aria-selected="false">Catalogue</button>
+      </div>
+
+      <section class="panel" id="p-gen" role="tabpanel" aria-labelledby="t-gen">
+        <div class="card" id="upgCard">
+          <div class="head"><h2>Niveaux</h2><span class="small">Remis à zéro à chaque singularité</span></div>
+          <div id="upgRows"></div>
+        </div>
+        <div class="card">
+          <div class="head"><h2>Améliorations de run</h2><span class="small" id="upsHint"></span></div>
+          <div class="tiles" id="upsRows"></div>
+        </div>
+        <div class="card" id="specCard" hidden>
+          <div class="head"><h2>Spécialisation</h2><span class="small" id="specHint"></span></div>
+          <div class="btns" id="specBtns"></div>
+        </div>
+        <div class="card">
+          <details id="bdDetails"><summary>Détail de la production</summary><div class="breakdown" id="breakdown"></div></details>
+        </div>
+      </section>
+
+      <section class="panel" id="p-el" role="tabpanel" aria-labelledby="t-el" hidden>
+        <div class="card" id="genCard"></div>
+        <div class="els" id="els"></div>
+      </section>
+
+      <section class="panel" id="p-law" role="tabpanel" aria-labelledby="t-law" hidden></section>
+      <section class="panel" id="p-ch" role="tabpanel" aria-labelledby="t-ch" hidden></section>
+
+      <section class="panel" id="p-log" role="tabpanel" aria-labelledby="t-log" hidden>
+        <div class="card"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
+          <p class="small">Chaque noyau donne un type d'étoile différent selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand sa configuration atteint le premier quart de la run. Chaque étoile : production +5 %. Une ligne complète : effet du noyau ×1,25.</p>
+          <div class="cat" id="cat"></div></div>
+        <div class="card"><h2>Cycle de vie</h2><div class="pals" id="pals"></div></div>
+        <div class="card"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div><div class="rx" id="rx"></div></div>
+        <div class="card"><h2>Partie</h2><div class="stats" id="stats"></div></div>
+      </section>
+
+      <div class="settings">
+        <div class="grp"><span class="label">Notation</span>
+          <div class="seg" role="group" aria-label="Notation des nombres" id="notation">
+            <button type="button" data-n="sci" aria-pressed="true">1,23e9</button>
+            <button type="button" data-n="suf" aria-pressed="false">1,23 Md</button>
+          </div>
+        </div>
+        <div class="grp"><span class="label">Banc de test</span>
+          <div class="seg" role="group" aria-label="Accélération de test" id="speed">
+            <button type="button" data-s="1" aria-pressed="true">×1</button>
+            <button type="button" data-s="10" aria-pressed="false">×10</button>
+            <button type="button" data-s="60" aria-pressed="false">×60</button>
+          </div>
+        </div>
+        <button class="btn warn" type="button" id="wipe">Tout effacer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="win" id="win" hidden>
+  <div class="wbox">
+    <span class="label">Fusion totale</span>
+    <h2>SINGULARITÉ ULTIME</h2>
+    <p id="winText"></p>
+    <button class="btn big" type="button" id="winClose">Continuer à regarder le générateur</button>
+  </div>
+</div>
+
+<script>
+const ENV = (typeof process !== 'undefined' && process.env) ? process.env : {};
+// ===== SINGULARITY v3 — modèle (constantes validées par simulation : ~19 h pour un joueur optimal) =====
+const sat = (t, tau) => 1 - Math.exp(-t / tau);
+const ORDER = ['dust', 'plasma', 'dark', 'anti', 'neutro'];
+const ELEMENTS = {
+  dust:   { name: 'Poussière stellaire', short: 'Po', trait: 'Stable',   instab: 1 },
+  plasma: { name: 'Plasma',              short: 'Pl', trait: 'Rapide',   instab: 2 },
+  dark:   { name: 'Matière noire',       short: 'Mn', trait: 'Lente',    instab: 4 },
+  anti:   { name: 'Antimatière',         short: 'Am', trait: 'Volatile', instab: 4 },
+  neutro: { name: 'Neutronium',          short: 'Ne', trait: 'Dense',    instab: 5 },
+};
+const CORE = { dust: c => 1, plasma: c => 2.5, dark: c => 1 + 3 * sat(c.t, 1200), anti: c => 6, neutro: c => 1 + 0.5 * c.n };
+const FUSED = { dust: c => 1.4, plasma: c => 1.7, dark: c => 1 + 1.2 * sat(c.t, 1200), anti: c => 3, neutro: c => 1.6 };
+const EL_FX = {
+  dust:   { core: '×1', fused: '×1,4' },
+  plasma: { core: '×2,5', fused: '×1,7' },
+  dark:   { core: 'jusqu\'à ×4 avec la durée de la run', fused: 'jusqu\'à ×2,2 avec la durée de la run' },
+  anti:   { core: '×6, mais coûts ×4', fused: '×3, mais coûts ×2' },
+  neutro: { core: '+0,5 par élément fusionné', fused: '×1,6' },
+};
+// Seuils de déblocage des noyaux pendant la première run
+const RUN1_UNLOCK = { plasma: 1e3, dark: 1e5, anti: 1e7, neutro: 1e9 };
+const key = (a, b) => [a, b].sort().join('+');
+const REACTIONS = {
+  [key('dust', 'plasma')]:  { name: 'Ignition', desc: '×2', f: c => 2 },
+  [key('dust', 'dark')]:    { name: 'Accrétion', desc: 'jusqu\'à ×2 avec le temps', f: c => 1 + 1 * sat(c.t, 600) },
+  [key('dust', 'anti')]:    { name: 'Annihilation douce', desc: 'supprime la pénalité de coût de l\'Antimatière', f: c => 1, nopen: true },
+  [key('dust', 'neutro')]:  { name: 'Compactage', desc: 'instabilité totale −2', f: c => 1, stab: 2 },
+  [key('plasma', 'dark')]:  { name: 'Combustion lente', desc: 'jusqu\'à ×2,2 avec le temps', f: c => 1 + 1.2 * sat(c.t, 900) },
+  [key('plasma', 'anti')]:  { name: 'Déflagration', desc: '×3', f: c => 3 },
+  [key('plasma', 'neutro')]:{ name: 'Fusion stellaire', desc: 'le Flux compte double', f: c => 1, flux2: true },
+  [key('dark', 'anti')]:    { name: 'Effondrement', desc: 'jusqu\'à ×4,5 avec le temps, pénalité de coût doublée', f: c => 1 + 3.5 * sat(c.t, 1200), pen2: true },
+  [key('dark', 'neutro')]:  { name: 'Étoile à neutrons', desc: '×2,5', f: c => 2.5 },
+  [key('anti', 'neutro')]:  { name: 'Confinement', desc: '×2,5, pénalité de coût divisée par deux', f: c => 2.5, halfpen: true },
+};
+const UPG = {
+  flux:  { base: 10, mul: 1.15 },
+  power: { base: 50, mul: 5 },
+  syn:   { base: 1e5, mul: 15 },
+  stab:  { base: 1e9, mul: 1e4 },
+  spec:  { cost: 1e6 },
+};
+const SYN_MAX = 8, SOBER_POWER = 25;
+const LAWS = {
+  M: [ { id: 'M1', name: 'Écho', desc: 'Production ×2', cost: 1 },
+       { id: 'M2', name: 'Graine', desc: 'Chaque run commence avec 10 niveaux de Flux de plus', cost: 2 },
+       { id: 'M3', name: 'Écho profond', desc: 'Production ×3', cost: 3 },
+       { id: 'M4', name: 'Résonance', desc: 'Effet des réactions ×1,5', cost: 4 } ],
+  S: [ { id: 'S1', name: 'Coque', desc: 'Stabilité +1', cost: 1 },
+       { id: 'S2', name: 'Blindage', desc: 'Stabilité +1', cost: 2 },
+       { id: 'S3', name: 'Ancrage', desc: 'Instabilité de la Matière noire −2', cost: 3 },
+       { id: 'S4', name: 'Cœur stable', desc: 'Stabilité +2', cost: 4 } ],
+  A: [ { id: 'A1', name: 'Auto-Flux', desc: 'Achète le Flux automatiquement', cost: 1 },
+       { id: 'A2', name: 'Auto-Puissance', desc: 'Achète la Puissance automatiquement', cost: 2 },
+       { id: 'A3', name: 'Auto-réglages', desc: 'Achète Synergie et Stabilité automatiquement', cost: 3 },
+       { id: 'A4', name: 'Auto-singularité', desc: 'Déclenche la singularité dès que l\'objectif est atteint', cost: 4, pal: 6 } ],
+};
+const ALL_LAWS = Object.values(LAWS).flat();
+const CHALLENGES = {
+  pure:     { name: 'Pur', desc: 'Aucune fusion possible', reward: 'Stabilité +1', tier: 5, rel: Number(ENV.CP || 2e-5) },
+  unstable: { name: 'Instable', desc: 'Stabilité divisée par deux', reward: 'Synergie : plafond relevé de 4 niveaux', tier: 5, rel: Number(ENV.C5 || 1e-4) },
+  sober:    { name: 'Sobriété', desc: `Puissance limitée à ${SOBER_POWER} niveaux`, reward: 'Pureté et Catalyse ensemble', tier: 5, rel: Number(ENV.C5 || 1e-4) },
+  noecho:   { name: 'Sans écho', desc: 'Pas de Synergie', reward: 'Stabilité +2', tier: 6, rel: Number(ENV.C6 || 1e-2) },
+  forced:   { name: 'Noyau imposé', desc: 'Poussière stellaire au noyau', reward: 'Pénalité de coût de l\'Antimatière divisée par deux', tier: 6, rel: Number(ENV.C6 || 1e-2) },
+};
+// Paliers : on passe au suivant en atteignant l'objectif de la run puis en déclenchant une singularité
+const PALIERS = [
+  { n: 0, name: 'Nébuleuse', unlock: 'Les cinq noyaux se découvrent pendant la run' },
+  { n: 1, name: 'Protoétoile', unlock: 'Fusion des éléments et limite de stabilité' },
+  { n: 2, name: 'Étoile', unlock: 'Synergie et Spécialisation' },
+  { n: 3, name: 'Géante', unlock: 'Arbre des lois permanentes' },
+  { n: 4, name: 'Supernova', unlock: 'Amélioration de la stabilité' },
+  { n: 5, name: 'Étoile à neutrons', unlock: 'Défis Pur, Instable et Sobriété' },
+  { n: 6, name: 'Trou noir', unlock: 'Défis avancés, 5e élément fusionnable, Auto-singularité' },
+];
+const LAST_PAL = 6;
+const OBJ0 = Number(ENV.O0 || 1e10), OBJ_FACTOR = Number(ENV.F || 1e5), SPEED_BASE = 2, HERITAGE = Number(ENV.H || 0.125), SING_MIN = 2e5;
+const USE_UPS = ENV.UPS !== '0', USE_MS = ENV.MS !== '0';
+// Paliers de niveaux
+const fluxMilestones = l => !USE_MS ? 0 : [10, 25, 50, 100].filter(x => l >= x).length + (l >= 150 ? Math.floor((l - 100) / 50) : 0);
+const nextFluxMilestone = l => { for (const x of [10, 25, 50, 100]) if (l < x) return x; return 100 + 50 * (Math.floor((l - 100) / 50) + 1); };
+const POWER_MS_STEP = 10, POWER_MS_MULT = 1.25;
+const powerMilestones = l => !USE_MS ? 0 : Math.floor(l / POWER_MS_STEP);
+// Améliorations uniques, rachetées à chaque run, réparties sur toute la run (f = position dans la run, en échelle log)
+const RUN_UPS = [
+  { id: 'coils',   name: 'Bobines supraconductrices', desc: 'Flux ×2', f: 0.10 },
+  { id: 'cap',     name: 'Condensateur', desc: 'La Puissance coûte deux fois moins', f: 0.22 },
+  { id: 'coreres', name: 'Résonance du noyau', desc: 'Effet du noyau ×1,5', f: 0.34 },
+  { id: 'catal',   name: 'Catalyseur', desc: 'Effet de chaque élément fusionné ×1,25', f: 0.46 },
+  { id: 'harm',    name: 'Amplificateur harmonique', desc: 'Effet des réactions ×1,5', f: 0.58 },
+  { id: 'comp',    name: 'Compression temporelle', desc: 'La run avance 1,25 fois plus vite', f: 0.70 },
+  { id: 'over',    name: 'Surcharge', desc: 'Production ×3', f: 0.82 },
+  { id: 'crit',    name: 'Masse critique', desc: 'Production +5 % par puissance de 10 produite dans la run', f: 0.92 },
+];
+const hasUp = (r, id) => USE_UPS && (r.ups || []).includes(id);
+// Catalogue stellaire : un type d'étoile par noyau et par nombre d'éléments fusionnés (0, 1, 2, 3 ou plus)
+const STAR_TYPES = {
+  dust:   ['Naine brune', 'Naine rouge', 'Naine jaune', 'Géante jaune'],
+  plasma: ['Étoile bleue', 'Géante bleue', 'Supergéante bleue', 'Hypergéante'],
+  dark:   ['Étoile sombre', 'Naine noire', 'Quasi-étoile', 'Étoile primordiale'],
+  anti:   ['Étoile miroir', 'Étoile d\'antimatière', 'Kilonova', 'Blazar'],
+  neutro: ['Pulsar', 'Magnétar', 'Étoile à quarks', 'Étoile étrange'],
+};
+const USE_CAT = ENV.CAT !== '0';
+const CAT_BONUS = Number(ENV.CB || 1.05), CAT_LINE = Number(ENV.CL || 1.25);
+const starKey = r => `${r.core}:${Math.min(3, r.fused.length)}`;
+const starName = k => { const [c, b] = k.split(':'); return STAR_TYPES[c][Number(b)]; };
+const catalog = m => USE_CAT ? (m.catalog || []) : [];
+const lineDone = (m, core) => [0, 1, 2, 3].every(b => catalog(m).includes(`${core}:${b}`));
+const FINAL_CUT = Number(ENV.FC || 0.1);
+const objective = pal => OBJ0 * Math.pow(OBJ_FACTOR, pal) * (pal >= 6 ? FINAL_CUT : 1);
+const runFloor = pal => pal ? objective(pal) / OBJ_FACTOR : 10;
+const upCost = (m, up) => { const lo = runFloor(palier(m)), hi = objective(palier(m)); return lo * Math.pow(hi / lo, up.f); };
+const observeAt = m => { const lo = runFloor(palier(m)), hi = objective(palier(m)); return lo * Math.pow(hi / lo, 0.25); };
+const runSpeed = (m, r) => speedOf(palier(m)) * (hasUp(r, 'comp') ? 1.25 : 1);
+const speedOf = pal => Math.pow(SPEED_BASE, pal);
+const palier = m => m.pal || 0;
+const owned = m => m.ownedList || ['dust'];
+const hasLaw = (m, id) => (m.laws || []).includes(id);
+const lawPointsTotal = m => m.record < SING_MIN ? 0 : Math.max(0, Math.floor(Math.log10(m.record)) - 4);
+const lawPointsSpent = m => (m.laws || []).reduce((a, id) => a + ALL_LAWS.find(l => l.id === id).cost, 0);
+const maxFused = m => palier(m) >= 6 ? 4 : 3;
+function stabMax(m, r) {
+  let s = 4 + (r.lv.stab || 0);
+  if (hasLaw(m, 'S1')) s += 1; if (hasLaw(m, 'S2')) s += 1; if (hasLaw(m, 'S4')) s += 2;
+  if (m.challengesDone.includes('pure')) s += 1; if (m.challengesDone.includes('noecho')) s += 2;
+  if (r.challenge === 'unstable') s = Math.floor(s / 2);
+  return s;
+}
+const elInstab = (m, x) => (x === 'dark' && hasLaw(m, 'S3')) ? ELEMENTS.dark.instab - 2 : ELEMENTS[x].instab;
+function instab(m, r, fused = r.fused, core = r.core) {
+  let s = elInstab(m, core);
+  for (const x of fused) { s += elInstab(m, x); const re = REACTIONS[key(core, x)]; if (re && re.stab) s -= re.stab; }
+  return Math.max(0, s);
+}
+function newRun(m, challenge = null) {
+  const r = { t: 0, energy: 10, produced: 0, lv: { flux: 1 + (hasLaw(m, 'M2') ? 10 : 0), power: 0, syn: 0, stab: 0 },
+    core: owned(m).includes(m.core) ? m.core : 'dust', fused: [], spec: [], ups: [], challenge };
+  if (challenge === 'forced') r.core = 'dust';
+  if (instab(m, r, [], r.core) > stabMax(m, r)) r.core = 'dust';
+  return r;
+}
+const reactionsOf = r => r.fused.map(x => ({ k: key(r.core, x), ...REACTIONS[key(r.core, x)] }));
+function costPenalty(m, r) {
+  let p = 1;
+  if (r.core === 'anti') p *= 4; if (r.fused.includes('anti')) p *= 2;
+  if (p === 1) return 1;
+  const re = reactionsOf(r);
+  if (re.some(x => x.nopen)) return 1;
+  if (re.some(x => x.pen2)) p *= p;
+  if (re.some(x => x.halfpen)) p = p / 2;
+  if (m.challengesDone.includes('forced')) p = p / 2;
+  return Math.max(1, p);
+}
+const synCap = m => SYN_MAX + (m.challengesDone.includes('unstable') ? 4 : 0);
+function upgradeOpen(m, r, u) {
+  const p = palier(m);
+  if (u === 'syn' || u === 'spec') return p >= 2 && !(u === 'syn' && r.challenge === 'noecho');
+  if (u === 'stab') return p >= 4;
+  return true;
+}
+function cost(m, r, u) {
+  if (!upgradeOpen(m, r, u)) return Infinity;
+  const pen = costPenalty(m, r);
+  if (u === 'spec') return UPG.spec.cost * pen;
+  if (u === 'syn' && r.lv.syn >= synCap(m)) return Infinity;
+  if (u === 'power' && r.challenge === 'sober' && r.lv.power >= SOBER_POWER) return Infinity;
+  const lv = u === 'flux' ? r.lv.flux - 1 : r.lv[u];
+  return UPG[u].base * Math.pow(UPG[u].mul, lv) * pen * (u === 'power' && hasUp(r, 'cap') ? 0.5 : 1);
+}
+const heritage = m => m.record >= SING_MIN ? Math.pow(m.record / SING_MIN, HERITAGE) : 1;
+function breakdown(m, r) {
+  const c = { t: r.t, n: r.fused.length };
+  const re = reactionsOf(r);
+  const parts = [];
+  parts.push({ id: 'flux', label: 'Flux', v: r.lv.flux * (re.some(x => x.flux2) ? 2 : 1), base: true });
+  const fm = fluxMilestones(r.lv.flux); if (fm) parts.push({ id: 'fluxms', label: `Paliers de Flux (${fm})`, v: Math.pow(2, fm) });
+  if (hasUp(r, 'coils')) parts.push({ id: 'coils', label: 'Bobines supraconductrices', v: 2 });
+  parts.push({ id: 'power', label: 'Puissance', v: Math.pow(2, r.lv.power) });
+  const pm = powerMilestones(r.lv.power); if (pm) parts.push({ id: 'powms', label: `Paliers de Puissance (${pm})`, v: Math.pow(POWER_MS_MULT, pm) });
+  parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: CORE[r.core](c) * (hasUp(r, 'coreres') ? 1.5 : 1) * (lineDone(m, r.core) ? CAT_LINE : 1) });
+  for (const x of r.fused) parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné', v: FUSED[x](c) * (hasUp(r, 'catal') ? 1.25 : 1) });
+  const synK = 1 + 0.12 * r.lv.syn, resK = hasLaw(m, 'M4') ? 1.5 : 1;
+  const harmK = hasUp(r, 'harm') ? 1.5 : 1;
+  for (const x of re) { const v = x.f(c); if (v !== 1) parts.push({ id: 'r-' + x.k, label: x.name, v: 1 + (v - 1) * synK * resK * harmK, reaction: true }); }
+  const n = r.fused.length;
+  if (r.spec.includes('purity')) parts.push({ id: 'purity', label: 'Pureté', v: n <= 1 ? 3 : 1 });
+  if (r.spec.includes('catalysis')) parts.push({ id: 'catalysis', label: 'Catalyse', v: Math.pow(1.35, n) });
+  const cat = catalog(m).length; if (cat) parts.push({ id: 'catalog', label: `Catalogue stellaire (${cat})`, v: Math.pow(CAT_BONUS, cat) });
+  if (r.boostLeft > 0) parts.push({ id: 'comet', label: 'Queue de comète', v: 3 });
+  if (hasUp(r, 'over')) parts.push({ id: 'over', label: 'Surcharge', v: 3 });
+  if (hasUp(r, 'crit')) parts.push({ id: 'crit', label: 'Masse critique', v: 1 + 0.05 * Math.log10(Math.max(1, r.produced)) });
+  const h = heritage(m); if (h > 1) parts.push({ id: 'heritage', label: 'Héritage (record)', v: h });
+  let law = 1; if (hasLaw(m, 'M1')) law *= 2; if (hasLaw(m, 'M3')) law *= 3;
+  if (law > 1) parts.push({ id: 'laws', label: 'Lois', v: law });
+  return { parts, total: parts.reduce((a, p) => a * p.v, 1) };
+}
+const prod = (m, r) => breakdown(m, r).total;
+// Avance de dt secondes de jeu (pas d'intégration ≤ 1 s de jeu)
+function step(m, r, dt, maxH = 1) {
+  const n = Math.max(1, Math.ceil(dt / maxH)), h = dt / n; let g = 0;
+  for (let i = 0; i < n; i++) { const p0 = prod(m, r); r.t += h; g += (p0 + prod(m, r)) / 2 * h; }
+  r.energy += g; r.produced += g; return g;
+}
+const freshMeta = () => ({ catalog: [], bank: 0, comets: 0, cometIn: 180, pal: 0, ownedList: ['dust'], core: 'dust', record: 0, sings: 0, discovered: [], laws: [], challengesDone: [], chTargets: {}, won: false, totalTime: 0, best: 0 });
+if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starName, catalog, lineDone, observeAt, CAT_BONUS, CAT_LINE, RUN_UPS, hasUp, upCost, runSpeed, runFloor, fluxMilestones, nextFluxMilestone, powerMilestones, POWER_MS_STEP, POWER_MS_MULT, sat, ORDER, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, REACTIONS, UPG, SYN_MAX, SOBER_POWER, LAWS, ALL_LAWS, CHALLENGES, PALIERS, LAST_PAL, OBJ0, OBJ_FACTOR, SPEED_BASE, HERITAGE, SING_MIN, objective, speedOf, palier, owned, hasLaw, lawPointsTotal, lawPointsSpent, maxFused, stabMax, elInstab, instab, newRun, reactionsOf, costPenalty, synCap, upgradeOpen, cost, heritage, breakdown, prod, step, freshMeta, key };
+
+</script>
+<script>
+(() => {
+  const VERSION = 'singularity-v4';
+  const OFFLINE_CAP = 3600, BANK_CAP = 72 * 3600;
+  const EL_COLOR = { dust: '#e8dcc0', plasma: '#52e4f0', dark: '#9b6bff', anti: '#ff5fa2', neutro: '#b8c7ff' };
+  const $ = id => document.getElementById(id);
+  const h = (tag, attrs = {}, ...kids) => {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v === false || v == null) continue;
+      if (k === 'class') e.className = v; else if (k === 'style') e.setAttribute('style', v);
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+    }
+    for (const k of kids) if (k != null && k !== false) e.append(k);
+    return e;
+  };
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  };
+
+  // ---------- Nombres ----------
+  let notation = store.get(VERSION + '-notation') === 'suf' ? 'suf' : 'sci';
+  const nf0 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+  const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+  const nf2 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  const UNITS = ['', 'k', 'M', 'Md', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+  function sci(n) { const e = Math.floor(Math.log10(n)); let m = n / Math.pow(10, e); if (m >= 9.995) { m = 1; return nf2.format(m) + 'e' + (e + 1); } return nf2.format(m) + 'e' + e; }
+  function fmt(n) {
+    if (!isFinite(n)) return '∞';
+    if (n < 1000) return nf1.format(n);
+    if (notation === 'sci') return n < 1e6 ? nf0.format(n) : sci(n);
+    const e = Math.floor(Math.log10(n) / 3);
+    if (e < UNITS.length) return nf2.format(n / Math.pow(1000, e)) + ' ' + UNITS[e];
+    return sci(n);
+  }
+  function fmtT(sec) {
+    sec = Math.floor(sec);
+    const hh = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    return hh ? `${hh} h ${String(m).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  // ---------- État ----------
+  let meta = freshMeta();
+  let run = newRun(meta);
+  let testSpeed = 1;
+  const speed = () => runSpeed(meta, run);
+  function save() { store.set(VERSION, JSON.stringify({ meta, run, savedAt: Date.now() })); }
+  function load() {
+    try { const d = JSON.parse(store.get(VERSION) || 'null'); return d && d.meta && d.run && d.run.lv ? d : null; } catch (e) { return null; }
+  }
+
+  // ---------- Règles ----------
+  const P = () => prod(meta, run);
+  const isFinal = () => meta.pal >= LAST_PAL;
+  const fullFusion = () => run.fused.length === ORDER.length - 1;
+  const canSing = () => !run.challenge && run.produced >= objective(meta.pal) && (!isFinal() || fullFusion());
+  function buy(u, max) {
+    let n = 0;
+    while (true) {
+      const c = cost(meta, run, u);
+      if (!(run.energy >= c)) break;
+      run.energy -= c; run.lv[u]++; n++;
+      if (!max || n >= 3000) break;
+    }
+    return n;
+  }
+  function userBuy(u, max, el) {
+    const g = u === 'stab' ? '+1 stabilité' : gainOf({ ...run, lv: { ...run.lv, [u]: run.lv[u] + 1 } });
+    const n = buy(u, max); if (!n) return;
+    floatAt(el, max && n > 1 ? `+${n} niveaux` : g);
+    fx.pulse({ flux: '#52e4f0', power: '#9b6bff', syn: '#6ee7a8', stab: '#f2c46b' }[u], 0.8);
+    if (u === 'stab') { toast(`Stabilité : <b>${stabMax(meta, run)}</b>`, '#f2c46b'); structure(); }
+    refresh(true);
+  }
+  const ICONS = {
+    coils: '<path d="M3 12c0-4 3-4 3 0s3 4 3 0 3-4 3 0 3 4 3 0 3-4 3 0 3 4 3 0"/>',
+    cap: '<path d="M10 4v16M14 4v16M3 12h7M14 12h7"/>',
+    coreres: '<circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="9.5"/>',
+    catal: '<path d="M12 3l9 16H3z"/><circle cx="12" cy="13" r="2"/>',
+    harm: '<path d="M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3-5 5-5"/>',
+    comp: '<path d="M6 3h12M6 21h12M7 3c0 6 10 5 10 9s-10 3-10 9M17 3c0 6-10 5-10 9s10 3 10 9"/>',
+    over: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    crit: '<path d="M12 2v5M12 17v5M2 12h5M17 12h5M5 5l3.5 3.5M15.5 15.5L19 19M19 5l-3.5 3.5M8.5 15.5L5 19"/><circle cx="12" cy="12" r="2"/>',
+  };
+  function floatAt(el, text, color) {
+    if (!el || !text) return;
+    const r = el.getBoundingClientRect();
+    const s = h('span', { class: 'floatGain', style: `left:${r.left + r.width / 2}px;top:${r.top - 4}px;${color ? 'color:' + color : ''}` }, text);
+    document.body.append(s); setTimeout(() => s.remove(), 1200);
+  }
+  function buyUp(id, el) {
+    const up = RUN_UPS.find(x => x.id === id);
+    if (run.ups.includes(id) || !(run.energy >= upCost(meta, up))) return;
+    const g = id === 'cap' ? 'Puissance ÷2' : id === 'comp' ? 'Vitesse ×1,25' : gainOf({ ...run, ups: [...run.ups, id] });
+    run.energy -= upCost(meta, up); run.ups.push(id);
+    floatAt(el, g, '#b89bff');
+    fx.flash(up.name, '#9b6bff'); fx.pulse('#9b6bff', 1.4);
+    structure(); refresh(true);
+  }
+  function gainOf(mod) {
+    const now = P(); if (!(now > 0)) return '';
+    const g = prod(meta, mod) / now - 1;
+    return g > 0.0005 ? `+${g >= 10 ? fmt(g * 100) : g >= 1 ? nf0.format(g * 100) : nf1.format(g * 100)} %` : '';
+  }
+  function chooseSpec(kind) {
+    if (run.spec.includes(kind)) return;
+    const both = meta.challengesDone.includes('sober');
+    if (run.spec.length && !both) return;
+    const c = cost(meta, run, 'spec'); if (!(run.energy >= c)) return;
+    run.energy -= c; run.spec.push(kind);
+    fx.pulse('#ffffff', 1.2); structure(); refresh(true);
+  }
+  function canCore(x) {
+    if (!owned(meta).includes(x) || x === run.core) return false;
+    if (run.challenge === 'forced') return false;
+    if (meta.pal >= 1 && run.fused.length) return false;
+    return instab(meta, run, [], x) <= stabMax(meta, run);
+  }
+  function setCore(x) {
+    if (!canCore(x)) return;
+    run.core = x; meta.core = x;
+    fx.pulse(EL_COLOR[x], 1.2); structure(); refresh(true);
+  }
+  function canFuse(x) {
+    if (meta.pal < 1 || run.challenge === 'pure') return false;
+    if (x === run.core || run.fused.includes(x) || !owned(meta).includes(x)) return false;
+    if (run.fused.length >= maxFused(meta)) return false;
+    return instab(meta, run, [...run.fused, x]) <= stabMax(meta, run);
+  }
+  function fuse(x) {
+    if (!canFuse(x)) return;
+    run.fused.push(x);
+    const k = key(run.core, x), re = REACTIONS[k];
+    const isNew = !meta.discovered.includes(k);
+    if (isNew) meta.discovered.push(k);
+    fx.fuse(EL_COLOR[x], isNew);
+    toast(isNew ? `Réaction découverte : <b>${re.name}</b> · ${re.desc}` : `${ELEMENTS[x].name} fusionné · <b>${re.name}</b>`, EL_COLOR[x]);
+    structure(); refresh(true); save();
+  }
+  function unlockRun1() {
+    if (meta.pal > 0) return;
+    for (const [x, th] of Object.entries(RUN1_UNLOCK)) {
+      if (run.produced >= th && !meta.ownedList.includes(x)) {
+        meta.ownedList.push(x);
+        fx.unlock(EL_COLOR[x]);
+        toast(`Nouveau noyau : <b>${ELEMENTS[x].name}</b> · ${EL_FX[x].core} au noyau`, EL_COLOR[x]);
+        markTab('el'); structure();
+      }
+    }
+  }
+  let singArmed = false, singTimer = null;
+  function singularity(auto) {
+    if (!canSing()) return;
+    if (!auto && !singArmed) {
+      singArmed = true; $('singBtn').textContent = 'Confirmer la singularité';
+      singTimer = setTimeout(() => { singArmed = false; refresh(true); }, 3500); return;
+    }
+    clearTimeout(singTimer); singArmed = false;
+    meta.record = Math.max(meta.record, run.produced);
+    meta.best = Math.max(meta.best, P());
+    meta.sings++;
+    if (isFinal()) {
+      meta.won = true;
+      fx.singularity('Singularité ultime');
+      setTimeout(() => {
+        $('winText').textContent = `Les cinq éléments se sont effondrés en une seule singularité. ${meta.sings} singularités, ${fmtT(meta.totalTime)} de jeu, record ${fmt(meta.best)} /s.`;
+        $('win').hidden = false;
+      }, 900);
+      run = newRun(meta); structure(); refresh(true); save(); return;
+    }
+    meta.pal++;
+    for (const [k, ch] of Object.entries(CHALLENGES)) if (ch.tier === meta.pal) meta.chTargets[k] = meta.record * ch.rel;
+    run = newRun(meta);
+    const pal = PALIERS[meta.pal];
+    fx.singularity(`Palier ${meta.pal}`);
+    toast(`Palier ${meta.pal} · <b>${pal.name}</b> · ${pal.unlock}. Vitesse <b>×${speed()}</b>`, '#9b6bff');
+    if (meta.pal === 1) markTab('el');
+    if (meta.pal === 3) markTab('law');
+    if (meta.pal === 5) markTab('ch');
+    structure(); refresh(true); save();
+  }
+  function lawState(l) {
+    if (meta.laws.includes(l.id)) return 'have';
+    const br = LAWS[l.id[0]], i = br.findIndex(x => x.id === l.id);
+    if (i > 0 && !meta.laws.includes(br[i - 1].id)) return 'locked';
+    if (l.pal && meta.pal < l.pal) return 'locked';
+    return lawPointsTotal(meta) - lawPointsSpent(meta) >= l.cost ? 'can' : 'poor';
+  }
+  function buyLaw(id) {
+    const l = ALL_LAWS.find(x => x.id === id);
+    if (meta.pal < 3 || lawState(l) !== 'can') return;
+    meta.laws.push(id);
+    fx.pulse('#9b6bff', 1.1);
+    toast(`Loi acquise : <b>${l.name}</b> · ${l.desc}`, '#9b6bff');
+    structure(); refresh(true); save();
+  }
+  let respecArmed = false, respecTimer = null;
+  function respec() {
+    if (!meta.laws.length) return;
+    if (!respecArmed) { respecArmed = true; $('respecBtn').textContent = 'Confirmer'; respecTimer = setTimeout(() => { respecArmed = false; structure(); }, 3000); return; }
+    clearTimeout(respecTimer); respecArmed = false;
+    meta.laws = [];
+    if (instab(meta, run) > stabMax(meta, run)) toast('Ta fusion actuelle dépasse la stabilité : elle reste active jusqu\'à la prochaine singularité.', '#f2c46b');
+    structure(); refresh(true); save();
+  }
+  let chArmed = null, chTimer = null;
+  function startChallenge(k) {
+    if (meta.pal < CHALLENGES[k].tier || meta.challengesDone.includes(k) || run.challenge) return;
+    if (chArmed !== k) { chArmed = k; structure(); chTimer = setTimeout(() => { chArmed = null; structure(); }, 3500); return; }
+    clearTimeout(chTimer); chArmed = null;
+    run = newRun(meta, k);
+    fx.pulse('#f2c46b', 1.6);
+    toast(`Défi lancé : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].desc}`, '#f2c46b');
+    structure(); refresh(true); save();
+  }
+  function abandonChallenge() {
+    if (!run.challenge) return;
+    run = newRun(meta);
+    toast('Défi abandonné. Nouvelle run.', '#f2c46b');
+    structure(); refresh(true); save();
+  }
+  function checkChallenge() {
+    const k = run.challenge; if (!k) return;
+    if (run.produced >= meta.chTargets[k]) {
+      meta.challengesDone.push(k);
+      fx.singularity('Défi réussi');
+      toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}`, '#6ee7a8');
+      run = newRun(meta);
+      structure(); refresh(true); save();
+    }
+  }
+  function autos() {
+    if (hasLaw(meta, 'A1')) buy('flux', true);
+    if (hasLaw(meta, 'A2')) buy('power', true);
+    if (hasLaw(meta, 'A3')) { buy('syn', true); if (buy('stab', true)) structure(); }
+  }
+  function observeStar(quiet) {
+    if (run.challenge || run.produced < observeAt(meta)) return;
+    const k = starKey(run);
+    if (meta.catalog.includes(k)) return;
+    meta.catalog.push(k);
+    const [c] = k.split(':');
+    if (!quiet) { fx.flash(starName(k), EL_COLOR[c]); toast(`Nouvelle étoile cataloguée : <b>${starName(k)}</b> · production +5 %${lineDone(meta, c) ? ` · ligne ${ELEMENTS[c].name} complète, noyau ×1,25` : ''}`, EL_COLOR[c]); }
+    markTab('log'); if (!quiet) structure();
+  }
+  function tickComets(realDt) {
+    if (meta.comets >= 3) return;
+    meta.cometIn -= realDt;
+    while (meta.cometIn <= 0 && meta.comets < 3) { meta.comets++; meta.cometIn += 180 + Math.random() * 180; }
+    if (meta.comets >= 3) meta.cometIn = 180 + Math.random() * 180;
+  }
+  function captureComet() {
+    if (meta.comets <= 0) return;
+    meta.comets--;
+    const roll = Math.random();
+    if (roll < 0.4) { run.boostLeft = 60; toast('Comète capturée : <b>Queue de comète</b> · production ×3 pendant 60 s', '#9fe8ff'); }
+    else if (roll < 0.8) { const g = P() * speed() * 180; run.energy += g; run.produced += g; toast(`Comète capturée : <b>Salve d'énergie</b> · +${fmt(g)} (3 min de production)`, '#9fe8ff'); }
+    else { meta.bank = Math.min(BANK_CAP, meta.bank + 900); toast('Comète capturée : <b>Fragment de temps</b> · +15 min dans la réserve', '#9fe8ff'); }
+    fx.comet(); refresh(true); save();
+  }
+  let spending = false;
+  function spendBank(sec) {
+    if (spending || meta.bank < 1) return;
+    const total = Math.min(meta.bank, sec === 'all' ? meta.bank : Number(sec));
+    meta.bank -= total; spending = true;
+    const before = run.produced, pal0 = meta.pal; let left = total;
+    fx.warp(Math.min(4, 1 + total / 3600));
+    (function slice() {
+      const t0 = performance.now();
+      while (left > 0 && performance.now() - t0 < 30) { const s = Math.min(60, left); advance(s, 20); left -= s; }
+      $('bankValue').textContent = left > 0 ? `${fmtT(left)} restantes…` : fmtT(meta.bank);
+      if (left > 0) { setTimeout(slice, 0); return; }
+      spending = false;
+      toast(`<b>${fmtT(total)}</b> de temps dépensées · +${fmt(Math.max(0, run.produced - before))} d'énergie produite${meta.pal > pal0 ? ` · palier ${meta.pal} atteint` : ''}`, '#9b6bff');
+      structure(); refresh(true); save();
+    })();
+  }
+  $('bankBtns').addEventListener('click', e => { const b = e.target.closest('[data-bank]'); if (b) spendBank(b.dataset.bank); });
+  $('cometBtn').addEventListener('click', captureComet);
+  function advance(realDt, maxH) {
+    const g = realDt * speed();
+    meta.totalTime += realDt;
+    step(meta, run, g, maxH);
+    if (run.boostLeft > 0) run.boostLeft = Math.max(0, run.boostLeft - realDt);
+    tickComets(realDt);
+    observeStar(maxH > 1);
+    unlockRun1();
+    autos();
+    checkChallenge();
+    if (hasLaw(meta, 'A4') && !isFinal() && canSing()) singularity(true);
+  }
+
+  // ---------- Structure (reconstruite quand l'état change de forme) ----------
+  const UPG_ROWS = [
+    { u: 'flux', name: 'Flux', desc: 'Production de base +1 par niveau. Double aux paliers.', val: () => `niveau ${run.lv.flux} · prochain palier au niveau ${nextFluxMilestone(run.lv.flux)} (×2)` },
+    { u: 'power', name: 'Puissance', desc: `Production ×2 par niveau, et ×1,25 tous les ${POWER_MS_STEP} niveaux`, val: () => `niveau ${run.lv.power} · prochain palier au niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP}${run.challenge === 'sober' ? ` · limite ${SOBER_POWER}` : ''}` },
+    { u: 'syn', name: 'Synergie', desc: 'Effet des réactions +12 % par niveau', val: () => `+${run.lv.syn * 12} % · ${run.lv.syn} / ${synCap(meta)}` },
+    { u: 'stab', name: 'Stabilité', desc: 'Limite de stabilité +1 par niveau', val: () => `stabilité ${stabMax(meta, run)}` },
+  ];
+  const ui = { upg: {} };
+  function structure() {
+    // Améliorations
+    const sig = UPG_ROWS.filter(r => upgradeOpen(meta, run, r.u)).map(r => r.u).join();
+    const rows = $('upgRows');
+    if (sig !== ui.sig) { ui.sig = sig; rows.replaceChildren(); ui.upg = {}; }
+    for (const r of UPG_ROWS) {
+      if (!upgradeOpen(meta, run, r.u) || ui.upg[r.u]) continue;
+      const lvl = h('span', { class: 'val' });
+      const bar = (r.u === 'flux' || r.u === 'power') ? h('div', { class: 'msbar' }, h('i')) : null;
+      const buyBtn = h('button', { class: 'btn fill', type: 'button', onclick: e => userBuy(r.u, false, e.currentTarget) }, 'Acheter', h('small'));
+      const maxBtn = h('button', { class: 'btn', type: 'button', onclick: e => userBuy(r.u, true, e.currentTarget) }, 'Max');
+      rows.append(h('div', { class: 'upg' }, h('div', { class: 'info' }, h('b', {}, r.name), h('small', {}, r.desc), lvl, bar), h('div', { class: 'btns' }, buyBtn, maxBtn)));
+      ui.upg[r.u] = { lvl, buyBtn, cost: buyBtn.querySelector('small'), maxBtn, r, bar: bar && bar.firstChild };
+    }
+    // Améliorations de run
+    const ur = $('upsRows'); ur.replaceChildren(); ui.ups = {};
+    for (const up of RUN_UPS) {
+      const have = run.ups.includes(up.id);
+      const ic = h('span', { class: 'ic' }); ic.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[up.id]}</svg>`;
+      const cost = h('span', { class: 'cost' }, have ? 'Acquise' : '');
+      const b = h('button', { class: 'tile' + (have ? ' have' : ''), type: 'button', disabled: have, title: up.desc, onclick: e => buyUp(up.id, e.currentTarget) }, ic, h('b', {}, up.name), h('small', {}, up.desc), cost);
+      ur.append(b);
+      if (!have) ui.ups[up.id] = { b, small: cost, up };
+    }
+    $('upsHint').textContent = `${run.ups.length} / ${RUN_UPS.length} · rachetées à chaque run`;
+    // Spécialisation
+    $('specCard').hidden = meta.pal < 2;
+    const sb = $('specBtns'); sb.replaceChildren(); ui.spec = [];
+    if (meta.pal >= 2) {
+      const both = meta.challengesDone.includes('sober');
+      $('specHint').textContent = both ? 'Les deux sont possibles (Sobriété)' : 'Une seule par run';
+      const opts = [['purity', 'Pureté', '×3 si 1 élément fusionné au plus'], ['catalysis', 'Catalyse', '×1,35 par élément fusionné']];
+      for (const [k, name, d] of opts) {
+        if (run.spec.includes(k)) { sb.append(h('span', { class: 'small' }, h('b', {}, name), ` active · ${d}`)); continue; }
+        if (run.spec.length && !both) continue;
+        const b = h('button', { class: 'btn', type: 'button', onclick: () => chooseSpec(k) }, name, h('small', {}, d));
+        sb.append(b); ui.spec.push(b);
+      }
+    }
+    // Générateur et éléments
+    const gc = $('genCard'); gc.replaceChildren();
+    if (meta.pal === 0) {
+      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyaux'), h('span', { class: 'small' }, 'La fusion se débloque au palier 1')),
+        h('p', { class: 'small' }, 'Pendant cette première run, chaque nouvel élément se découvre en produisant de l\'énergie. Essaie-les au noyau, tu peux en changer à tout moment.'));
+    } else {
+      const used = instab(meta, run), max = stabMax(meta, run);
+      const gauge = h('div', { class: 'gauge' },
+        h('div', { class: 'row' }, h('span', {}, 'Stabilité utilisée'), h('b', {}, `${used} / ${max}`)),
+        h('div', { class: 'bar' }, h('i', { style: `width:${Math.min(100, used / max * 100)}%` })));
+      const orb = (x, cls, label) => h('div', { class: 'slot ' + cls }, h('div', { class: 'orb', style: x ? `--c:${EL_COLOR[x]}` : '' }, x ? ELEMENTS[x].short : ''), h('small', {}, label));
+      const slots = h('div', { class: 'slots' }, orb(run.core, 'core', 'Noyau'));
+      for (let i = 0; i < maxFused(meta); i++) { slots.append(h('span', { class: 'plus' }, '+')); const x = run.fused[i]; slots.append(x ? orb(x, '', 'Fusionné') : orb(null, 'free', 'Libre')); }
+      const anyFuse = ORDER.some(x => canFuse(x));
+      const hint = !anyFuse && !run.fused.length && run.challenge !== 'pure' ? h('p', { class: 'small', style: 'color:var(--warn)' }, 'Aucun élément ne tient dans ta stabilité avec ce noyau. Essaie un noyau moins instable, ou augmente ta stabilité.') : null;
+      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Le cœur de l\'étoile'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} fusions`)), gauge, slots, ...(hint ? [hint] : []),
+        h('p', { class: 'small' }, run.challenge === 'pure' ? 'Défi Pur : aucune fusion possible.' : 'Le noyau compte dans la stabilité. Il se change tant que rien n\'est fusionné. Une fusion dure jusqu\'à la prochaine singularité.'));
+    }
+    const els = $('els'); els.replaceChildren();
+    for (const x of ORDER) {
+      const own = owned(meta).includes(x);
+      if (!own) {
+        els.append(h('div', { class: 'el lockedEl' }, h('div', { class: 'orb' }, '?'),
+          h('div', { class: 'body' }, h('b', {}, 'Élément inconnu'), h('span', { class: 'small' }, meta.pal === 0 ? `Apparaît à ${fmt(RUN1_UNLOCK[x])} d'énergie produite` : ''))));
+        continue;
+      }
+      const isCore = run.core === x, isFused = run.fused.includes(x);
+      const actions = h('div', { class: 'btns' });
+      if (!isCore && !isFused) {
+        if (meta.pal >= 1) {
+          const after = instab(meta, run, [...run.fused, x]), max = stabMax(meta, run);
+          const why = run.challenge === 'pure' ? 'Défi Pur' : run.fused.length >= maxFused(meta) ? 'Plus de place' : after > max ? `Stabilité ${after} / ${max}` : `Stabilité ${after} / ${max}`;
+          actions.append(h('button', { class: 'btn' + (canFuse(x) ? ' ok' : ''), type: 'button', disabled: !canFuse(x), onclick: () => fuse(x) }, 'Fusionner', h('small', {}, why)));
+        }
+        actions.append(h('button', { class: 'btn' + (meta.pal === 0 && canCore(x) ? ' ok' : ''), type: 'button', disabled: !canCore(x), onclick: () => setCore(x) }, 'Mettre au noyau'));
+      }
+      const fxRows = [h('span', {}, 'Au noyau'), h('span', {}, EL_FX[x].core), h('span', {}, 'Fusionné'), h('span', {}, meta.pal >= 1 ? EL_FX[x].fused : '—'), h('span', {}, 'Instabilité'), h('span', {}, String(elInstab(meta, x)))];
+      if (!isCore && meta.pal >= 1) {
+        const k = key(run.core, x), known = meta.discovered.includes(k);
+        fxRows.push(h('span', {}, 'Avec le noyau'), h('span', {}, known ? `${REACTIONS[k].name} · ${REACTIONS[k].desc}` : '? Réaction inconnue'));
+      }
+      els.append(h('div', { class: 'el', style: `--c:${EL_COLOR[x]}` }, h('div', { class: 'orb' }, ELEMENTS[x].short),
+        h('div', { class: 'body' },
+          h('div', { class: 'title' }, h('b', {}, ELEMENTS[x].name), h('span', { class: 'tag' }, ELEMENTS[x].trait)),
+          h('div', { class: 'fx' }, ...fxRows),
+          isCore ? h('span', { class: 'state' }, 'Au noyau') : isFused ? h('span', { class: 'state' }, 'Fusionné jusqu\'à la prochaine singularité') : null,
+          actions.childNodes.length ? actions : null)));
+    }
+    // Lois
+    const pl = $('p-law'); pl.replaceChildren();
+    if (meta.pal < 3) pl.append(lockCard(3));
+    else {
+      const tot = lawPointsTotal(meta), free = tot - lawPointsSpent(meta);
+      const nextAt = Math.pow(10, Math.floor(Math.log10(Math.max(meta.record, 1))) + 1);
+      const branches = h('div', { class: 'branches' });
+      for (const [b, title] of [['M', 'Matière'], ['S', 'Stabilité'], ['A', 'Automatisation']]) {
+        const col = h('div', { class: 'branch' }, h('h3', {}, title));
+        for (const l of LAWS[b]) {
+          const st = lawState(l);
+          col.append(h('button', { class: 'law ' + st, type: 'button', disabled: st !== 'can', onclick: () => buyLaw(l.id) },
+            h('b', {}, l.name), h('span', {}, l.desc),
+            h('span', { class: 'c' }, st === 'have' ? 'Acquise' : l.pal && meta.pal < l.pal ? `Palier ${l.pal}` : `${l.cost} point${l.cost > 1 ? 's' : ''}`)));
+        }
+        branches.append(col);
+      }
+      pl.append(h('div', { class: 'card' },
+        h('div', { class: 'head' }, h('h2', {}, 'Lois permanentes'), h('span', { class: 'small' }, h('b', { class: 'mono' }, `${free} libre${free > 1 ? 's' : ''}`), ` sur ${tot}`)),
+        h('p', { class: 'small' }, `Tes points dépendent de ton record : un point de plus à chaque puissance de 10. Prochain point quand une run se termine au-delà de ${fmt(nextAt)}. Les lois s'achètent dans l'ordre de chaque branche.`),
+        branches,
+        h('div', { class: 'btns' }, h('button', { class: 'btn', type: 'button', id: 'respecBtn', disabled: !meta.laws.length, onclick: respec }, 'Redistribuer tous les points'))));
+    }
+    // Défis
+    const pc = $('p-ch'); pc.replaceChildren();
+    if (meta.pal < 5) pc.append(lockCard(5));
+    else {
+      const list = h('div', { class: 'els' });
+      for (const [k, ch] of Object.entries(CHALLENGES)) {
+        const done = meta.challengesDone.includes(k), active = run.challenge === k, locked = meta.pal < ch.tier;
+        const st = done ? ['done', 'Réussi'] : active ? ['run', 'En cours'] : locked ? ['lock', `Palier ${ch.tier}`] : ['', 'Disponible'];
+        const btn = !done && !active && !locked ? h('button', { class: 'btn' + (chArmed === k ? ' ok' : ''), type: 'button', disabled: !!run.challenge, onclick: () => startChallenge(k) }, chArmed === k ? 'Confirmer : la run actuelle sera perdue' : 'Lancer le défi') : null;
+        list.append(h('div', { class: 'chal' },
+          h('div', { class: 'top' }, h('b', {}, ch.name), h('span', { class: 'st ' + st[0] }, st[1])),
+          h('div', { class: 'fx' }, h('span', {}, 'Contrainte'), h('span', {}, ch.desc), h('span', {}, 'Objectif'), h('span', {}, locked ? 'Fixé au déblocage' : `${fmt(meta.chTargets[k])} d'énergie produite`), h('span', {}, 'Récompense'), h('span', {}, ch.reward)),
+          btn));
+      }
+      pc.append(h('div', { class: 'card' }, h('div', { class: 'head' }, h('h2', {}, 'Défis'), h('span', { class: 'small' }, 'Lancer un défi remplace la run en cours')), list));
+    }
+    // Catalogue
+    const cat = $('cat'); cat.replaceChildren();
+    for (const c of ORDER) {
+      const line = h('div', { class: 'line' + (lineDone(meta, c) ? ' done' : ''), style: `--c:${EL_COLOR[c]}` }, h('div', { class: 'orb' }, ELEMENTS[c].short));
+      [0, 1, 2, 3].forEach(b => {
+        const k = `${c}:${b}`, found = meta.catalog.includes(k);
+        line.append(h('div', { class: 'star' + (found ? ' found' : ' unk') }, h('b', {}, found ? STAR_TYPES[c][b] : '?'), h('span', {}, `${b === 3 ? '3+' : b} fusion${b > 1 ? 's' : ''}`)));
+      });
+      cat.append(line);
+    }
+    $('catCount').textContent = `${meta.catalog.length} / 20 · production ×${fmt(Math.pow(CAT_BONUS, meta.catalog.length))}`;
+    // Journal
+    const pals = $('pals'); pals.replaceChildren();
+    for (const p of PALIERS) pals.append(h('div', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '' }, h('span', {}, String(p.n)), h('span', {}, h('b', {}, p.name), h('br'), h('small', {}, `${p.unlock} · vitesse ×${speedOf(p.n)}`))));
+    const rx = $('rx'); rx.replaceChildren();
+    const ks = Object.keys(REACTIONS);
+    for (const k of ks) {
+      const [a, b] = k.split('+'), known = meta.discovered.includes(k);
+      rx.append(h('div', { class: 'r' + (known ? '' : ' unk') }, h('b', {}, known ? REACTIONS[k].name : '???'), h('span', { class: 'pair' }, `${ELEMENTS[a].name} + ${ELEMENTS[b].name}`), known ? h('span', {}, REACTIONS[k].desc) : null));
+    }
+    $('rxCount').textContent = `${meta.discovered.length} / ${ks.length} découvertes`;
+    // Onglets verrouillés
+    $('t-law').classList.toggle('locked', meta.pal < 3);
+    $('t-ch').classList.toggle('locked', meta.pal < 5);
+    // Piste des paliers
+    const tr = $('track'); tr.replaceChildren();
+    for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
+    const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
+    $('palNow').replaceChildren(h('b', {}, `Palier ${meta.pal} · ${cur.name}`), ` · vitesse ×${speed()}`);
+    $('palNext').textContent = nxt ? `Prochain palier : ${nxt.name} (${nxt.unlock.toLowerCase()}), vitesse ×${speedOf(nxt.n)}` : 'Dernier palier : fusionne les cinq éléments et atteins l\'objectif pour la singularité ultime.';
+  }
+  function lockCard(n) {
+    return h('div', { class: 'card lock' }, h('b', {}, `Palier ${n} · ${PALIERS[n].name}`), h('span', {}, `Se débloque en atteignant le palier ${n}. Il te reste ${n - meta.pal} singularité${n - meta.pal > 1 ? 's' : ''}.`));
+  }
+
+  // ---------- Rafraîchissement (textes et états) ----------
+  let msRun = null, msF = 0, msP = 0;
+  function setBtn(b, ok) { b.disabled = !ok; b.classList.toggle('ok', ok); }
+  const fillPct = (have, need) => (need > 0 && isFinite(need) ? Math.max(0, Math.min(100, have / need * 100)) : 0).toFixed(1) + '%';
+  let lastExp = 0;
+  function refresh(full) {
+    const p = P();
+    const cb = $('cometBtn'); cb.hidden = meta.comets <= 0; if (meta.comets > 0) cb.textContent = `Capturer la comète${meta.comets > 1 ? ` (${meta.comets})` : ''}`;
+    const bc = $('boostChip'); bc.hidden = !(run.boostLeft > 0); if (run.boostLeft > 0) bc.textContent = `Comète ×3 · ${Math.ceil(run.boostLeft)} s`;
+    $('bankBox').hidden = meta.bank < 60 && !spending;
+    if (!spending) $('bankValue').textContent = fmtT(meta.bank);
+    $('bankBtns').querySelectorAll('button').forEach(b => b.disabled = spending || meta.bank < 1);
+    $('energy').textContent = fmt(run.energy);
+    const ex = Math.floor(Math.log10(Math.max(1, run.energy)));
+    if (ex > lastExp) { const e = $('energy'); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
+    lastExp = ex;
+    $('rate').textContent = fmt(p) + ' /s';
+    $('hPal').textContent = `${meta.pal} / ${LAST_PAL}`;
+    $('hSpeed').textContent = `×${fmt(speed())}${testSpeed > 1 ? ` (test ×${testSpeed})` : ''}`;
+    $('hSing').textContent = meta.sings;
+    $('hTime').textContent = fmtT(run.t / speed());
+    for (const k in ui.upg) {
+      const o = ui.upg[k], c = cost(meta, run, k);
+      o.lvl.textContent = o.r.val();
+      if (!isFinite(c)) { o.cost.textContent = 'max'; setBtn(o.buyBtn, false); o.maxBtn.disabled = true; continue; }
+      const ok = run.energy >= c;
+      const g = k === 'stab' ? '+1 stabilité' : gainOf({ ...run, lv: { ...run.lv, [k]: run.lv[k] + 1 } });
+      o.cost.textContent = fmt(c) + (g ? ' · ' + g : ''); setBtn(o.buyBtn, ok); o.maxBtn.disabled = !ok;
+      o.buyBtn.style.setProperty('--p', fillPct(run.energy, c));
+      if (o.bar) {
+        let lo, hi, l;
+        if (k === 'flux') { l = run.lv.flux; hi = nextFluxMilestone(l); lo = [0, 10, 25, 50, 100].filter(x => x <= l).pop(); if (l >= 100) lo = hi - 50; }
+        else { l = run.lv.power; lo = Math.floor(l / POWER_MS_STEP) * POWER_MS_STEP; hi = lo + POWER_MS_STEP; }
+        o.bar.style.width = Math.max(0, Math.min(100, (l - lo) / (hi - lo) * 100)) + '%';
+      }
+    }
+    for (const id in ui.ups) {
+      const o = ui.ups[id], c = upCost(meta, o.up), ok = run.energy >= c;
+      const g = id === 'cap' ? 'Puissance ÷2' : id === 'comp' ? 'vitesse ×1,25' : gainOf({ ...run, ups: [...run.ups, id] });
+      o.small.textContent = fmt(c) + (g ? ' · ' + g : '');
+      o.b.disabled = !ok; o.b.classList.toggle('ok', ok); o.b.style.setProperty('--p', fillPct(run.energy, c));
+    }
+    if (run !== msRun) { msRun = run; msF = fluxMilestones(run.lv.flux); msP = powerMilestones(run.lv.power); }
+    const nf = fluxMilestones(run.lv.flux), np = powerMilestones(run.lv.power);
+    if (nf > msF) fx.flash('Flux ×2', '#52e4f0'); if (np > msP) fx.flash('Puissance ×1,25', '#9b6bff');
+    msF = nf; msP = np;
+    if (ui.spec) { const ok = run.energy >= cost(meta, run, 'spec'); ui.spec.forEach(b => { setBtn(b, ok); b.title = 'Coût : ' + fmt(cost(meta, run, 'spec')); }); }
+    // Objectif
+    const box = $('objBox');
+    const logp = v => Math.log10(Math.max(1, v));
+    if (run.challenge) {
+      const ch = CHALLENGES[run.challenge], tg = meta.chTargets[run.challenge];
+      box.classList.add('challenge');
+      $('objLabel').textContent = `Défi ${ch.name} · ${ch.desc}`;
+      $('objValue').textContent = `${fmt(run.produced)} / ${fmt(tg)}`;
+      $('objBar').style.width = Math.max(0, Math.min(1, logp(run.produced) / logp(tg))) * 100 + '%';
+      $('objNote').textContent = `Récompense : ${ch.reward}`;
+      $('singBtn').hidden = true; $('abandonBtn').hidden = false;
+    } else {
+      box.classList.remove('challenge');
+      const obj = objective(meta.pal), lo = runFloor(meta.pal);
+      $('objLabel').textContent = isFinal() ? 'Objectif final' : 'Objectif de la run';
+      $('objValue').textContent = `${fmt(run.produced)} / ${fmt(obj)} produits`;
+      $('objBar').style.width = Math.max(0, Math.min(1, (logp(run.produced) - logp(lo)) / (logp(obj) - logp(lo)))) * 100 + '%';
+      let note = '';
+      if (meta.pal === 0) { const nx = ORDER.find(x => !meta.ownedList.includes(x)); note = nx ? `Prochain noyau : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} produits.` : 'Tous les noyaux sont découverts.'; }
+      else if (isFinal() && !fullFusion()) note = 'La singularité ultime demande les cinq éléments dans le générateur.';
+      else if (run.produced >= obj) note = `Plus tu attends, plus ton record monte : héritage et points de loi plus élevés.`;
+      $('objNote').textContent = note;
+      const sb = $('singBtn'); sb.hidden = false; $('abandonBtn').hidden = true;
+      const ok = canSing(); setBtn(sb, ok); sb.classList.add('fill');
+      sb.style.setProperty('--p', (Math.max(0, Math.min(1, (logp(run.produced) - logp(lo)) / (logp(obj) - logp(lo)))) * 100).toFixed(1) + '%');
+      if (!singArmed) sb.textContent = ok ? (isFinal() ? 'Déclencher la singularité ultime' : `Singularité → palier ${meta.pal + 1} · ${PALIERS[meta.pal + 1].name}`) : 'Singularité : objectif non atteint';
+    }
+    if (full || $('bdDetails').open) {
+      const bd = breakdown(meta, run), pen = costPenalty(meta, run);
+      $('breakdown').replaceChildren(...bd.parts.map(x => h('div', { class: x.reaction ? 're' : '' }, h('span', {}, x.label), h('span', {}, x.base ? fmt(x.v) + ' /s' : '×' + fmt(x.v)))),
+        ...(speed() > 1 ? [h('div', {}, h('span', {}, 'Vitesse du temps'), h('span', {}, '×' + fmt(speed()) + ' (tout avance plus vite)'))] : []),
+        ...(pen > 1 ? [h('div', {}, h('span', {}, 'Pénalité de coût (Antimatière)'), h('span', {}, '×' + fmt(pen)))] : []),
+        h('div', { class: 'tot' }, h('span', {}, 'Production'), h('span', {}, fmt(bd.total) + ' /s')));
+    }
+    if (full) {
+      const st = [['Temps de jeu', fmtT(meta.totalTime)], ['Singularités', String(meta.sings)], ['Record d\'énergie produite', meta.record ? fmt(meta.record) : '—'], ['Héritage', '×' + fmt(heritage(meta))], ['Défis réussis', `${meta.challengesDone.length} / 5`], ['Meilleure production', fmt(Math.max(meta.best, p)) + ' /s']];
+      $('stats').replaceChildren(...st.map(([k, v]) => h('div', {}, h('span', { class: 'label' }, k), h('b', {}, v))));
+    }
+  }
+
+  // ---------- Onglets, toasts ----------
+  function selectTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+    ['gen', 'el', 'law', 'ch', 'log'].forEach(x => $('p-' + x).hidden = x !== id);
+    $('t-' + id).querySelector('.ping')?.remove();
+    store.set(VERSION + '-tab', id);
+  }
+  function markTab(id) { if ($('p-' + id).hidden && !$('t-' + id).querySelector('.ping')) $('t-' + id).append(h('span', { class: 'ping' })); }
+  document.querySelector('.tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) selectTab(t.dataset.tab); });
+  function toast(html, color) {
+    const t = h('div', { class: 'toast', style: color ? `--c:${color}` : null }); t.innerHTML = html;
+    const box = $('toasts'); box.append(t);
+    while (box.children.length > 3) box.firstChild.remove();
+    setTimeout(() => t.remove(), 5000);
+  }
+
+  // ---------- Le générateur (canvas) ----------
+  // Chaque palier ajoute une couche : 1 arcs vers les éléments, 2 flux de matière, 3 disque d'accrétion,
+  // 4 bouclier de stabilité, 5 jets polaires, 6 horizon des événements (trou noir à la fin).
+  const PAL_ACCENT = ['#52e4f0', '#52e4f0', '#6ee7a8', '#9b6bff', '#f2c46b', '#ff5fa2', '#ffffff'];
+  const fx = (() => {
+    const cv = $('gen'), ctx = cv.getContext('2d');
+    const bg = $('bg'), bx = bg.getContext('2d');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let W = 400, BW = 0, BH = 0;
+    const TAU = Math.PI * 2;
+    const rings = [{ r: 0.24, k: 1.8, b: 0.6, a: 0 }, { r: 0.335, k: 0.9, b: 0.4, a: 2.1 }, { r: 0.43, k: 0.62, b: 0.25, a: 4.2 }];
+    const TRAIL = 0.33, waves = [], sparks = [], flashes = [], floats = [], inflow = [];
+    let motesA = 0, lastTier = null, fullCount = 0, last = performance.now(), t0 = last;
+    let diskA = 0, shieldA = 0, floatT = 0, arcT = 0, arcs = [], primed = false, warpT = 0, warpK = 1, cometPos = [];
+    const nebula = Array.from({ length: 7 }, (_, i) => ({ a: i * 0.9, r: 0.12 + Math.random() * 0.2, s: 0.18 + Math.random() * 0.14, col: ['#e8dcc0', '#9b6bff', '#52e4f0', '#ff5fa2'][i % 4], v: 0.03 + Math.random() * 0.05 }));
+    const stars = Array.from({ length: 170 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
+    const diskStreaks = Array.from({ length: 46 }, () => ({ r: Math.random(), len: 0.25 + Math.random() * 0.9, off: Math.random() * TAU, w: 0.6 + Math.random() * 1.4 }));
+    function resize() {
+      const w = cv.parentElement.getBoundingClientRect().width, dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(200, w); cv.width = W * dpr; cv.height = W * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function resizeBg() {
+      const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+      BW = window.innerWidth; BH = window.innerHeight; bg.width = BW * dpr; bg.height = BH * dpr; bx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    new ResizeObserver(resize).observe(cv.parentElement); resize();
+    window.addEventListener('resize', resizeBg); resizeBg();
+    const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, a))})`; };
+    const ringColor = i => run.fused[i] ? EL_COLOR[run.fused[i]] : ['#52e4f0', '#9b6bff', '#e9edf8'][i];
+    const pal = () => meta.won ? 7 : meta.pal;
+    const pulse = (color, s = 1) => waves.push({ t: 0, color, s });
+    function burst(color, nb) { for (let i = 0; i < nb; i++) sparks.push({ a: Math.random() * TAU, d: 0.45 + Math.random() * 0.1, v: 0.5 + Math.random() * 0.8, color, life: 1 }); }
+    function fuse(color, isNew) { waves.push({ t: 0, color, s: 1.6 }); burst(color, isNew ? 90 : 40); if (isNew) flashes.push({ t: 0, text: 'Réaction découverte', color }); }
+    function unlock(color) { waves.push({ t: 0, color, s: 1.8 }); burst(color, 70); flashes.push({ t: 0, text: 'Nouveau noyau', color }); }
+    function singularity(text) { for (let i = 0; i < 5; i++) waves.push({ t: -i * 0.14, color: '#ffffff', s: 2.2 }); burst('#ffffff', 160); flashes.push({ t: 0, text, color: '#ffffff' }); lastTier = null; fullCount = 0; inflow.length = 0; }
+    function warp(k) { warpT = 1.6; warpK = k; for (let i = 0; i < 3; i++) waves.push({ t: -i * 0.12, color: '#9b6bff', s: 1.6 }); }
+    function comet() { burst('#9fe8ff', 60); waves.push({ t: 0, color: '#9fe8ff', s: 1.4 }); flashes.push({ t: 0, text: 'Comète capturée', color: '#9fe8ff' }); }
+    function hitComet(e) {
+      const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * W / r.height;
+      return cometPos.some(([cx, cy]) => Math.hypot(cx - x, cy - y) < W * 0.07);
+    }
+    function flash(text, color) { flashes.push({ t: 0, text, color }); waves.push({ t: 0, color, s: 1 }); }
+
+    // --- Fond : champ d'étoiles qui s'étire avec la vitesse du temps ---
+    function drawStars(dt) {
+      bx.clearRect(0, 0, BW, BH);
+      if (warpT > 0) warpT -= dt;
+      const sp = speed(), v = (0.02 + 0.055 * Math.log2(1 + sp)) * (reduce ? 0 : 1) * (warpT > 0 ? 1 + 7 * warpK * Math.min(1, warpT) : 1);
+      const f = Math.max(BW, BH) * 0.55, cx = BW * 0.5, cy = BH * 0.42;
+      const acc = PAL_ACCENT[Math.min(6, meta.pal)];
+      for (const s of stars) {
+        const pz = s.z; s.z -= v * dt;
+        if (s.z <= 0.03) { s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; s.z = 1; continue; }
+        const x = cx + s.x / s.z * f, y = cy + s.y / s.z * f;
+        if (x < -20 || x > BW + 20 || y < -20 || y > BH + 20) { s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; s.z = 1; continue; }
+        const tail = Math.min(1, pz + v * 0.12 * (1 + sp / 24));
+        const x0 = cx + s.x / tail * f, y0 = cy + s.y / tail * f;
+        const b = Math.min(1, (1 - s.z) * 1.2);
+        bx.strokeStyle = rgba(s.z < 0.35 ? '#ffffff' : acc, b * 0.4);
+        bx.lineWidth = 0.6 + (1 - s.z) * 1.4;
+        bx.beginPath(); bx.moveTo(x0, y0); bx.lineTo(x, y); bx.stroke();
+      }
+    }
+    // --- Disque d'accrétion (palier 3+), dessiné en deux moitiés pour passer devant et derrière le cœur ---
+    function drawDisk(c, cr, front, col) {
+      const R0 = cr * 1.35, R1 = W * 0.47;
+      ctx.save(); ctx.translate(c, c); ctx.rotate(-0.36); ctx.scale(1, 0.28);
+      ctx.beginPath(); front ? ctx.rect(-R1, 0, 2 * R1, R1) : ctx.rect(-R1, -R1, 2 * R1, R1); ctx.clip();
+      const g = ctx.createRadialGradient(0, 0, R0, 0, 0, R1);
+      g.addColorStop(0, rgba('#fff1d6', front ? 0.55 : 0.4)); g.addColorStop(0.25, rgba('#ffb36b', 0.32)); g.addColorStop(0.6, rgba(col, 0.16)); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R1, 0, TAU); ctx.arc(0, 0, R0, 0, TAU, true); ctx.fill();
+      ctx.globalCompositeOperation = 'lighter';
+      for (const s of diskStreaks) {
+        const r = R0 + (R1 - R0) * s.r, kep = Math.pow(R0 / r, 1.5);
+        const a = s.off + diskA * kep * 3;
+        ctx.strokeStyle = rgba(s.r < 0.35 ? '#fff1d6' : '#ffb36b', 0.5 * (1 - s.r));
+        ctx.lineWidth = s.w * 3;
+        ctx.beginPath(); ctx.arc(0, 0, r, a, a + s.len); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // --- Bouclier de stabilité (palier 4+) : un segment par point de stabilité, allumé s'il est utilisé ---
+    function drawShield(c) {
+      const max = stabMax(meta, run), used = Math.min(max, instab(meta, run)), R = W * 0.468;
+      const seg = TAU / max;
+      ctx.save(); ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+      for (let i = 0; i < max; i++) {
+        const a = shieldA + i * seg;
+        ctx.strokeStyle = i < used ? rgba('#f2c46b', 0.55) : 'rgba(120,135,180,0.14)';
+        ctx.beginPath(); ctx.arc(c, c, R, a + seg * 0.12, a + seg * 0.88); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // --- Jets polaires (palier 5+) ---
+    function drawJets(c, cr, time, col) {
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(c, c); ctx.rotate(-0.36);
+      for (const dir of [-1, 1]) {
+        const len = W * (0.44 + 0.03 * Math.sin(time * 7 + dir)), wd = cr * (0.22 + 0.04 * Math.sin(time * 11 + dir * 2));
+        const g = ctx.createLinearGradient(0, 0, 0, dir * len);
+        g.addColorStop(0, rgba('#ffffff', 0.6)); g.addColorStop(0.25, rgba(col, 0.32)); g.addColorStop(1, rgba(col, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(-wd, 0); ctx.lineTo(wd, 0); ctx.lineTo(wd * 0.15, dir * len); ctx.lineTo(-wd * 0.15, dir * len); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function frame(now) {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const time = (now - t0) / 1000, p = P(), L = Math.log10(1 + p), c = W / 2, pl = pal();
+      const vis = 1 + 0.12 * meta.pal;
+      drawStars(dt);
+      ctx.clearRect(0, 0, W, W);
+      const coreCol = EL_COLOR[run.core], acc = PAL_ACCENT[Math.min(6, meta.pal)];
+      // voile sombre : les étoiles passent derrière le générateur sans le traverser
+      const veil = ctx.createRadialGradient(c, c, W * 0.2, c, c, W * 0.5);
+      veil.addColorStop(0, 'rgba(5,7,14,0.92)'); veil.addColorStop(0.75, 'rgba(5,7,14,0.6)'); veil.addColorStop(1, 'rgba(5,7,14,0)');
+      ctx.fillStyle = veil; ctx.fillRect(0, 0, W, W);
+      // halo
+      const halo = ctx.createRadialGradient(c, c, 0, c, c, W * 0.5);
+      halo.addColorStop(0, rgba(coreCol, 0.12 + Math.min(0.2, L * 0.005))); halo.addColorStop(0.6, rgba(acc, 0.04)); halo.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = halo; ctx.fillRect(0, 0, W, W);
+      if (pl <= 1) {
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (const n of nebula) {
+          if (!reduce) n.a += dt * n.v;
+          const x = c + Math.cos(n.a) * n.r * W, y = c + Math.sin(n.a * 1.3) * n.r * W * 0.7, R = n.s * W;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, R);
+          g.addColorStop(0, rgba(n.col, pl === 0 ? 0.16 : 0.08)); g.addColorStop(1, rgba(n.col, 0));
+          ctx.fillStyle = g; ctx.fillRect(x - R, y - R, 2 * R, 2 * R);
+        }
+        ctx.restore();
+      }
+      const beat = 1 + 0.035 * Math.sin(time * (2 + Math.min(10, L * 0.3)));
+      const cr = W * (0.08 + Math.min(0.03, L * 0.0009)) * beat * (pl === 5 ? 0.6 : pl === 0 ? 0.8 : 1);
+      if (!reduce) { diskA += dt * (0.4 + 0.05 * L) * vis; shieldA += dt * 0.12; motesA += dt * (0.8 + 0.06 * L) * vis; }
+      if (pl >= 3) drawDisk(c, cr, false, coreCol);
+      // anneaux
+      let full = 0;
+      rings.forEach((g, i) => {
+        const w = (g.b + g.k * L / 1.3) * vis;
+        if (!reduce) g.a += w * dt;
+        const R = g.r * W, col = ringColor(i), trail = Math.min(TAU, w * TRAIL);
+        const soft = pl >= 3 ? 0.5 : 1;
+        ctx.lineWidth = (3 + i * 0.5) * (pl >= 3 ? 0.55 : 1); ctx.strokeStyle = 'rgba(120,135,180,0.12)';
+        ctx.beginPath(); ctx.arc(c, c, R, 0, TAU); ctx.stroke();
+        if (trail >= TAU - 1e-6) {
+          full++;
+          const pul = 0.75 + 0.25 * Math.sin(time * 4 + i);
+          ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 18 * soft; ctx.strokeStyle = rgba(col, 0.85 * pul * soft); ctx.lineWidth = (4 + i * 0.5) * (pl >= 3 ? 0.55 : 1);
+          ctx.beginPath(); ctx.arc(c, c, R, 0, TAU); ctx.stroke(); ctx.restore();
+        } else {
+          const N = 28;
+          for (let s = 0; s < N; s++) { ctx.strokeStyle = rgba(col, 0.9 * soft * Math.pow(1 - s / N, 1.6)); ctx.beginPath(); ctx.arc(c, c, R, g.a - trail * (s + 1) / N, g.a - trail * s / N); ctx.stroke(); }
+          ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.fillStyle = '#ffffff';
+          ctx.beginPath(); ctx.arc(c + Math.cos(g.a) * R, c + Math.sin(g.a) * R, 3.5 + i * 0.4, 0, TAU); ctx.fill(); ctx.restore();
+        }
+      });
+      if (!primed) { primed = true; fullCount = full; }
+      if (full > fullCount) for (let i = fullCount; i < full; i++) { waves.push({ t: 0, color: ringColor(i), s: 1.8 }); flashes.push({ t: 0, text: 'Anneau saturé', color: ringColor(i) }); }
+      fullCount = full;
+      if (pl >= 4) drawShield(c);
+      // flux de matière qui spirale vers le cœur (palier 2+)
+      if (pl >= 1) {
+        const want = Math.min(70, 16 + L * 1.6);
+        while (inflow.length < want && !reduce) {
+          const pool = run.fused.length ? run.fused : [run.core];
+          inflow.push({ r: W * (0.46 + Math.random() * 0.05), a: Math.random() * TAU, col: EL_COLOR[pool[Math.floor(Math.random() * pool.length)]] });
+        }
+        ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineWidth = 1.4;
+        for (let i = inflow.length - 1; i >= 0; i--) {
+          const q = inflow[i], r0 = q.r, a0 = q.a;
+          q.a += dt * 1.1 * Math.pow(W * 0.2 / q.r, 1.5) * vis;
+          q.r -= dt * W * 0.05 * (1 + W * 0.12 / q.r) * vis;
+          if (q.r <= cr * 1.05) { inflow.splice(i, 1); continue; }
+          ctx.strokeStyle = rgba(q.col, Math.min(0.85, 0.25 + (1 - q.r / (W * 0.5))));
+          ctx.beginPath(); ctx.moveTo(c + Math.cos(a0) * r0, c + Math.sin(a0) * r0); ctx.lineTo(c + Math.cos(q.a) * q.r, c + Math.sin(q.a) * q.r); ctx.stroke();
+        }
+        ctx.restore();
+      }
+      // éléments fusionnés + arcs électriques (palier 1+)
+      const mr = W * 0.165;
+      arcT -= dt;
+      const regen = arcT <= 0; if (regen) { arcT = 0.07; arcs = []; }
+      run.fused.forEach((x, i) => {
+        const a = motesA + i * TAU / run.fused.length, mx = c + Math.cos(a) * mr, my = c + Math.sin(a) * mr;
+        if (regen) {
+          const pts = [[c, c]];
+          for (let k = 1; k < 7; k++) { const t = k / 7, j = (Math.random() - 0.5) * W * 0.03; pts.push([c + (mx - c) * t - Math.sin(a) * j, c + (my - c) * t + Math.cos(a) * j]); }
+          pts.push([mx, my]); arcs.push({ pts, col: EL_COLOR[x] });
+        }
+        ctx.save(); ctx.shadowColor = EL_COLOR[x]; ctx.shadowBlur = 16; ctx.fillStyle = EL_COLOR[x]; ctx.beginPath(); ctx.arc(mx, my, W * 0.022, 0, TAU); ctx.fill(); ctx.restore();
+      });
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineWidth = 1.6;
+      for (const ar of arcs) { ctx.strokeStyle = rgba(ar.col, 0.75); ctx.shadowColor = ar.col; ctx.shadowBlur = 10; ctx.beginPath(); ar.pts.forEach(([x, y], k) => k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); }
+      ctx.restore();
+      if (pl >= 5) drawJets(c, cr, time, coreCol);
+      // cœur, ou horizon des événements au palier final
+      if (pl >= 6) {
+        const obj = objective(meta.pal), lo = runFloor(meta.pal);
+        const prog = meta.won ? 1 : Math.max(0, Math.min(1, (Math.log10(Math.max(1, run.produced)) - Math.log10(lo)) / (Math.log10(obj) - Math.log10(lo))));
+        const rh = cr * (0.55 + 0.75 * prog);
+        const lens = ctx.createRadialGradient(c, c, rh * 0.9, c, c, rh * 2.6);
+        lens.addColorStop(0, rgba('#ffffff', 0.9)); lens.addColorStop(0.12, rgba('#ffd9a0', 0.55)); lens.addColorStop(0.4, rgba(coreCol, 0.18)); lens.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = lens; ctx.beginPath(); ctx.arc(c, c, rh * 2.6, 0, TAU); ctx.fill();
+        ctx.save(); ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 22; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(c, c, rh * 1.06, 0, TAU); ctx.stroke(); ctx.restore();
+        ctx.fillStyle = '#000000'; ctx.beginPath(); ctx.arc(c, c, rh, 0, TAU); ctx.fill();
+      } else {
+        const g2 = ctx.createRadialGradient(c, c, 0, c, c, cr * 1.9);
+        g2.addColorStop(0, '#ffffff'); g2.addColorStop(0.32, pl === 5 ? '#dff4ff' : coreCol); g2.addColorStop(1, rgba(pl === 5 ? '#9fd8ff' : coreCol, 0));
+        ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(c, c, cr * 1.9, 0, TAU); ctx.fill();
+        ctx.fillStyle = '#05070e'; ctx.font = `${Math.round(W * 0.032)}px Michroma, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(ELEMENTS[run.core].short, c, c + 1);
+      }
+      if (pl >= 3) drawDisk(c, cr, true, coreCol);
+      // ondes
+      for (let i = waves.length - 1; i >= 0; i--) {
+        const w = waves[i]; w.t += dt; if (w.t < 0) continue;
+        const k = w.t / (0.9 * w.s); if (k >= 1) { waves.splice(i, 1); continue; }
+        ctx.strokeStyle = rgba(w.color, (1 - k) * 0.7); ctx.lineWidth = 2 + 3 * (1 - k);
+        ctx.beginPath(); ctx.arc(c, c, cr + (W * 0.48 - cr) * k, 0, TAU); ctx.stroke();
+      }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i]; s.d -= s.v * dt * 0.6; s.life -= dt * 0.9;
+        if (s.d <= 0.06 || s.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.fillStyle = rgba(s.color, Math.min(1, s.life + 0.2)); ctx.beginPath(); ctx.arc(c + Math.cos(s.a) * s.d * W, c + Math.sin(s.a) * s.d * W, 2, 0, TAU); ctx.fill();
+      }
+      // gains qui s'échappent du cœur, une fois par seconde
+      floatT -= dt;
+      if (floatT <= 0 && !reduce) { floatT = 2; const a = Math.random() * TAU; floats.push({ a, r: cr * 1.6, t: 0, text: '+' + fmt(p * speed()) }); }
+      ctx.font = `600 ${Math.round(W * 0.028)}px "IBM Plex Mono", monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (let i = floats.length - 1; i >= 0; i--) {
+        const f = floats[i]; f.t += dt; f.r += dt * W * 0.06;
+        if (f.t > 1.6) { floats.splice(i, 1); continue; }
+        ctx.fillStyle = rgba(acc, 0.6 * (1 - f.t / 1.6));
+        ctx.fillText(f.text, c + Math.cos(f.a) * f.r, c + Math.sin(f.a) * f.r);
+      }
+      cometPos = [];
+      for (let i = 0; i < meta.comets; i++) {
+        const per = 13, ph = ((time + i * 4.3) % per) / per;
+        const x0 = -0.1 * W, y0 = (0.12 + i * 0.22) * W, x1 = 1.1 * W, y1 = (0.32 + i * 0.2) * W;
+        const x = x0 + (x1 - x0) * ph, y = y0 + (y1 - y0) * ph, ang = Math.atan2(y1 - y0, x1 - x0);
+        const tl = W * 0.16, tg = ctx.createLinearGradient(x, y, x - Math.cos(ang) * tl, y - Math.sin(ang) * tl);
+        tg.addColorStop(0, 'rgba(217,246,255,0.9)'); tg.addColorStop(1, 'rgba(159,232,255,0)');
+        ctx.strokeStyle = tg; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - Math.cos(ang) * tl, y - Math.sin(ang) * tl); ctx.stroke();
+        ctx.save(); ctx.shadowColor = '#9fe8ff'; ctx.shadowBlur = 14; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, TAU); ctx.fill(); ctx.restore();
+        cometPos.push([x, y]);
+      }
+      const tier = Math.floor(Math.log10(Math.max(1, p)) / 3);
+      if (lastTier !== null && tier > lastTier && tier >= 1) { waves.push({ t: 0, color: '#52e4f0', s: 1.3 }); flashes.push({ t: 0, text: fmt(Math.pow(1000, tier)) + ' /s', color: '#52e4f0' }); }
+      lastTier = tier;
+      ctx.font = `${Math.round(W * 0.04)}px Michroma, sans-serif`;
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        const f = flashes[i]; f.t += dt; if (f.t > 2.2) { flashes.splice(i, 1); continue; }
+        const a = f.t < 0.2 ? f.t / 0.2 : 1 - Math.max(0, f.t - 1.4) / 0.8;
+        ctx.fillStyle = rgba(f.color, a); ctx.fillText(f.text, c, W * (0.92 - 0.06 * i) - f.t * 8);
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+    return { pulse, fuse, unlock, singularity, flash, warp, comet, hitComet };
+  })();
+
+  // ---------- Réglages ----------
+  function setNotation(n) {
+    notation = n; store.set(VERSION + '-notation', n);
+    $('notation').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === n)));
+    structure(); refresh(true);
+  }
+  $('notation').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setNotation(b.dataset.n); });
+  $('speed').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    testSpeed = Number(b.dataset.s);
+    $('speed').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  });
+  let wipeArmed = false, wipeTimer = null;
+  $('wipe').addEventListener('click', () => {
+    if (!wipeArmed) { wipeArmed = true; $('wipe').textContent = 'Confirmer ?'; wipeTimer = setTimeout(() => { wipeArmed = false; $('wipe').textContent = 'Tout effacer'; }, 3000); return; }
+    clearTimeout(wipeTimer); wipeArmed = false; $('wipe').textContent = 'Tout effacer';
+    meta = freshMeta(); run = newRun(meta); $('win').hidden = true; structure(); refresh(true); save();
+  });
+  $('winClose').addEventListener('click', () => { $('win').hidden = true; });
+  $('singBtn').addEventListener('click', () => singularity(false));
+  $('gen').addEventListener('click', e => { if (fx.hitComet(e)) captureComet(); });
+  $('abandonBtn').addEventListener('click', abandonChallenge);
+
+  // ---------- Démarrage ----------
+  function start(data) {
+    const live = data && data.meta && data.run;
+    const d = live ? data : load();
+    if (d) {
+      meta = Object.assign(freshMeta(), d.meta); run = d.run;
+      const awayAll = !live && d.savedAt ? Math.max(0, (Date.now() - d.savedAt) / 1000) : 0;
+      const away = Math.min(OFFLINE_CAP, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - OFFLINE_CAP));
+      if (away > 30) {
+        const before = run.produced, pal0 = meta.pal; let left = away;
+        while (left > 0) { const s = Math.min(60, left); advance(s, 20); left -= s; }
+        meta.bank += Math.max(0, banked);
+        setTimeout(() => toast(`Pendant ton absence (${fmtT(awayAll)}) : <b>+${fmt(Math.max(0, run.produced - before))}</b> d'énergie produite${meta.pal > pal0 ? ` · palier ${meta.pal} atteint` : ''}${banked > 60 ? ` · <b>${fmtT(banked)}</b> mises en réserve` : ''}`), 400);
+      }
+    }
+    notation === 'suf' && $('notation').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === 'suf')));
+    structure(); refresh(true);
+    const tab = store.get(VERSION + '-tab');
+    selectTab(['gen', 'el', 'law', 'ch', 'log'].includes(tab) ? tab : 'gen');
+    let lastT = performance.now(), n = 0;
+    setInterval(() => {
+      const now = performance.now(), dt = Math.min(1, (now - lastT) / 1000) * testSpeed; lastT = now;
+      advance(dt);
+      refresh(++n % 10 === 0);
+    }, 100);
+    setInterval(save, 5000);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+    window.addEventListener('pagehide', save);
+  }
+  window.claude?.hot?.snapshot?.(() => ({ meta, run, savedAt: Date.now() }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body></html>
