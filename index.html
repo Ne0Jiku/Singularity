@@ -1,4 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SINGULARITY</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,7 +183,6 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 .win .wbox { max-width: 460px; text-align: center; display: grid; gap: 14px; padding: 28px; border: 1px solid var(--violet); border-radius: 14px; background: var(--panel); box-shadow: 0 0 60px rgba(155, 107, 255, 0.35); }
 .win h2 { margin: 0; font-family: var(--f-display); font-weight: 400; letter-spacing: 0.2em; font-size: 18px; }
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } .bar > i { transition: none; } }
-@media (max-width: 480px) { .upg { grid-template-columns: minmax(0, 1fr); } .upg .btns .btn.fill { flex: 1; } }
 .comet-btn { position: absolute; right: 4%; top: 4%; appearance: none; cursor: pointer; border: 1px solid color-mix(in srgb, #9fe8ff 70%, transparent); background: color-mix(in srgb, #0b1a2a 80%, transparent); color: #d9f6ff; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; box-shadow: 0 0 18px rgba(159, 232, 255, 0.35); animation: ready 1.8s ease-in-out infinite; --fc: #9fe8ff; }
 .comet-btn:focus-visible { outline: 2px solid #9fe8ff; outline-offset: 2px; }
 .boost-chip { position: absolute; left: 4%; top: 4%; border-radius: 999px; padding: 5px 11px; font-size: 12px; font-family: var(--f-mono); color: #d9f6ff; background: color-mix(in srgb, #0b1a2a 80%, transparent); border: 1px solid #9fe8ff; }
@@ -195,6 +198,22 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 .cat .star span { color: var(--muted); font-size: 10.5px; }
 .cat .star.unk b { color: var(--muted); font-family: var(--f-mono); }
 @media (max-width: 480px) { .cat .line { grid-template-columns: 26px repeat(4, minmax(0, 1fr)); gap: 4px; } .cat .orb { width: 24px; height: 24px; font-size: 9px; } .cat .star { padding: 5px; } .cat .star span { display: none; } }
+/* Lignes de niveaux : nom + niveau en titre, boutons à droite, paliers en dessous sur toute la largeur */
+.upg { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "info btns" "ms ms"; row-gap: 6px; }
+.upg .info { grid-area: info; } .upg > .btns { grid-area: btns; } .upg .ms { grid-area: ms; display: grid; gap: 3px; }
+.upg .ms .val { font-family: var(--f-mono); font-size: 11.5px; color: var(--cyan); }
+.upg .ms .msbar { max-width: none; }
+.upg .title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.upg .lvl { font-family: var(--f-mono); font-size: 12px; color: var(--cyan); padding: 1px 7px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--cyan) 40%, var(--line)); }
+.upg > .btns .btn { min-width: 58px; }
+/* Boutons d'éléments : positions et largeurs fixes */
+.elbtns { display: grid; grid-template-columns: repeat(2, minmax(0, 170px)); gap: 6px; }
+.elbtns .btn { width: 100%; }
+.btn.armed { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 18%, var(--panel-2)); --fc: var(--warn); }
+.btn.sing { display: grid; gap: 2px; justify-items: center; }
+.btn.sing .sub { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+.btn.sing.ok .sub { color: var(--fg); }
+@media (max-width: 480px) { .upg { grid-template-columns: minmax(0, 1fr); grid-template-areas: "info" "btns" "ms"; } .upg > .btns { display: grid; grid-template-columns: 2fr 1fr 1fr; } }
 #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .wrap { position: relative; z-index: 1; }
 .tabs, .settings { background: color-mix(in srgb, var(--panel) 84%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -234,6 +253,9 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 @keyframes bump { 35% { transform: scale(1.07); text-shadow: 0 0 26px var(--cyan); } }
 @media (prefers-reduced-motion: reduce) { .floatGain, .energy.bump, .btn.sing.ok, .tile.ok { animation: none; } }
 </style>
+</head>
+<body>
+
 
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="wrap">
@@ -319,7 +341,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 
       <section class="panel" id="p-log" role="tabpanel" aria-labelledby="t-log" hidden>
         <div class="card"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
-          <p class="small">Chaque noyau donne un type d'étoile différent selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand sa configuration atteint le premier quart de la run. Chaque étoile : production +5 %. Une ligne complète : effet du noyau ×1,25.</p>
+          <p class="small">Chaque noyau donne un type d'étoile différent selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand sa configuration atteint le premier quart de la run ou du défi. Chaque étoile : production +5 %. Une ligne complète : effet du noyau ×1,25.</p>
           <div class="cat" id="cat"></div></div>
         <div class="card"><h2>Cycle de vie</h2><div class="pals" id="pals"></div></div>
         <div class="card"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div><div class="rx" id="rx"></div></div>
@@ -621,20 +643,28 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
   const isFinal = () => meta.pal >= LAST_PAL;
   const fullFusion = () => run.fused.length === ORDER.length - 1;
   const canSing = () => !run.challenge && run.produced >= objective(meta.pal) && (!isFinal() || fullFusion());
+  // max : true = autant que possible, un nombre = au plus ce nombre de niveaux
   function buy(u, max) {
+    const limit = max === true ? 3000 : max ? max : 1;
     let n = 0;
-    while (true) {
+    while (n < limit) {
       const c = cost(meta, run, u);
       if (!(run.energy >= c)) break;
       run.energy -= c; run.lv[u]++; n++;
-      if (!max || n >= 3000) break;
     }
     return n;
   }
+  // Nombre de niveaux achetables sans rien acheter
+  function affordable(u, limit) {
+    const lv = { ...run.lv }, sim = { ...run, lv };
+    let e = run.energy, n = 0;
+    while (n < limit) { const c = cost(meta, sim, u); if (!(e >= c)) break; e -= c; lv[u]++; n++; }
+    return n;
+  }
   function userBuy(u, max, el) {
-    const g = u === 'stab' ? '+1 stabilité' : gainOf({ ...run, lv: { ...run.lv, [u]: run.lv[u] + 1 } });
+    const g = u === 'stab' ? '+1 stabilité' : u === 'flux' ? '+1' : gainOf({ ...run, lv: { ...run.lv, [u]: run.lv[u] + 1 } });
     const n = buy(u, max); if (!n) return;
-    floatAt(el, max && n > 1 ? `+${n} niveaux` : g);
+    floatAt(el, n > 1 ? `+${n} niveaux` : g);
     fx.pulse({ flux: '#52e4f0', power: '#9b6bff', syn: '#6ee7a8', stab: '#f2c46b' }[u], 0.8);
     if (u === 'stab') { toast(`Stabilité : <b>${stabMax(meta, run)}</b>`, '#f2c46b'); structure(); }
     refresh(true);
@@ -694,8 +724,11 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
     if (run.fused.length >= maxFused(meta)) return false;
     return instab(meta, run, [...run.fused, x]) <= stabMax(meta, run);
   }
+  let fuseArmed = null, fuseTimer = null;
   function fuse(x) {
     if (!canFuse(x)) return;
+    if (fuseArmed !== x) { fuseArmed = x; clearTimeout(fuseTimer); fuseTimer = setTimeout(() => { fuseArmed = null; structure(); }, 3500); structure(); return; }
+    clearTimeout(fuseTimer); fuseArmed = null;
     run.fused.push(x);
     const k = key(run.core, x), re = REACTIONS[k];
     const isNew = !meta.discovered.includes(k);
@@ -719,7 +752,7 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
   function singularity(auto) {
     if (!canSing()) return;
     if (!auto && !singArmed) {
-      singArmed = true; $('singBtn').textContent = 'Confirmer la singularité';
+      singArmed = true; refresh(false);
       singTimer = setTimeout(() => { singArmed = false; refresh(true); }, 3500); return;
     }
     clearTimeout(singTimer); singArmed = false;
@@ -802,7 +835,8 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
     if (hasLaw(meta, 'A3')) { buy('syn', true); if (buy('stab', true)) structure(); }
   }
   function observeStar(quiet) {
-    if (run.challenge || run.produced < observeAt(meta)) return;
+    const at = run.challenge ? 10 * Math.pow(meta.chTargets[run.challenge] / 10, 0.25) : observeAt(meta);
+    if (run.produced < at) return;
     const k = starKey(run);
     if (meta.catalog.includes(k)) return;
     meta.catalog.push(k);
@@ -859,10 +893,10 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
 
   // ---------- Structure (reconstruite quand l'état change de forme) ----------
   const UPG_ROWS = [
-    { u: 'flux', name: 'Flux', desc: 'Production de base +1 par niveau. Double aux paliers.', val: () => `niveau ${run.lv.flux} · prochain palier au niveau ${nextFluxMilestone(run.lv.flux)} (×2)` },
-    { u: 'power', name: 'Puissance', desc: `Production ×2 par niveau, et ×1,25 tous les ${POWER_MS_STEP} niveaux`, val: () => `niveau ${run.lv.power} · prochain palier au niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP}${run.challenge === 'sober' ? ` · limite ${SOBER_POWER}` : ''}` },
-    { u: 'syn', name: 'Synergie', desc: 'Effet des réactions +12 % par niveau', val: () => `+${run.lv.syn * 12} % · ${run.lv.syn} / ${synCap(meta)}` },
-    { u: 'stab', name: 'Stabilité', desc: 'Limite de stabilité +1 par niveau', val: () => `stabilité ${stabMax(meta, run)}` },
+    { u: 'flux', name: 'Flux', desc: 'Production de base +1 par niveau', lvl: () => `niv. ${run.lv.flux}`, val: () => `Prochain palier : niveau ${nextFluxMilestone(run.lv.flux)} · ×2` },
+    { u: 'power', name: 'Puissance', desc: 'Production ×2 par niveau', lvl: () => `niv. ${run.lv.power}`, val: () => `Prochain palier : niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP} · ×1,25${run.challenge === 'sober' ? ` · limite ${SOBER_POWER}` : ''}` },
+    { u: 'syn', name: 'Synergie', desc: 'Effet des réactions +12 % par niveau', lvl: () => `niv. ${run.lv.syn} / ${synCap(meta)}`, val: () => `Réactions +${run.lv.syn * 12} %` },
+    { u: 'stab', name: 'Stabilité', desc: 'Limite de stabilité +1 par niveau', lvl: () => `niv. ${run.lv.stab}`, val: () => `Stabilité totale : ${stabMax(meta, run)}` },
   ];
   const ui = { upg: {} };
   function structure() {
@@ -872,12 +906,17 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
     if (sig !== ui.sig) { ui.sig = sig; rows.replaceChildren(); ui.upg = {}; }
     for (const r of UPG_ROWS) {
       if (!upgradeOpen(meta, run, r.u) || ui.upg[r.u]) continue;
+      const lvlChip = h('span', { class: 'lvl' });
       const lvl = h('span', { class: 'val' });
       const bar = (r.u === 'flux' || r.u === 'power') ? h('div', { class: 'msbar' }, h('i')) : null;
-      const buyBtn = h('button', { class: 'btn fill', type: 'button', onclick: e => userBuy(r.u, false, e.currentTarget) }, 'Acheter', h('small'));
-      const maxBtn = h('button', { class: 'btn', type: 'button', onclick: e => userBuy(r.u, true, e.currentTarget) }, 'Max');
-      rows.append(h('div', { class: 'upg' }, h('div', { class: 'info' }, h('b', {}, r.name), h('small', {}, r.desc), lvl, bar), h('div', { class: 'btns' }, buyBtn, maxBtn)));
-      ui.upg[r.u] = { lvl, buyBtn, cost: buyBtn.querySelector('small'), maxBtn, r, bar: bar && bar.firstChild };
+      const buyBtn = h('button', { class: 'btn fill', type: 'button', onclick: e => userBuy(r.u, 1, e.currentTarget) }, 'Acheter', h('small'));
+      const tenBtn = h('button', { class: 'btn', type: 'button', onclick: e => userBuy(r.u, 10, e.currentTarget) }, '×10', h('small'));
+      const maxBtn = h('button', { class: 'btn', type: 'button', onclick: e => userBuy(r.u, true, e.currentTarget) }, 'Max', h('small'));
+      rows.append(h('div', { class: 'upg' },
+        h('div', { class: 'info' }, h('div', { class: 'title' }, h('b', {}, r.name), lvlChip), h('small', {}, r.desc)),
+        h('div', { class: 'btns' }, buyBtn, tenBtn, maxBtn),
+        h('div', { class: 'ms' }, lvl, bar)));
+      ui.upg[r.u] = { lvl, lvlChip, buyBtn, cost: buyBtn.querySelector('small'), tenBtn, tenN: tenBtn.querySelector('small'), maxBtn, maxN: maxBtn.querySelector('small'), r, bar: bar && bar.firstChild };
     }
     // Améliorations de run
     const ur = $('upsRows'); ur.replaceChildren(); ui.ups = {};
@@ -933,12 +972,15 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
       const isCore = run.core === x, isFused = run.fused.includes(x);
       const actions = h('div', { class: 'btns' });
       if (!isCore && !isFused) {
+        // Ordre et largeur fixes : « Mettre au noyau » toujours à gauche, « Fusionner » toujours à droite
+        actions.classList.add('elbtns');
+        actions.append(h('button', { class: 'btn' + (meta.pal === 0 && canCore(x) ? ' ok' : ''), type: 'button', disabled: !canCore(x), onclick: () => setCore(x) }, 'Mettre au noyau', h('small', {}, canCore(x) ? 'Changer de noyau' : meta.pal >= 1 && run.fused.length ? 'Fusion en cours' : 'Indisponible')));
         if (meta.pal >= 1) {
           const after = instab(meta, run, [...run.fused, x]), max = stabMax(meta, run);
-          const why = run.challenge === 'pure' ? 'Défi Pur' : run.fused.length >= maxFused(meta) ? 'Plus de place' : after > max ? `Stabilité ${after} / ${max}` : `Stabilité ${after} / ${max}`;
-          actions.append(h('button', { class: 'btn' + (canFuse(x) ? ' ok' : ''), type: 'button', disabled: !canFuse(x), onclick: () => fuse(x) }, 'Fusionner', h('small', {}, why)));
+          const armed = fuseArmed === x && canFuse(x);
+          const why = armed ? 'Jusqu\'à la singularité' : run.challenge === 'pure' ? 'Défi Pur' : run.fused.length >= maxFused(meta) ? 'Plus de place' : `Stabilité ${after} / ${max}`;
+          actions.append(h('button', { class: 'btn' + (canFuse(x) ? ' ok' : '') + (armed ? ' armed' : ''), type: 'button', disabled: !canFuse(x), onclick: () => fuse(x) }, armed ? 'Confirmer la fusion' : 'Fusionner', h('small', {}, why)));
         }
-        actions.append(h('button', { class: 'btn' + (meta.pal === 0 && canCore(x) ? ' ok' : ''), type: 'button', disabled: !canCore(x), onclick: () => setCore(x) }, 'Mettre au noyau'));
       }
       const fxRows = [h('span', {}, 'Au noyau'), h('span', {}, EL_FX[x].core), h('span', {}, 'Fusionné'), h('span', {}, meta.pal >= 1 ? EL_FX[x].fused : '—'), h('span', {}, 'Instabilité'), h('span', {}, String(elInstab(meta, x)))];
       if (!isCore && meta.pal >= 1) {
@@ -1049,11 +1091,14 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
     $('hTime').textContent = fmtT(run.t / speed());
     for (const k in ui.upg) {
       const o = ui.upg[k], c = cost(meta, run, k);
-      o.lvl.textContent = o.r.val();
-      if (!isFinite(c)) { o.cost.textContent = 'max'; setBtn(o.buyBtn, false); o.maxBtn.disabled = true; continue; }
+      o.lvl.textContent = o.r.val(); o.lvlChip.textContent = o.r.lvl();
+      if (!isFinite(c)) { o.cost.textContent = 'max'; setBtn(o.buyBtn, false); o.tenBtn.disabled = o.maxBtn.disabled = true; o.tenN.textContent = o.maxN.textContent = '—'; continue; }
       const ok = run.energy >= c;
-      const g = k === 'stab' ? '+1 stabilité' : gainOf({ ...run, lv: { ...run.lv, [k]: run.lv[k] + 1 } });
-      o.cost.textContent = fmt(c) + (g ? ' · ' + g : ''); setBtn(o.buyBtn, ok); o.maxBtn.disabled = !ok;
+      const g = k === 'stab' ? '+1 stabilité' : k === 'flux' ? '+1' : gainOf({ ...run, lv: { ...run.lv, [k]: run.lv[k] + 1 } });
+      o.cost.textContent = fmt(c) + (g ? ' · ' + g : ''); setBtn(o.buyBtn, ok);
+      const nMax = affordable(k, 3000), nTen = Math.min(10, nMax);
+      o.tenN.textContent = `+${nTen} niv.`; o.maxN.textContent = `+${nMax >= 3000 ? '3000+' : nMax} niv.`;
+      o.tenBtn.disabled = o.maxBtn.disabled = !ok;
       o.buyBtn.style.setProperty('--p', fillPct(run.energy, c));
       if (o.bar) {
         let lo, hi, l;
@@ -1080,6 +1125,7 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
       const ch = CHALLENGES[run.challenge], tg = meta.chTargets[run.challenge];
       box.classList.add('challenge');
       $('objLabel').textContent = `Défi ${ch.name} · ${ch.desc}`;
+      $('objValue').hidden = false; $('objBar').parentElement.hidden = false;
       $('objValue').textContent = `${fmt(run.produced)} / ${fmt(tg)}`;
       $('objBar').style.width = Math.max(0, Math.min(1, logp(run.produced) / logp(tg))) * 100 + '%';
       $('objNote').textContent = `Récompense : ${ch.reward}`;
@@ -1088,8 +1134,7 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
       box.classList.remove('challenge');
       const obj = objective(meta.pal), lo = runFloor(meta.pal);
       $('objLabel').textContent = isFinal() ? 'Objectif final' : 'Objectif de la run';
-      $('objValue').textContent = `${fmt(run.produced)} / ${fmt(obj)} produits`;
-      $('objBar').style.width = Math.max(0, Math.min(1, (logp(run.produced) - logp(lo)) / (logp(obj) - logp(lo)))) * 100 + '%';
+      $('objValue').hidden = true; $('objBar').parentElement.hidden = true;
       let note = '';
       if (meta.pal === 0) { const nx = ORDER.find(x => !meta.ownedList.includes(x)); note = nx ? `Prochain noyau : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} produits.` : 'Tous les noyaux sont découverts.'; }
       else if (isFinal() && !fullFusion()) note = 'La singularité ultime demande les cinq éléments dans le générateur.';
@@ -1098,7 +1143,10 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
       const sb = $('singBtn'); sb.hidden = false; $('abandonBtn').hidden = true;
       const ok = canSing(); setBtn(sb, ok); sb.classList.add('fill');
       sb.style.setProperty('--p', (Math.max(0, Math.min(1, (logp(run.produced) - logp(lo)) / (logp(obj) - logp(lo)))) * 100).toFixed(1) + '%');
-      if (!singArmed) sb.textContent = ok ? (isFinal() ? 'Déclencher la singularité ultime' : `Singularité → palier ${meta.pal + 1} · ${PALIERS[meta.pal + 1].name}`) : 'Singularité : objectif non atteint';
+      const main = singArmed ? 'Confirmer la singularité' : ok ? (isFinal() ? 'Déclencher la singularité ultime' : `Singularité → palier ${meta.pal + 1} · ${PALIERS[meta.pal + 1].name}`) : (isFinal() ? 'Singularité ultime' : `Singularité → palier ${meta.pal + 1} · ${PALIERS[meta.pal + 1].name}`);
+      const sub = `${fmt(run.produced)} / ${fmt(obj)} produits`;
+      if (sb.dataset.main !== main) { sb.dataset.main = main; sb.replaceChildren(h('span', {}, main), h('small', { class: 'sub' })); }
+      sb.querySelector('.sub').textContent = sub;
     }
     if (full || $('bdDetails').open) {
       const bd = breakdown(meta, run), pen = costPenalty(meta, run);
@@ -1449,4 +1497,5 @@ if (typeof module !== 'undefined') module.exports = { STAR_TYPES, starKey, starN
 })();
 </script>
 
-</body></html>
+</body>
+</html>
