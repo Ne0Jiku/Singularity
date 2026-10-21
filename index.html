@@ -22,6 +22,7 @@
   --gold: #f2c46b;
   --good: #6ee7a8;
   --bad: #ff8a8a;
+  --stab: #ff9e6b;
   --f-display: "Michroma", "Eurostile", "Arial Black", sans-serif;
   --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -56,7 +57,10 @@ button { font: inherit; color: inherit; }
 .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 12px; white-space: nowrap; }
 .chip.ecl { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); color: var(--gold); font-family: var(--f-mono); }
 .chip.spd { color: var(--cyan); font-family: var(--f-mono); }
-.gem { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); border-radius: 1px; box-shadow: 0 0 8px var(--gold); }
+/* Icône des éclats : un petit carré jaune, toujours collé au mot « éclats » */
+.ec { display: inline-block; width: 0.62em; height: 0.62em; margin: 0 0.28em 0 0.06em; vertical-align: 0; border-radius: 2px; background: var(--gold); box-shadow: 0 0 6px color-mix(in srgb, var(--gold) 65%, transparent); flex: none; }
+.chip.ecl .ec { width: 9px; height: 9px; margin: 0 1px 0 0; }
+.ecw { white-space: nowrap; }
 .icon-btn { appearance: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; cursor: pointer; color: var(--muted); }
 .icon-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .goal { max-width: 1180px; margin: 8px auto 0; display: grid; gap: 4px; }
@@ -174,11 +178,11 @@ canvas#gen { width: 100%; height: 100%; display: block; }
 .breakdown .tot { color: var(--cyan); font-weight: 600; }
 details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-height: 28px; display: flex; align-items: center; }
 
-/* Cœur et éléments */
+/* Noyau et éléments */
 .gauge { display: grid; gap: 6px; }
 .gauge .row { display: flex; justify-content: space-between; font-size: 13px; }
 .gauge .row b { font-family: var(--f-mono); font-weight: 500; }
-.gauge .bar > i { background: var(--gold); }
+.gauge .bar > i { background: var(--stab); }
 .slots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .slot { display: grid; justify-items: center; gap: 4px; min-width: 48px; }
 .orb { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--c, var(--line)); display: grid; place-items: center; font-family: var(--f-display); font-size: 11px; color: var(--c, var(--muted)); box-shadow: 0 0 14px color-mix(in srgb, var(--c, transparent) 45%, transparent); background: var(--panel); flex: none; }
@@ -192,7 +196,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .el .title { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
 .el .title b { font-weight: 600; }
 .el .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c); }
-.el .ins { font-family: var(--f-mono); font-size: 11.5px; color: var(--gold); margin-left: auto; }
+.el .ins { font-family: var(--f-mono); font-size: 11.5px; color: var(--stab); margin-left: auto; }
 .el .fx { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 12.5px; }
 .el .fx span:nth-child(odd) { color: var(--muted); }
 .el .state { font-size: 12px; color: var(--cyan); }
@@ -200,13 +204,13 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .el .elbtns { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .el .elbtns .btn { width: 100%; }
 
-/* Arbre : une branche à la fois */
+/* Ciel : une constellation à la fois */
 .branch-pick { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
 .branch-pick::-webkit-scrollbar { display: none; }
 .bp { appearance: none; flex: none; cursor: pointer; border: 1px solid var(--line); background: var(--panel-2); border-radius: 999px; padding: 7px 12px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; color: var(--muted); min-height: 36px; }
 .bp[aria-pressed="true"] { color: var(--fg); border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 12%, var(--panel-2)); }
 .bp.off { opacity: .5; }
-.bp .n { font-family: var(--f-mono); font-size: 11px; background: var(--gold); color: var(--bg); border-radius: 999px; padding: 0 6px; font-weight: 600; }
+.bp .n { font-family: var(--f-mono); font-size: 11px; background: var(--cyan); color: var(--bg); border-radius: 999px; padding: 0 6px; font-weight: 600; }
 .nodes { display: grid; gap: 8px; }
 .node { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
 .node .t { display: grid; gap: 2px; min-width: 0; }
@@ -218,6 +222,61 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .node.can .btn { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, var(--panel-2)); }
 .node.locked { opacity: .55; }
 .node.key { border-style: dashed; }
+
+/* Ciel : constellations */
+.sky-pick { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+.sp { appearance: none; cursor: pointer; position: relative; min-width: 0; min-height: 46px; padding: 4px 0; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); display: grid; justify-items: center; align-content: center; gap: 1px; }
+.sp b { font-family: var(--f-mono); font-size: 13px; font-weight: 600; color: var(--fg); }
+.sp small { font-family: var(--f-mono); font-size: 10.5px; }
+.sp.done { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); }
+.sp.done small { color: var(--gold); }
+.sp.off { opacity: .45; }
+.sp.off b { color: var(--muted); }
+.sp.can::after { content: ""; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+.sp[aria-pressed="true"] { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, var(--panel-2)); opacity: 1; }
+.sky-head { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 8px; align-items: center; }
+.sky-name { display: grid; justify-items: center; text-align: center; min-width: 0; }
+.sky-name b { font-weight: 600; font-size: 15px; }
+.sky { touch-action: pan-y; }
+.sky { position: relative; width: 100%; aspect-ratio: 100 / 86; max-height: 460px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, color-mix(in srgb, var(--violet) 12%, transparent), transparent 70%), #03050b; }
+.sky svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sky .dust { fill: #8a93ae; opacity: .45; }
+.sky line { stroke-linecap: round; fill: none; }
+.sky line.lit { stroke: var(--gold); stroke-width: 1.6; opacity: .75; }
+.sky line.next { stroke: var(--cyan); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: .6; }
+.sky line.dark { stroke: #2a3354; stroke-width: 1; stroke-dasharray: 3 5; }
+.sky line.pair { stroke: var(--violet); stroke-width: 1; stroke-dasharray: 2 4; opacity: .7; }
+.sky line.fig { stroke: var(--gold); stroke-width: 9; opacity: .12; }
+.sky.complete { border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); box-shadow: inset 0 0 50px color-mix(in srgb, var(--gold) 14%, transparent); }
+.sky.off .ls, .sky.off .ll { opacity: .5; }
+.ls { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; display: grid; place-items: center; z-index: 2; }
+.ls i { display: block; width: 6px; height: 6px; border-radius: 50%; background: #3a4566; transition: width .2s, height .2s, background .2s; }
+.ls.poor i { width: 11px; height: 11px; background: transparent; border: 1.5px solid #c9d2ec; }
+.ls.can i { width: 12px; height: 12px; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+.ls.can::after { content: ""; position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--cyan); opacity: .7; animation: twinkle 1.8s ease-in-out infinite; }
+.ls.have i { width: 13px; height: 13px; background: #fff6dc; box-shadow: 0 0 10px var(--gold), 0 0 24px color-mix(in srgb, var(--gold) 55%, transparent); }
+.ls.have.can i { background: #fff6dc; }
+.ls.rep.have:not(.can)::after { content: ""; position: absolute; width: 24px; height: 24px; border-radius: 50%; border: 1px dashed var(--gold); opacity: .6; }
+.ls.sel::before { content: ""; position: absolute; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--fg); opacity: .55; }
+.ls:focus-visible { outline-offset: -4px; }
+.ll { position: absolute; z-index: 1; font-size: 12px; line-height: 1.2; color: var(--muted); max-width: 104px; pointer-events: none; text-shadow: 0 1px 4px #000, 0 0 2px #000; }
+.ll.r, .ll.l { transform: translateY(-50%); }
+.ll.l { text-align: right; }
+.ll.t, .ll.b { transform: translateX(-50%); text-align: center; width: max-content; max-width: 90px; }
+.ll.have { color: var(--fg); }
+.ll.can { color: var(--cyan); font-weight: 600; }
+.ll.locked { color: #4a5470; }
+.ll.pairlab { font-size: 10.5px; color: var(--violet); font-style: italic; }
+.sky-badge { position: absolute; left: 10px; top: 10px; z-index: 3; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 50%, var(--line)); background: color-mix(in srgb, var(--bg) 80%, transparent); }
+.sky-badge.off { color: var(--muted); border-color: var(--line); }
+.law { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t b" "d b"; gap: 4px 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.law.can { border-color: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
+.law-t { grid-area: t; display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; min-width: 0; }
+.law-t b { font-weight: 600; font-size: 15px; }
+.law > p { grid-area: d; }
+.law > .btn { grid-area: b; min-width: 124px; min-height: 46px; }
+@keyframes twinkle { 50% { transform: scale(1.18); opacity: .35; } }
 
 /* Défis */
 .chal { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
@@ -300,10 +359,14 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
   .sheet-in { border-radius: 16px; }
 }
 @media (max-width: 380px) {
+  .sky-pick { gap: 3px; }
+  .sp b { font-size: 12px; }
+  .sp small { font-size: 9.5px; }
+  .law { grid-template-areas: "t" "d" "b"; grid-template-columns: minmax(0, 1fr); }
   .upg { grid-template-columns: minmax(0, 1fr); grid-template-areas: "info" "buy" "ms" "more"; }
   .rx { grid-template-columns: minmax(0, 1fr); }
 }
-@media (prefers-reduced-motion: reduce) { .toast, .floatGain, .energy.bump, .act.ok, .tile.ok, .comet-btn { animation: none; } .bar > i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .toast, .floatGain, .energy.bump, .act.ok, .tile.ok, .comet-btn, .ls.can::after { animation: none; } .bar > i { transition: none; } }
 </style>
 
 </head>
@@ -318,7 +381,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
       <span class="rate" id="rate">0 /s</span>
       <div class="chips">
       <span class="chip" id="hPal">Palier 0</span>
-      <span class="chip ecl" title="Éclats à dépenser dans l'arbre"><i class="gem" aria-hidden="true"></i><span id="hEcl">0</span></span>
+      <span class="chip ecl" title="Éclats : gagnés par Nova, ils allument les lois de tes constellations"><i class="ec" aria-hidden="true"></i><span id="hEcl">0 éclat</span></span>
       <span class="chip spd" id="hSpeed">×1</span>
       </div>
     </div>
@@ -332,7 +395,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 
 <main class="layout">
   <section class="stage">
-    <div class="canvas-box"><canvas id="gen" role="img" aria-label="L'étoile, son cœur et ses couches"></canvas>
+    <div class="canvas-box"><canvas id="gen" role="img" aria-label="L'étoile, son noyau et ses éléments fusionnés"></canvas>
       <button class="comet-btn" type="button" id="cometBtn" hidden></button>
       <span class="boost-chip" id="boostChip" hidden></span>
     </div>
@@ -361,8 +424,8 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
   <section class="console">
     <nav class="tabs" role="tablist" aria-label="Sections du jeu">
       <button class="tab" role="tab" id="t-gen" data-tab="gen" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><span>Run</span></button>
-      <button class="tab" role="tab" id="t-el" data-tab="el" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5" stroke-dasharray="3 3"/><circle cx="19.5" cy="12" r="1.6"/></svg><span>Cœur</span></button>
-      <button class="tab" role="tab" id="t-law" data-tab="law" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V11M12 11L6 5M12 11l6-6M6 5V3M18 5V3M12 15l-4-3M12 15l4-3"/></svg><span>Arbre</span></button>
+      <button class="tab" role="tab" id="t-el" data-tab="el" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5" stroke-dasharray="3 3"/><circle cx="19.5" cy="12" r="1.6"/></svg><span>Éléments</span></button>
+      <button class="tab" role="tab" id="t-law" data-tab="law" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 18.5l5-7 5 3 5.5-9"/><circle cx="4.5" cy="18.5" r="1.7"/><circle cx="9.5" cy="11.5" r="1.7"/><circle cx="14.5" cy="14.5" r="1.7"/><circle cx="20" cy="5.5" r="1.7"/></svg><span>Ciel</span></button>
       <button class="tab" role="tab" id="t-ch" data-tab="ch" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM12 13v4M8 21h8M9 17h6M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span>Défis</span></button>
       <button class="tab" role="tab" id="t-log" data-tab="log" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 19l-5-3-5 3 1.4-6.2L4 9l5.8-.6z"/></svg><span>Catalogue</span></button>
     </nav>
@@ -391,9 +454,9 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 
     <section class="panel" id="p-log" role="tabpanel" aria-labelledby="t-log" hidden>
       <div class="card"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
-        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre 1 éclat au début de chaque palier.</p>
+        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre <span class="ecw">1 <i class="ec" aria-hidden="true"></i>éclat</span> au début de chaque palier.</p>
         <div class="cat" id="cat"></div></div>
-      <div class="card"><h2>Cycle de vie</h2><div class="pals" id="pals"></div></div>
+      <div class="card"><h2>Paliers</h2><div class="pals" id="pals"></div></div>
       <div class="card"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div><div class="rx" id="rx"></div></div>
       <div class="card"><h2>Partie</h2><div class="stats" id="stats"></div></div>
     </section>
@@ -405,7 +468,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
     <div class="head"><h2 id="sheetTitle">Réglages</h2><button class="icon-btn" type="button" id="sheetClose" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="mini">
       <div><span class="label">Singularités</span><b id="hSing">0</b></div>
-      <div><span class="label">Run en cours</span><b id="hTime">0:00</b></div>
+      <div><span class="label">Durée de la run</span><b id="hTime">0:00</b></div>
     </div>
     <div class="set"><span class="label">Notation des nombres</span>
       <div class="seg" role="group" aria-label="Notation des nombres" id="notation">
@@ -439,7 +502,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 <script>
 const ENV = (typeof process !== 'undefined' && process.env) ? process.env : {};
 // ===== SINGULARITY v9 — modèle =====
-// Acte 1 : run → Nova (éclats) → arbre des lois (une branche par palier, remis à zéro à chaque singularité).
+// Acte 1 : run → Nova (éclats) → constellations (une par palier ; le ciel s'éteint à chaque singularité).
 const sat = (t, tau) => 1 - Math.exp(-t / tau);
 const ORDER = ['dust', 'plasma', 'dark', 'anti', 'neutro', 'chronon', 'graviton', 'quark'];
 const EXOTIC = ['chronon', 'graviton', 'quark'];
@@ -456,49 +519,49 @@ const ELEMENTS = {
 const CORE = { dust: c => 1, plasma: c => 2.5, dark: c => 1 + 3 * sat(c.t, 1200), anti: c => 6, neutro: c => 1 + 0.5 * c.n, chronon: c => 1.5, graviton: c => 1.5, quark: c => 1.5 };
 const FUSED = { dust: c => 1.4, plasma: c => 1.7, dark: c => 1 + 1.2 * sat(c.t, 1200), anti: c => 3, neutro: c => 1.6, chronon: c => 1.2, graviton: c => 1.2, quark: c => 1.2 };
 const EL_FX = {
-  dust:     { core: '×1', fused: '×1,4' },
-  plasma:   { core: '×2,5', fused: '×1,7' },
-  dark:     { core: 'jusqu\'à ×4 avec la durée de la run', fused: 'jusqu\'à ×2,2 avec la durée de la run' },
-  anti:     { core: '×6, mais coûts ×4', fused: '×3, mais coûts ×2' },
-  neutro:   { core: '+0,5 par élément fusionné', fused: '×1,6' },
-  chronon:  { core: '×1,5 · les effets liés au temps progressent ×3 plus vite', fused: '×1,2 · effets liés au temps ×2 plus vite' },
-  graviton: { core: '×1,5 · chaque élément fusionné coûte 1 de stabilité en moins', fused: '×1,2 · le noyau ne compte plus dans la stabilité' },
-  quark:    { core: '×1,5 · les éléments fusionnés réagissent aussi entre eux', fused: '×1,2 · les fusionnés réagissent entre eux à 50 %' },
+  dust:     { core: 'production ×1', fused: 'production ×1,4' },
+  plasma:   { core: 'production ×2,5', fused: 'production ×1,7' },
+  dark:     { core: 'production jusqu\'à ×4 avec la durée de la run', fused: 'production jusqu\'à ×2,2 avec la durée de la run' },
+  anti:     { core: 'production ×6, mais pénalité de coût ×4', fused: 'production ×3, mais pénalité de coût ×2' },
+  neutro:   { core: 'production +50 % par élément fusionné', fused: 'production ×1,6' },
+  chronon:  { core: 'production ×1,5 · les effets liés au temps progressent ×3 plus vite', fused: 'production ×1,2 · les effets liés au temps progressent ×2 plus vite' },
+  graviton: { core: 'production ×1,5 · chaque élément fusionné coûte 1 de stabilité en moins', fused: 'production ×1,2 · le noyau ne coûte plus de stabilité' },
+  quark:    { core: 'production ×1,5 · les éléments fusionnés réagissent aussi entre eux', fused: 'production ×1,2 · les éléments fusionnés réagissent entre eux à 50 %' },
 };
 const RUN1_UNLOCK = { plasma: 1e3, dark: 1e5, anti: 1e7, neutro: 1e9 };
 const key = (a, b) => [a, b].sort().join('+');
 const REACTIONS = {
-  [key('dust', 'plasma')]:  { name: 'Ignition', desc: '×2', f: c => 2 },
-  [key('dust', 'dark')]:    { name: 'Accrétion', desc: 'jusqu\'à ×2 avec le temps', f: c => 1 + 1 * sat(c.t, 600) },
+  [key('dust', 'plasma')]:  { name: 'Ignition', desc: 'production ×2', f: c => 2 },
+  [key('dust', 'dark')]:    { name: 'Accrétion', desc: 'production jusqu\'à ×2 avec le temps', f: c => 1 + 1 * sat(c.t, 600) },
   [key('dust', 'anti')]:    { name: 'Annihilation douce', desc: 'pénalité de coût de l\'Antimatière divisée par deux', f: c => 1, pen: 0.5 },
-  [key('dust', 'neutro')]:  { name: 'Compactage', desc: 'instabilité totale −2', f: c => 1, stab: 2 },
-  [key('plasma', 'dark')]:  { name: 'Combustion lente', desc: 'jusqu\'à ×2,2 avec le temps', f: c => 1 + 1.2 * sat(c.t, 900) },
-  [key('plasma', 'anti')]:  { name: 'Déflagration', desc: '×3', f: c => 3 },
-  [key('plasma', 'neutro')]:{ name: 'Fusion stellaire', desc: 'le Flux compte double', f: c => 1, flux: 2 },
-  [key('dark', 'anti')]:    { name: 'Effondrement', desc: 'jusqu\'à ×4,5 avec le temps, pénalité de coût doublée', f: c => 1 + 3.5 * sat(c.t, 1200), pen: 2 },
-  [key('dark', 'neutro')]:  { name: 'Étoile à neutrons', desc: '×2,5', f: c => 2.5 },
-  [key('anti', 'neutro')]:  { name: 'Confinement', desc: '×2,5, pénalité de coût divisée par deux', f: c => 2.5, pen: 0.5 },
+  [key('dust', 'neutro')]:  { name: 'Compactage', desc: 'coût en stabilité −2', f: c => 1, stab: 2 },
+  [key('plasma', 'dark')]:  { name: 'Combustion lente', desc: 'production jusqu\'à ×2,2 avec le temps', f: c => 1 + 1.2 * sat(c.t, 900) },
+  [key('plasma', 'anti')]:  { name: 'Déflagration', desc: 'production ×3', f: c => 3 },
+  [key('plasma', 'neutro')]:{ name: 'Flash de l\'hélium', desc: 'le Flux compte double', f: c => 1, flux: 2 },
+  [key('dark', 'anti')]:    { name: 'Effondrement', desc: 'production jusqu\'à ×4,5 avec le temps, pénalité de coût doublée', f: c => 1 + 3.5 * sat(c.t, 1200), pen: 2 },
+  [key('dark', 'neutro')]:  { name: 'Écorce sombre', desc: 'production ×2,5', f: c => 2.5 },
+  [key('anti', 'neutro')]:  { name: 'Confinement', desc: 'production ×2,5, pénalité de coût divisée par deux', f: c => 2.5, pen: 0.5 },
   // Quark
-  [key('quark', 'dust')]:     { name: 'Hadronisation', desc: '×2', f: c => 2 },
+  [key('quark', 'dust')]:     { name: 'Hadronisation', desc: 'production ×2', f: c => 2 },
   [key('quark', 'plasma')]:   { name: 'Soupe de quarks', desc: 'les réactions entre fusionnés passent à 100 %', f: c => 1, innerFull: true },
-  [key('quark', 'dark')]:     { name: 'Étrangeté', desc: 'jusqu\'à ×3 avec le temps', f: c => 1 + 2 * sat(c.t, 900) },
-  [key('quark', 'anti')]:     { name: 'Antiquark', desc: '×3, pénalité de coût ×1,5', f: c => 3, pen: 1.5 },
-  [key('quark', 'neutro')]:   { name: 'Étoile à quarks', desc: '×1,5 par élément fusionné', f: c => Math.pow(1.5, c.n) },
+  [key('quark', 'dark')]:     { name: 'Étrangeté', desc: 'production jusqu\'à ×3 avec le temps', f: c => 1 + 2 * sat(c.t, 900) },
+  [key('quark', 'anti')]:     { name: 'Antiquark', desc: 'production ×3, pénalité de coût ×1,5', f: c => 3, pen: 1.5 },
+  [key('quark', 'neutro')]:   { name: 'Matière dégénérée', desc: 'production ×1,5 par élément fusionné', f: c => Math.pow(1.5, c.n) },
   [key('quark', 'chronon')]:  { name: 'Chromodynamique', desc: 'effet des réactions ×1,5', f: c => 1, react: 1.5 },
-  [key('quark', 'graviton')]: { name: 'Liaison forte', desc: 'instabilité totale −2', f: c => 1, stab: 2 },
+  [key('quark', 'graviton')]: { name: 'Liaison forte', desc: 'coût en stabilité −2', f: c => 1, stab: 2 },
   // Chronon
-  [key('chronon', 'dust')]:     { name: 'Sédimentation', desc: 'jusqu\'à ×3, lentement', f: c => 1 + 2 * sat(c.t, 2400) },
-  [key('chronon', 'plasma')]:   { name: 'Éclair', desc: '×4 pendant les 2 premières minutes de la run, puis ×1,5', f: c => (c.age < 120 ? 4 : 1.5) },
-  [key('chronon', 'dark')]:     { name: 'Âge sombre', desc: 'jusqu\'à ×5 avec le temps', f: c => 1 + 4 * sat(c.t, 1500) },
+  [key('chronon', 'dust')]:     { name: 'Sédimentation', desc: 'production jusqu\'à ×3, lentement', f: c => 1 + 2 * sat(c.t, 2400) },
+  [key('chronon', 'plasma')]:   { name: 'Éclair', desc: 'production ×4 pendant les 2 premières minutes de la run, puis ×1,5', f: c => (c.age < 120 ? 4 : 1.5) },
+  [key('chronon', 'dark')]:     { name: 'Âge sombre', desc: 'production jusqu\'à ×5 avec le temps', f: c => 1 + 4 * sat(c.t, 1500) },
   [key('chronon', 'anti')]:     { name: 'Inversion', desc: 'la pénalité de coût baisse au fil de la run (jusqu\'à ÷4)', f: c => 1, penT: true },
-  [key('chronon', 'neutro')]:   { name: 'Horloge à neutrons', desc: 'vitesse de la run ×1,5', f: c => 1, speed: 1.5 },
-  [key('chronon', 'graviton')]: { name: 'Dilatation', desc: 'vitesse de la run ×1,5', f: c => 1, speed: 1.5 },
+  [key('chronon', 'neutro')]:   { name: 'Horloge à neutrons', desc: 'vitesse ×1,5', f: c => 1, speed: 1.5 },
+  [key('chronon', 'graviton')]: { name: 'Dilatation', desc: 'vitesse ×1,5', f: c => 1, speed: 1.5 },
   // Graviton
   [key('graviton', 'dust')]:   { name: 'Agrégation', desc: 'Flux ×1,5', f: c => 1, flux: 1.5 },
-  [key('graviton', 'plasma')]: { name: 'Lentille', desc: '×2,5', f: c => 2.5 },
-  [key('graviton', 'dark')]:   { name: 'Halo', desc: 'instabilité de la Matière noire −2', f: c => 1, darkStab: 2 },
+  [key('graviton', 'plasma')]: { name: 'Lentille', desc: 'production ×2,5', f: c => 2.5 },
+  [key('graviton', 'dark')]:   { name: 'Halo', desc: 'la Matière noire coûte 2 de stabilité en moins', f: c => 1, darkStab: 2 },
   [key('graviton', 'anti')]:   { name: 'Puits', desc: 'pénalité de coût divisée par deux', f: c => 1, pen: 0.5 },
-  [key('graviton', 'neutro')]: { name: 'Écrasement', desc: '+0,5 par élément fusionné', f: c => 1 + 0.5 * c.n },
+  [key('graviton', 'neutro')]: { name: 'Écrasement', desc: 'production +50 % par élément fusionné', f: c => 1 + 0.5 * c.n },
 };
 const UPG = { flux: { base: 10, mul: 1.15 }, power: { base: 50, mul: 5 } };
 
@@ -515,8 +578,8 @@ const TREE = [
   { pal: 1, id: 'S', name: 'Stabilité', nodes: [
     { id: 'S1', name: 'Coque', desc: 'Stabilité +1', cost: 2, stab: 1 },
     { id: 'S2', name: 'Blindage', desc: 'Stabilité +1', cost: 4, stab: 1 },
-    { id: 'S3', name: 'Ancrage', desc: 'Instabilité de la Matière noire −2', cost: 8, darkStab: 2 },
-    { id: 'S4', name: 'Cœur stable', desc: 'Stabilité +2', cost: 16, stab: 2 },
+    { id: 'S3', name: 'Ancrage', desc: 'La Matière noire coûte 2 de stabilité en moins', cost: 8, darkStab: 2 },
+    { id: 'S4', name: 'Noyau stable', desc: 'Stabilité +2', cost: 16, stab: 2 },
     { id: 'S5', name: 'Coquille', desc: 'Stabilité +1', cost: 32, stab: 1 } ] },
   { pal: 2, id: 'R', name: 'Réactions', nodes: [
     { id: 'R1', name: 'Synergie', desc: 'Effet des réactions +50 %', cost: 3, syn: 0.5 },
@@ -525,10 +588,10 @@ const TREE = [
     { id: 'R4', name: 'Synergie profonde', desc: 'Effet des réactions +100 %', cost: 12, syn: 1 },
     { id: 'R5', name: 'Résonance', desc: 'Effet des réactions ×1,5', cost: 24, react: 1.5 } ] },
   { pal: 3, id: 'T', name: 'Temps', nodes: [
-    { id: 'T1', name: 'Accélération', desc: 'Vitesse de la run ×1,5', cost: 4, speed: 1.5 },
+    { id: 'T1', name: 'Accélération', desc: 'Vitesse ×1,5', cost: 4, speed: 1.5 },
     { id: 'T2', name: 'Maturation', desc: 'Les effets liés au temps progressent ×2 plus vite', cost: 8, time: 2 },
     { id: 'T3', name: 'Pluie de comètes', desc: 'Les comètes arrivent 2× plus souvent', cost: 16, comets: 2 },
-    { id: 'T4', name: 'Accélération profonde', desc: 'Vitesse de la run ×1,5', cost: 32, speed: 1.5 },
+    { id: 'T4', name: 'Accélération profonde', desc: 'Vitesse ×1,5', cost: 32, speed: 1.5 },
     { id: 'T5', name: 'Patience', desc: 'Production +10 % par minute de run (jusqu\'à ×4)', cost: 64, patience: true } ] },
   { pal: 4, id: 'A', name: 'Automatisation', nodes: [
     { id: 'A1', name: 'Auto-Flux', desc: 'Achète le Flux automatiquement', cost: 5, auto: 'flux' },
@@ -537,23 +600,23 @@ const TREE = [
     { id: 'A4', name: 'Nova automatique', desc: 'Déclenche une Nova dès qu\'elle rapporte autant d\'éclats que tu en as gagné depuis le début du palier', cost: 40, auto: 'nova' },
     { id: 'A5', name: 'Auto-singularité', desc: 'Déclenche la singularité dès que l\'objectif est atteint', cost: 80, auto: 'sing' } ] },
   { pal: 5, id: 'E', name: 'Exotique', nodes: [
-    { id: 'E1', name: 'Matière exotique', desc: 'Effet fusionné des éléments exotiques ×2', cost: 6, exo: 2 },
+    { id: 'E1', name: 'Matière exotique', desc: 'Effet des éléments exotiques fusionnés ×2', cost: 6, exo: 2 },
     { id: 'E2', name: 'Neutralisation', desc: 'Pénalité de coût de l\'Antimatière divisée par deux', cost: 12, pen: 0.5 },
-    { id: 'E3', name: 'Résonance exotique', desc: 'Réactions des éléments exotiques ×2', cost: 24, exoReact: 2 },
+    { id: 'E3', name: 'Résonance exotique', desc: 'Effet des réactions des éléments exotiques ×2', cost: 24, exoReact: 2 },
     { id: 'E4', name: 'Coquille exotique', desc: 'Stabilité +2', cost: 48, stab: 2 },
     { id: 'E5', name: 'Écho exotique', desc: 'Production ×10', cost: 96, mult: 10 } ] },
   { pal: 6, id: 'X', name: 'Singularité', nodes: [
     { id: 'X1', name: 'Horizon', desc: 'Production ×10', cost: 10, mult: 10 },
     { id: 'X2', name: 'Éjection', desc: 'Éclats gagnés par Nova ×2', cost: 20, eclats: 2 },
-    { id: 'X3', name: 'Cinquième couche', desc: 'Un emplacement de fusion de plus', cost: 40, slot: 1 },
-    { id: 'X4', name: 'Effondrement final', desc: 'Production ×100', cost: 80, mult: 100 } ] },
+    { id: 'X3', name: 'Cinquième emplacement', desc: 'Un emplacement de fusion de plus', cost: 40, slot: 1 },
+    { id: 'X4', name: 'Point de non-retour', desc: 'Production ×100', cost: 80, mult: 100 } ] },
 ];
-// Nœuds-clés débloqués par les défis (s'achètent ensuite dans l'arbre, branche Défis)
+// Lois clés débloquées par les défis (s'achètent ensuite dans l'arbre, branche Lois clés)
 const KEYS = [
   { id: 'K1', ch: 'pure',     name: 'Pureté renforcée', desc: 'Pureté ×6 au lieu de ×3', cost: 10, purity: 6 },
   { id: 'K2', ch: 'unstable', name: 'Stabilité éprouvée', desc: 'Stabilité +2', cost: 10, stab: 2 },
   { id: 'K3', ch: 'sober',    name: 'Double spécialisation', desc: 'Pureté et Catalyse ensemble', cost: 10, bothSpec: true },
-  { id: 'K4', ch: 'noecho',   name: 'Liaisons profondes', desc: 'Réactions entre éléments fusionnés +50 %', cost: 20, innerBonus: 0.5 },
+  { id: 'K4', ch: 'noecho',   name: 'Liaisons profondes', desc: 'Effet des réactions entre éléments fusionnés +50 %', cost: 20, innerBonus: 0.5 },
   { id: 'K5', ch: 'forced',   name: 'Antimatière apprivoisée', desc: 'Pénalité de coût de l\'Antimatière divisée par deux', cost: 20, pen: 0.5 },
 ];
 const ALL_NODES = [...TREE.flatMap(b => b.nodes.map(n => ({ ...n, branch: b.id, pal: b.pal }))), ...KEYS.map(n => ({ ...n, branch: 'K', pal: 5 }))];
@@ -566,21 +629,21 @@ const MEMORY_CH = ['pure', 'unstable', 'sober'];
 const treePermanent = m => MEMORY_CH.every(k => (m.challengesDone || []).includes(k));
 
 const CHALLENGES = {
-  pure:     { name: 'Pur', desc: 'Aucune fusion possible', reward: 'Nœud-clé Pureté renforcée', tier: 5, rel: Number(ENV.CPU || 1e6) },
-  unstable: { name: 'Instable', desc: 'Stabilité divisée par deux', reward: 'Nœud-clé Stabilité éprouvée (+2)', tier: 5, rel: Number(ENV.CUN || 1e13) },
-  sober:    { name: 'Sobriété', desc: 'Puissance limitée à 25 niveaux', reward: 'Nœud-clé Double spécialisation', tier: 5, rel: Number(ENV.CSO || 1e11) },
-  noecho:   { name: 'Sans écho', desc: 'Les réactions n\'ont aucun effet', reward: 'Nœud-clé Liaisons profondes', tier: 6, rel: Number(ENV.CNE || 1e-11) },
-  forced:   { name: 'Noyau imposé', desc: 'Poussière stellaire au noyau', reward: 'Nœud-clé Antimatière apprivoisée', tier: 6, rel: Number(ENV.CFO || 1e18) },
+  pure:     { name: 'Pur', desc: 'Aucune fusion possible', reward: 'Loi clé Pureté renforcée', tier: 5, rel: Number(ENV.CPU || 1e6) },
+  unstable: { name: 'Instable', desc: 'Stabilité divisée par deux', reward: 'Loi clé Stabilité éprouvée (+2)', tier: 5, rel: Number(ENV.CUN || 1e13) },
+  sober:    { name: 'Sobriété', desc: 'Puissance limitée à 25 niveaux', reward: 'Loi clé Double spécialisation', tier: 5, rel: Number(ENV.CSO || 1e11) },
+  noecho:   { name: 'Sans réaction', desc: 'Les réactions n\'ont aucun effet', reward: 'Loi clé Liaisons profondes', tier: 6, rel: Number(ENV.CNE || 1e-11) },
+  forced:   { name: 'Noyau imposé', desc: 'Poussière stellaire imposée au noyau', reward: 'Loi clé Antimatière apprivoisée', tier: 6, rel: Number(ENV.CFO || 1e18) },
 };
 const SOBER_POWER = 25;
 const PALIERS = [
-  { n: 0, name: 'Nébuleuse', unlock: 'Nova et branche Matière ; les cinq noyaux se découvrent pendant la run' },
-  { n: 1, name: 'Protoétoile', unlock: 'Fusion (2 emplacements) et branche Stabilité' },
-  { n: 2, name: 'Étoile', unlock: 'Chronon et branche Réactions' },
-  { n: 3, name: 'Géante', unlock: 'Graviton, 3e emplacement et branche Temps' },
-  { n: 4, name: 'Supernova', unlock: 'Quark et branche Automatisation' },
-  { n: 5, name: 'Étoile à neutrons', unlock: '4e emplacement, branche Exotique, défis Pur, Instable et Sobriété' },
-  { n: 6, name: 'Trou noir', unlock: 'Branche Singularité, défis Sans écho et Noyau imposé' },
+  { n: 0, name: 'Nébuleuse', unlock: 'Nova et constellation Matière ; les cinq premiers éléments se découvrent pendant la run' },
+  { n: 1, name: 'Protoétoile', unlock: 'Fusion (2 emplacements) et constellation Stabilité' },
+  { n: 2, name: 'Étoile', unlock: 'Chronon et constellation Réactions' },
+  { n: 3, name: 'Géante', unlock: 'Graviton, 3e emplacement et constellation Temps' },
+  { n: 4, name: 'Supernova', unlock: 'Quark et constellation Automatisation' },
+  { n: 5, name: 'Étoile à neutrons', unlock: '4e emplacement, constellation Exotique, défis Pur, Instable et Sobriété' },
+  { n: 6, name: 'Trou noir', unlock: 'Constellation Singularité, défis Sans réaction et Noyau imposé' },
 ];
 const LAST_PAL = 6;
 const SPEED_BASE = 2;
@@ -596,10 +659,10 @@ const powerMilestones = l => Math.floor(l / POWER_MS_STEP);
 const RUN_UPS = [
   { id: 'coils',   name: 'Bobines supraconductrices', desc: 'Flux ×2', f: 0.10 },
   { id: 'cap',     name: 'Condensateur', desc: 'La Puissance coûte deux fois moins', f: 0.22 },
-  { id: 'coreres', name: 'Résonance du noyau', desc: 'Effet du noyau ×1,5', f: 0.34 },
+  { id: 'coreres', name: 'Noyau surchauffé', desc: 'Effet du noyau ×1,5', f: 0.34 },
   { id: 'catal',   name: 'Catalyseur', desc: 'Effet de chaque élément fusionné ×1,25', f: 0.46 },
   { id: 'harm',    name: 'Amplificateur harmonique', desc: 'Effet des réactions ×1,5', f: 0.58 },
-  { id: 'comp',    name: 'Compression temporelle', desc: 'La run avance 1,25 fois plus vite', f: 0.70 },
+  { id: 'comp',    name: 'Compression temporelle', desc: 'Vitesse ×1,25', f: 0.70 },
   { id: 'over',    name: 'Surcharge', desc: 'Production ×3', f: 0.82 },
   { id: 'crit',    name: 'Masse critique', desc: 'Production +5 % par puissance de 10 produite dans la run', f: 0.92 },
 ];
@@ -687,10 +750,10 @@ function breakdown(m, r) {
   const parts = [];
   const fluxK = re.reduce((a, x) => a * (x.flux || 1), 1);
   parts.push({ id: 'flux', label: 'Flux', v: r.lv.flux * fluxK, base: true });
-  const fm = fluxMilestones(r.lv.flux); if (fm) parts.push({ id: 'fluxms', label: `Paliers de Flux (${fm})`, v: Math.pow(2, fm) });
+  const fm = fluxMilestones(r.lv.flux); if (fm) parts.push({ id: 'fluxms', label: `Jalons de Flux (${fm})`, v: Math.pow(2, fm) });
   if (hasUp(r, 'coils')) parts.push({ id: 'coils', label: 'Bobines supraconductrices', v: 2 });
   parts.push({ id: 'power', label: 'Puissance', v: Math.pow(2, r.lv.power) });
-  const pm = powerMilestones(r.lv.power); if (pm) parts.push({ id: 'powms', label: `Paliers de Puissance (${pm})`, v: Math.pow(POWER_MS_MULT, pm) });
+  const pm = powerMilestones(r.lv.power); if (pm) parts.push({ id: 'powms', label: `Jalons de Puissance (${pm})`, v: Math.pow(POWER_MS_MULT, pm) });
   parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: CORE[r.core](c) * (hasUp(r, 'coreres') ? 1.5 : 1) });
   const exoK = prodOf(m, 'exo');
   for (const x of r.fused) { let v = FUSED[x](c) * (hasUp(r, 'catal') ? 1.25 : 1); if (EXOTIC.includes(x)) v = 1 + (v - 1) * exoK; parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné', v }); }
@@ -700,7 +763,7 @@ function breakdown(m, r) {
   const usePur = sp.includes('purity') || both, useCat = sp.includes('catalysis') || both;
   if (usePur && n <= 1) parts.push({ id: 'purity', label: 'Pureté', v: has(m, 'K1') ? 6 : 3 });
   if (useCat && n) parts.push({ id: 'catalysis', label: 'Catalyse', v: Math.pow(1.35, n) });
-  const mult = prodOf(m, 'mult'); if (mult > 1) parts.push({ id: 'tree', label: 'Arbre des lois', v: mult });
+  const mult = prodOf(m, 'mult'); if (mult > 1) parts.push({ id: 'tree', label: 'Constellations', v: mult });
   if (has(m, 'T5')) parts.push({ id: 'patience', label: 'Patience', v: Math.min(4, 1 + 0.1 * (r.age || 0) / 60) });
   if (r.boostLeft > 0) parts.push({ id: 'comet', label: 'Queue de comète', v: 3 });
   if (hasUp(r, 'over')) parts.push({ id: 'over', label: 'Surcharge', v: 3 });
@@ -750,9 +813,22 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       if (k === 'class') e.className = v; else if (k === 'style') e.setAttribute('style', v);
       else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
     }
-    for (const k of kids) if (k != null && k !== false) e.append(k);
+    for (const k of kids) if (k != null && k !== false) { if (typeof k === 'string' && ECL_RE.test(k)) { const w = document.createElement('span'); w.append(...rich(k)); e.append(w); } else e.append(k); }
     return e;
   };
+  // Chaque mention des éclats reçoit son petit carré jaune, pour que l'icône du haut se comprenne d'elle-même
+  const ECL_RE = /éclats?/i;
+  const EC_HTML = '<i class="ec" aria-hidden="true"></i>';
+  function rich(str) {
+    const out = [];
+    // le nombre éventuel, le carré et le mot restent sur la même ligne : « +12 ■ éclats »
+    String(str).split(/((?:\+?\d[\d\s,.e]*\s)?éclats?)/i).forEach((part, i) => {
+      if (i % 2) { const [, num, word] = part.match(/^(.*?)(éclats?)$/i), w = document.createElement('span'), ic = document.createElement('i'); w.className = 'ecw'; ic.className = 'ec'; ic.setAttribute('aria-hidden', 'true'); w.append(num, ic, word); out.push(w); }
+      else if (part) out.push(part);
+    });
+    return out;
+  }
+  const eclW = n => `${fmt(n)} éclat${n > 1 ? 's' : ''}`;
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
@@ -880,7 +956,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       if (run.produced >= th && !meta.ownedList.includes(x)) {
         meta.ownedList.push(x);
         fx.unlock(EL_COLOR[x]);
-        toast(`Nouveau noyau : <b>${ELEMENTS[x].name}</b> · ${EL_FX[x].core} au noyau`, EL_COLOR[x]);
+        toast(`Nouvel élément : <b>${ELEMENTS[x].name}</b> · au noyau : ${EL_FX[x].core}`, EL_COLOR[x]);
         markTab('el'); structure();
       }
     }
@@ -895,7 +971,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.best = Math.max(meta.best, P());
     run = newRun(meta);
     fx.nova(g);
-    if (!auto) toast(`Nova · <b>+${fmt(g)} éclat${g > 1 ? 's' : ''}</b> · à dépenser dans l'arbre des lois`, '#f2c46b');
+    if (!auto) toast(`Nova · <b>+${fmt(g)} éclat${g > 1 ? 's' : ''}</b> · pour allumer tes constellations`, '#f2c46b');
     markTab('law'); structure(); refresh(true); save();
   }
   // ---------- Singularité ----------
@@ -920,17 +996,38 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     run = newRun(meta);
     const pal = PALIERS[meta.pal];
     fx.singularity(`Palier ${meta.pal}`);
-    toast(`Palier ${meta.pal} · <b>${pal.name}</b> · ${pal.unlock}. Vitesse <b>×${fmt(speed())}</b>${perm ? '' : ` · l'arbre repart de zéro avec ${catalogEclats(meta)} éclats offerts par le catalogue`}`, '#9b6bff');
+    toast(`Palier ${meta.pal} · <b>${pal.name}</b> · ${pal.unlock}. Vitesse <b>×${fmt(speed())}</b>${perm ? '' : ` · le ciel s'éteint${catalogEclats(meta) ? `, tu repars avec ${eclW(catalogEclats(meta))} offert${catalogEclats(meta) > 1 ? 's' : ''} par le catalogue` : ''}`}`, '#9b6bff');
     markTab('law'); if (ORDER.some(x => ELEMENTS[x].pal === meta.pal) || meta.pal === 1) markTab('el');
     if (meta.pal === 5) markTab('ch');
     structure(); refresh(true); save();
   }
-  // ---------- Arbre des lois ----------
+  // ---------- Constellations ----------
+  // Positions des étoiles (en % du ciel) et côté de l'étiquette : r droite, l gauche, t dessus, b dessous.
+  // edges : lignes entre étoiles (par défaut, dans l'ordre de la constellation) ; fig : lignes ajoutées quand elle est complète.
+  const SKY = {
+    M: { pts: { M1: [14, 78, 'r'], M2: [26, 50, 'r'], M3: [48, 62, 'b'], M4: [58, 34, 'r'], M5: [80, 16, 'l'], M6: [84, 56, 'l'] }, fig: [['M6', 'M3']] },
+    S: { pts: { S1: [18, 40, 'r'], S2: [42, 16, 'r'], S3: [72, 30, 'r'], S4: [64, 70, 'b'], S5: [30, 72, 'b'] }, fig: [['S5', 'S1']] },
+    R: { pts: { R1: [12, 50, 'b'], R2: [36, 24, 't'], R3: [36, 76, 'b'], R4: [62, 50, 'r'], R5: [86, 24, 't'] }, edges: [['R1', 'R2'], ['R1', 'R3'], ['R2', 'R4'], ['R3', 'R4'], ['R4', 'R5']], pair: ['R2', 'R3'] },
+    T: { pts: { T1: [16, 22, 't'], T2: [84, 22, 't'], T3: [50, 48, 'r'], T4: [16, 76, 'b'], T5: [84, 76, 'b'] }, fig: [['T5', 'T3'], ['T3', 'T1']] },
+    A: { pts: { A1: [12, 70, 'b'], A2: [26, 32, 'r'], A3: [50, 22, 't'], A4: [74, 32, 'r'], A5: [88, 70, 'b'] }, fig: [['A5', 'A1']] },
+    E: { pts: { E1: [16, 26, 'r'], E2: [42, 42, 'r'], E3: [24, 70, 'b'], E4: [62, 72, 'r'], E5: [84, 30, 't'] }, fig: [['E5', 'E2']] },
+    X: { pts: { X1: [50, 14, 'r'], X2: [80, 46, 'b'], X3: [50, 80, 'r'], X4: [20, 46, 'b'] }, fig: [['X4', 'X1']] },
+    K: { pts: { K1: [12, 66, 'b'], K2: [28, 26, 'r'], K3: [50, 48, 'b'], K4: [72, 26, 'r'], K5: [88, 66, 'b'] }, fig: [['K5', 'K1']] },
+  };
+  const SKY_BR = [...TREE, { pal: 5, id: 'K', name: 'Lois clés', nodes: KEYS }];
+  const isLit = id => { const n = NODE[id]; return n.repeat ? nodeCount(meta, id) > 0 : has(meta, id); };
+  const litCount = b => b.nodes.filter(n => isLit(n.id)).length;
+  const skyDone = b => b.nodes.every(n => isLit(n.id) || (n.excl && has(meta, n.excl)));
+  // un choix exclusif (Pureté ou Catalyse) compte pour une seule étoile, sauf avec Double spécialisation
+  const skyTotal = b => b.nodes.length - (SKY[b.id].pair && !has(meta, 'K3') ? 1 : 0);
   function buyNode(id) {
     const n = NODE[id]; if (nodeState(meta, n) !== 'can') return;
+    const br = SKY_BR.find(b => b.id === n.branch), wasDone = skyDone(br);
     meta.eclats -= nodeCost(meta, n); meta.tree.push(id);
     fx.pulse('#f2c46b', 1.1);
-    toast(`Loi acquise : <b>${n.name}</b> · ${n.desc}`, '#f2c46b');
+    toast(`Loi allumée : <b>${n.name}</b> · ${n.desc}`, '#f2c46b');
+    if (!wasDone && skyDone(br)) { fx.flash(`Constellation ${br.name}`, '#f2c46b'); setTimeout(() => toast(`<b>Constellation ${br.name} complète</b> · toutes ses étoiles brillent`, '#f2c46b'), 500); }
+    if (!n.repeat) { const next = br.nodes.find(x => nodeState(meta, NODE[x.id]) === 'can'); if (next) ui.sel = next.id; }
     structure(); refresh(true); save();
   }
   // ---------- Défis ----------
@@ -956,8 +1053,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       const wasPerm = treePermanent(meta);
       meta.challengesDone.push(k);
       fx.singularity('Défi réussi');
-      toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, disponible dans l'arbre`, '#6ee7a8');
-      if (!wasPerm && treePermanent(meta)) setTimeout(() => toast('<b>Mémoire stellaire</b> · ton arbre des lois ne repart plus de zéro à chaque palier', '#f2c46b'), 600);
+      toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, à allumer dans le ciel (constellation Lois clés)`, '#6ee7a8');
+      if (!wasPerm && treePermanent(meta)) setTimeout(() => toast('<b>Mémoire stellaire</b> · tes constellations restent allumées d\'un palier à l\'autre', '#f2c46b'), 600);
       run = newRun(meta);
       markTab('law'); structure(); refresh(true); save();
     }
@@ -1028,8 +1125,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
 
   // ---------- Structure (reconstruite quand l'état change de forme) ----------
   const UPG_ROWS = [
-    { u: 'flux', name: 'Flux', desc: 'Production de base +1 par niveau', lvl: () => `niv. ${run.lv.flux}`, val: () => `Prochain palier : niveau ${nextFluxMilestone(run.lv.flux)} · ×2` },
-    { u: 'power', name: 'Puissance', desc: 'Production ×2 par niveau', lvl: () => `niv. ${run.lv.power}`, val: () => `Prochain palier : niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP} · ×1,25${run.challenge === 'sober' ? ` · limite ${SOBER_POWER}` : ''}` },
+    { u: 'flux', name: 'Flux', desc: 'Production de base +1 par niveau', lvl: () => `niv. ${run.lv.flux}`, val: () => `Prochain jalon : niveau ${nextFluxMilestone(run.lv.flux)} · ×2` },
+    { u: 'power', name: 'Puissance', desc: 'Production ×2 par niveau', lvl: () => `niv. ${run.lv.power}`, val: () => `Prochain jalon : niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP} · ×1,25${run.challenge === 'sober' ? ` · limite ${SOBER_POWER}` : ''}` },
   ];
   const ui = { upg: {} };
   function structure() {
@@ -1054,11 +1151,11 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       const b = h('button', { class: 'tile' + (have ? ' have' : ''), type: 'button', disabled: have, title: up.desc, onclick: e => buyUp(up.id, e.currentTarget) }, ic, h('b', {}, up.name), h('small', {}, up.desc), cst);
       ur.append(b); if (!have) ui.ups[up.id] = { b, small: cst, up };
     }
-    $('upsHint').textContent = `${run.ups.length} / ${RUN_UPS.length} · rachetées à chaque run`;
-    // Cœur
+    $('upsHint').textContent = `${run.ups.length} / ${RUN_UPS.length} · remises à zéro à chaque Nova`;
+    // Éléments : noyau et fusions
     const gc = $('genCard'); gc.replaceChildren();
     if (meta.pal === 0) {
-      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyaux'), h('span', { class: 'small' }, 'La fusion se débloque au palier 1')),
+      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Éléments'), h('span', { class: 'small' }, 'La fusion se débloque au palier 1')),
         h('p', { class: 'small' }, 'Pendant ta première run, chaque nouvel élément se découvre en produisant de l\'énergie. Essaie-les au noyau, tu peux en changer à tout moment.'));
     } else {
       const used = instab(meta, run), max = stabMax(meta, run);
@@ -1067,10 +1164,10 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       const slots = h('div', { class: 'slots' }, orb(run.core, 'core', 'Noyau'));
       for (let i = 0; i < maxFused(meta); i++) { slots.append(h('span', { class: 'plus' }, '+')); const x = run.fused[i]; slots.append(x ? orb(x, '', 'Fusionné') : orb(null, 'free', 'Libre')); }
       const anyFuse = ORDER.some(x => canFuse(x));
-      const hint = !anyFuse && !run.fused.length && run.challenge !== 'pure' ? h('p', { class: 'small', style: 'color:var(--warn)' }, 'Aucun élément ne tient dans ta stabilité avec ce noyau. Essaie un noyau moins instable, ou achète de la stabilité dans l\'arbre des lois.') : null;
+      const hint = !anyFuse && !run.fused.length && run.challenge !== 'pure' ? h('p', { class: 'small', style: 'color:var(--bad)' }, 'Aucun élément ne tient dans ta stabilité avec ce noyau. Essaie un noyau qui coûte moins de stabilité, ou allume des lois de la constellation Stabilité.') : null;
       const ik = innerK(meta, run);
-      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Le cœur de l\'étoile'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} fusions`)), gauge, slots, ...(hint ? [hint] : []),
-        h('p', { class: 'small' }, run.challenge === 'pure' ? 'Défi Pur : aucune fusion possible.' : `${run.fused.includes('graviton') ? 'Graviton fusionné : le noyau ne compte pas dans la stabilité. ' : run.core === 'graviton' ? 'Graviton au noyau : chaque élément fusionné coûte 1 de stabilité en moins. ' : 'Le noyau compte dans la stabilité. '}${ik ? `Quark : les éléments fusionnés réagissent entre eux (${Math.round(ik * 100)} %). ` : ''}Le noyau se change tant que rien n'est fusionné ; une fusion dure jusqu'à la prochaine Nova.`));
+      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyau et fusions'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} emplacements`)), gauge, slots, ...(hint ? [hint] : []),
+        h('p', { class: 'small' }, run.challenge === 'pure' ? 'Défi Pur : aucune fusion possible.' : `${run.fused.includes('graviton') ? 'Graviton fusionné : le noyau ne coûte plus de stabilité. ' : run.core === 'graviton' ? 'Graviton au noyau : chaque élément fusionné coûte 1 de stabilité en moins. ' : 'Le noyau coûte aussi de la stabilité. '}${ik ? `Quark : les éléments fusionnés réagissent entre eux (${Math.round(ik * 100)} %). ` : ''}Le noyau se change tant que rien n'est fusionné ; une fusion dure jusqu'à la prochaine Nova.`));
     }
     const els = $('els'); els.replaceChildren();
     for (const x of ORDER) {
@@ -1083,41 +1180,90 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
         actions.append(h('button', { class: 'btn' + (meta.pal === 0 && canCore(x) ? ' ok' : ''), type: 'button', disabled: !canCore(x), onclick: () => setCore(x) }, 'Au noyau', h('small', {}, canCore(x) ? 'Changer de noyau' : meta.pal >= 1 && run.fused.length ? 'Fusion en cours' : 'Indisponible')));
         if (meta.pal >= 1) {
           const after = instab(meta, run, [...run.fused, x]), max = stabMax(meta, run), armed = fuseArmed === x && canFuse(x);
-          const why = armed ? 'Jusqu\'à la prochaine Nova' : run.challenge === 'pure' ? 'Défi Pur' : run.fused.length >= maxFused(meta) ? 'Plus de place' : `Stabilité ${after} / ${max}`;
+          const why = armed ? 'Jusqu\'à la prochaine Nova' : run.challenge === 'pure' ? 'Défi Pur' : run.fused.length >= maxFused(meta) ? 'Emplacements pleins' : `Stabilité ${after} / ${max}`;
           actions.append(h('button', { class: 'btn' + (canFuse(x) ? ' ok' : '') + (armed ? ' armed' : ''), type: 'button', disabled: !canFuse(x), onclick: () => fuse(x) }, armed ? 'Confirmer la fusion' : 'Fusionner', h('small', {}, why)));
         }
       }
       const fxRows = [h('span', {}, 'Au noyau'), h('span', {}, EL_FX[x].core), h('span', {}, 'Fusionné'), h('span', {}, meta.pal >= 1 ? EL_FX[x].fused : '—')];
       if (!isCore && meta.pal >= 1) { const k = key(run.core, x), known = meta.discovered.includes(k); fxRows.push(h('span', {}, 'Avec le noyau'), h('span', {}, known ? `${REACTIONS[k].name} · ${REACTIONS[k].desc}` : '? Réaction inconnue')); }
       els.append(h('div', { class: 'el', style: `--c:${EL_COLOR[x]}` }, h('div', { class: 'orb' }, E.short),
-        h('div', { class: 'body' }, h('div', { class: 'title' }, h('b', {}, E.name), h('span', { class: 'tag' }, E.trait), h('span', { class: 'ins', title: 'Instabilité' }, `stabilité ${elInstab(meta, x, run)}`)), h('div', { class: 'fx' }, ...fxRows),
+        h('div', { class: 'body' }, h('div', { class: 'title' }, h('b', {}, E.name), h('span', { class: 'tag' }, E.trait), h('span', { class: 'ins' }, `coûte ${elInstab(meta, x, run)} de stabilité`)), h('div', { class: 'fx' }, ...fxRows),
           isCore ? h('span', { class: 'state' }, 'Au noyau') : isFused ? h('span', { class: 'state' }, 'Fusionné jusqu\'à la prochaine Nova') : null),
         actions.childNodes.length ? actions : null));
     }
-    // Arbre des lois : sélecteur de branche + liste de lois
+    // Ciel : une constellation par branche, chaque loi est une étoile qu'on allume avec des éclats
     const pl = $('p-law'); pl.replaceChildren();
     const perm = treePermanent(meta);
-    const BR = [...TREE, { pal: 5, id: 'K', name: 'Défis', nodes: KEYS }];
-    const valid = BR.find(b => b.id === ui.branch);
-    if (!valid) ui.branch = (BR.filter(b => b.id !== 'K' && b.pal <= meta.pal).find(b => b.nodes.some(n => nodeState(meta, NODE[n.id]) === 'can')) || BR.filter(b => b.id !== 'K' && b.pal <= meta.pal).pop() || BR[0]).id;
-    const pick = h('div', { class: 'branch-pick', role: 'group', 'aria-label': 'Branches de l\'arbre' });
-    for (const b of BR) {
-      const nCan = b.nodes.filter(n => nodeState(meta, NODE[n.id]) === 'can').length, off = b.id !== 'K' && meta.pal < b.pal;
-      pick.append(h('button', { class: 'bp' + (off ? ' off' : ''), type: 'button', 'aria-pressed': String(ui.branch === b.id), onclick: () => { ui.branch = b.id; structure(); } }, b.name, off ? h('span', { class: 'small' }, `P${b.pal}`) : null, nCan ? h('span', { class: 'n' }, String(nCan)) : null));
+    const valid = SKY_BR.find(b => b.id === ui.branch);
+    if (!valid) ui.branch = (SKY_BR.filter(b => b.id !== 'K' && b.pal <= meta.pal).find(b => b.nodes.some(n => nodeState(meta, NODE[n.id]) === 'can')) || SKY_BR.filter(b => b.id !== 'K' && b.pal <= meta.pal).pop() || SKY_BR[0]).id;
+    // Sélecteur : 8 boutons courts sur une seule rangée (P0 à P6, puis les lois clés), toujours tous visibles, sans défilement
+    const pickSky = id => { ui.branch = id; ui.sel = null; structure(); };
+    const pick = h('div', { class: 'sky-pick', role: 'group', 'aria-label': 'Constellations' });
+    for (const b of SKY_BR) {
+      const nCan = b.nodes.filter(n => nodeState(meta, NODE[n.id]) === 'can').length, off = meta.pal < b.pal, done = skyDone(b);
+      const lab = b.id === 'K' ? 'Clés' : `P${b.pal}`, state = off ? 'verrouillée' : done ? 'complète' : `${litCount(b)} sur ${skyTotal(b)} allumées`;
+      pick.append(h('button', { class: 'sp' + (off ? ' off' : '') + (done ? ' done' : '') + (nCan ? ' can' : ''), type: 'button', title: b.name, 'aria-label': `${b.name}, ${state}${nCan ? `, ${nCan} à allumer` : ''}`, 'aria-pressed': String(ui.branch === b.id), onclick: () => pickSky(b.id) },
+        h('b', {}, lab), h('small', {}, off ? '—' : done ? '✓' : `${litCount(b)}/${skyTotal(b)}`)));
     }
-    const B = BR.find(b => b.id === ui.branch), list = h('div', { class: 'nodes' });
+    const B = SKY_BR.find(b => b.id === ui.branch), L = SKY[B.id], bi = SKY_BR.indexOf(B);
+    const go = d => pickSky(SKY_BR[(bi + d + SKY_BR.length) % SKY_BR.length].id);
+    const arrow = (d, label, path) => { const b = h('button', { class: 'icon-btn', type: 'button', 'aria-label': label, onclick: () => go(d) }); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg>`; return b; };
+    const skyHead = h('div', { class: 'sky-head' }, arrow(-1, 'Constellation précédente', 'M15 5l-7 7 7 7'),
+      h('div', { class: 'sky-name' }, h('b', {}, B.id === 'K' ? 'Lois clés' : `P${B.pal} · ${B.name}`), h('span', { class: 'small' }, B.id === 'K' ? 'débloquées par les défis' : meta.pal < B.pal ? `apparaît au palier ${B.pal}` : `${litCount(B)} sur ${skyTotal(B)} allumées`)),
+      arrow(1, 'Constellation suivante', 'M9 5l7 7-7 7'));
+    if (!ui.sel || !B.nodes.some(n => n.id === ui.sel)) {
+      const stOf = id => nodeState(meta, NODE[id]);
+      ui.sel = (B.nodes.find(n => stOf(n.id) === 'can') || B.nodes.find(n => stOf(n.id) === 'poor') || B.nodes.find(n => !isLit(n.id) && stOf(n.id) !== 'locked') || B.nodes.find(n => !isLit(n.id)) || B.nodes[B.nodes.length - 1]).id;
+    }
+    const complete = skyDone(B), lockedBr = meta.pal < B.pal;
+    const lineCls = (a, b) => isLit(a) && isLit(b) ? 'lit' : (isLit(a) && nodeState(meta, NODE[b]) !== 'locked') || (isLit(b) && nodeState(meta, NODE[a]) !== 'locked') ? 'next' : 'dark';
+    const edges = L.edges || B.nodes.slice(1).map((n, i) => [B.nodes[i].id, n.id]);
+    const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true');
+    const line = (a, b, cls) => { const e = document.createElementNS(NS, 'line'), [x1, y1] = L.pts[a], [x2, y2] = L.pts[b]; for (const [k, v] of Object.entries({ x1, y1, x2, y2, class: cls, 'vector-effect': 'non-scaling-stroke' })) e.setAttribute(k, v); svg.append(e); };
+    // fond : des étoiles fixes, toujours les mêmes pour une constellation donnée
+    let seed = [...B.id].reduce((a, c) => a * 31 + c.charCodeAt(0), 7);
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    for (let i = 0; i < 46; i++) { const e = document.createElementNS(NS, 'circle'); e.setAttribute('cx', (rnd() * 100).toFixed(1)); e.setAttribute('cy', (rnd() * 100).toFixed(1)); e.setAttribute('r', (0.18 + rnd() * 0.3).toFixed(2)); e.setAttribute('class', 'dust'); svg.append(e); }
+    if (complete) for (const [a, b] of L.fig || []) line(a, b, 'fig');
+    if (complete) for (const [a, b] of edges) line(a, b, 'fig');
+    for (const [a, b] of L.fig || []) if (complete) line(a, b, 'lit');
+    for (const [a, b] of edges) line(a, b, lineCls(a, b));
+    if (L.pair) line(L.pair[0], L.pair[1], 'pair');
+    const sky = h('div', { class: 'sky' + (complete ? ' complete' : '') + (lockedBr ? ' off' : '') }, svg);
+    // glisser le doigt sur le ciel change de constellation
+    let sx = null, sy = null;
+    sky.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+    sky.addEventListener('pointerup', e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null; if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) go(dx < 0 ? 1 : -1); });
+    sky.addEventListener('pointercancel', () => { sx = null; });
     for (const n0 of B.nodes) {
-      const n = NODE[n0.id], st = nodeState(meta, n), cnt = nodeCount(meta, n.id), nc = nodeCost(meta, n);
-      const label = n.repeat && st !== 'locked' ? `${fmt(nc)} éclats` : st === 'have' ? 'Acquise' : st === 'locked' ? (n.branch === 'K' ? `Défi ${CHALLENGES[n.ch].name}` : meta.pal < n.pal ? `Palier ${n.pal}` : n.excl && has(meta, n.excl) ? 'Choix exclusif' : 'Loi précédente') : `${n.cost} éclat${n.cost > 1 ? 's' : ''}`;
-      const cls = n.repeat && cnt && st !== 'can' ? 'have' : st;
-      list.append(h('div', { class: 'node ' + cls + (n.branch === 'K' ? ' key' : '') },
-        h('div', { class: 't' }, h('b', {}, n.name + (n.repeat && cnt ? ` ×${cnt}` : '')), h('span', {}, n.desc)),
-        h('button', { class: 'btn', type: 'button', disabled: st !== 'can', onclick: () => buyNode(n.id) }, label)));
+      const n = NODE[n0.id], st = nodeState(meta, n), cnt = nodeCount(meta, n.id), lit = isLit(n.id);
+      const cls = [lit ? 'have' : st, lit && st === 'can' ? 'can' : '', n.repeat ? 'rep' : '', ui.sel === n.id ? 'sel' : ''].filter(Boolean).join(' ');
+      const [x, y, side] = L.pts[n.id];
+      const word = lit ? (n.repeat ? `allumée ${cnt} fois` : 'allumée') : st === 'can' ? 'prête à être allumée' : st === 'poor' ? 'pas encore assez d\'éclats' : 'verrouillée';
+      sky.append(h('button', { class: 'ls ' + cls, type: 'button', 'data-id': n.id, style: `left:${x}%;top:${y}%`, 'aria-pressed': String(ui.sel === n.id), 'aria-label': `${n.name}, ${word}`, onclick: () => { ui.sel = n.id; structure(); } }, h('i')));
+      const pos = side === 'r' ? `left:calc(${x}% + 14px);top:${y}%` : side === 'l' ? `right:calc(${100 - x}% + 14px);top:${y}%` : side === 't' ? `left:${x}%;bottom:calc(${100 - y}% + 14px)` : `left:${x}%;top:calc(${y}% + 14px)`;
+      sky.append(h('span', { class: `ll ${side} ${lit ? 'have' : st}`, style: pos, 'aria-hidden': 'true' }, n.name + (n.repeat && cnt ? ` ×${cnt}` : '')));
     }
+    if (L.pair) { const [a, b] = L.pair.map(id => L.pts[id]); sky.append(h('span', { class: 'll r pairlab', style: `left:calc(${(a[0] + b[0]) / 2}% + 8px);top:${(a[1] + b[1]) / 2}%`, 'aria-hidden': 'true' }, has(meta, 'K3') ? 'les deux' : 'au choix')); }
+    if (complete) sky.append(h('span', { class: 'sky-badge' }, `Constellation ${B.name} complète`));
+    else if (lockedBr) sky.append(h('span', { class: 'sky-badge off' }, `Apparaît au palier ${B.pal}`));
+    // détail de l'étoile choisie
+    const n = NODE[ui.sel], st = nodeState(meta, n), cnt = nodeCount(meta, n.id), nc = nodeCost(meta, n), lit = isLit(n.id);
+    const firstMissing = () => { const i = B.nodes.findIndex(x => x.id === n.id), miss = B.nodes.slice(0, i).find(x => x.excl !== n.id && !(has(meta, x.id) || (x.excl && has(meta, x.excl)))); return miss ? miss.name : 'la loi précédente'; };
+    const why = n.branch === 'K' ? `Se débloque en réussissant le défi ${CHALLENGES[n.ch].name}.` : meta.pal < n.pal ? `Apparaît au palier ${n.pal}.` : n.excl && has(meta, n.excl) && !has(meta, 'K3') ? `Choix exclusif : ${NODE[n.excl].name} est déjà allumée.` : `Allume d'abord ${firstMissing()}.`;
+    const short = st === 'poor' ? `il te manque ${eclW(nc - (meta.eclats || 0))}` : st === 'can' ? (cnt ? 'peut se rallumer' : 'prête à être allumée') : '';
+    const status = lit && !n.repeat ? 'Allumée' : n.repeat && cnt ? `Allumée ${cnt} fois${short ? ' · ' + short : ''}` : short ? short[0].toUpperCase() + short.slice(1) : why;
+    const btnTxt = st === 'can' ? `Allumer · ${eclW(nc)}` : lit && !n.repeat ? 'Allumée' : st === 'locked' ? 'Verrouillée' : eclW(nc);
+    const detail = h('div', { class: 'law' + (st === 'can' ? ' can' : '') },
+      h('div', { class: 'law-t' }, h('b', {}, n.name + (n.repeat && cnt ? ` ×${cnt}` : '')), h('span', { class: 'small' }, status)),
+      h('p', { class: 'small' }, n.desc),
+      h('button', { class: 'btn' + (st === 'can' ? ' ok' : ''), id: 'lawBtn', type: 'button', disabled: st !== 'can', onclick: () => buyNode(n.id) }, btnTxt));
+    const ce = catalogEclats(meta);
     pl.append(h('div', { class: 'card' },
-      h('div', { class: 'head' }, h('h2', {}, 'Arbre des lois'), h('span', { class: 'small' }, h('b', { class: 'mono' }, `${fmt(meta.eclats)} éclat${meta.eclats > 1 ? 's' : ''}`), ' à dépenser')),
-      h('p', { class: 'small' }, perm ? 'Mémoire stellaire : ton arbre ne repart plus de zéro à chaque palier.' : `Les éclats se gagnent par Nova. À chaque singularité, l'arbre repart de zéro avec ${catalogEclats(meta)} éclat${catalogEclats(meta) > 1 ? 's' : ''} offert${catalogEclats(meta) > 1 ? 's' : ''} par le catalogue.`),
-      pick, list));
+      h('div', { class: 'head' }, h('h2', {}, 'Constellations'), h('span', { class: 'small' }, h('b', { class: 'mono' }, eclW(meta.eclats)), ' à dépenser')),
+      h('p', { class: 'small' }, perm ? 'Mémoire stellaire : tes constellations restent allumées d\'un palier à l\'autre.' : `Chaque loi est une étoile : allume-la avec des éclats, gagnés par Nova. À chaque singularité, le ciel s'éteint${ce ? ` et tu repars avec ${eclW(ce)} offert${ce > 1 ? 's' : ''} par le catalogue` : ''}.`),
+      pick, skyHead, sky, detail));
     // Défis
     const pc = $('p-ch'); pc.replaceChildren();
     if (meta.pal < 5) pc.append(lockCard(5));
@@ -1131,7 +1277,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
           h('div', { class: 'fx' }, h('span', {}, 'Contrainte'), h('span', {}, ch.desc), h('span', {}, 'Objectif'), h('span', {}, locked ? 'Fixé au déblocage' : `${fmt(meta.chTargets[k])} d'énergie produite`), h('span', {}, 'Récompense'), h('span', {}, ch.reward)), btn));
       }
       pc.append(h('div', { class: 'card' }, h('div', { class: 'head' }, h('h2', {}, 'Défis'), h('span', { class: 'small' }, 'Lancer un défi remplace la run en cours')),
-        h('p', { class: 'small' }, 'Chaque défi débloque un nœud-clé dans l\'arbre. Pur, Instable et Sobriété réussis : Mémoire stellaire, l\'arbre devient permanent.'), list));
+        h('p', { class: 'small' }, 'Chaque défi débloque une loi clé dans le ciel (constellation Lois clés). Pur, Instable et Sobriété réussis : Mémoire stellaire, tes constellations restent allumées d\'un palier à l\'autre.'), list));
     }
     // Catalogue
     const cat = $('cat'); cat.replaceChildren();
@@ -1140,7 +1286,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       [0, 1, 2, 3].forEach(b => { const k = `${c}:${b}`, found = meta.catalog.includes(k); line.append(h('div', { class: 'star' + (found ? ' found' : ' unk') }, h('b', {}, found ? STAR_TYPES[c][b] : '?'), h('span', {}, `${b === 3 ? '3+' : b} fusion${b > 1 ? 's' : ''}`))); });
       cat.append(line);
     }
-    $('catCount').textContent = `${meta.catalog.length} / ${ORDER.length * 4} · +${meta.catalog.length} éclats à chaque palier`;
+    $('catCount').replaceChildren(...rich(`${meta.catalog.length} / ${ORDER.length * 4} · +${eclW(meta.catalog.length)} à chaque palier`));
     const pals = $('pals'); pals.replaceChildren();
     for (const p of PALIERS) pals.append(h('div', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '' }, h('span', {}, String(p.n)), h('span', {}, h('b', {}, p.name), h('br'), h('small', {}, `${p.unlock} · vitesse ×${speedOf(p.n)}`))));
     const rx = $('rx'); rx.replaceChildren();
@@ -1152,7 +1298,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
     const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
     $('palNow').replaceChildren(h('b', {}, `Palier ${meta.pal} · ${cur.name}`), ` · vitesse ×${fmt(speed())}`);
-    $('palNext').textContent = nxt ? `Prochain palier : ${nxt.name} (${nxt.unlock.toLowerCase()}), vitesse ×${speedOf(nxt.n)}` : 'Dernier palier de l\'Acte 1 : atteins l\'objectif pour faire de ton étoile un trou noir.';
+    $('palNext').textContent = nxt ? `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}` : 'Dernier palier de l\'Acte 1 : atteins l\'objectif pour faire de ton étoile un trou noir.';
   }
   function lockCard(n) {
     return h('div', { class: 'card lock' }, h('b', {}, `Palier ${n} · ${PALIERS[n].name}`), h('span', {}, `Se débloque en atteignant le palier ${n}. Il te reste ${n - meta.pal} singularité${n - meta.pal > 1 ? 's' : ''}.`));
@@ -1176,9 +1322,9 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     if (ex > lastExp) { const e = $('energy'); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
     lastExp = ex;
     $('rate').textContent = fmt(p) + ' /s';
-    $('hPal').textContent = `P${meta.pal} · ${PALIERS[meta.pal].name}`;
-    $('hEcl').textContent = fmt(meta.eclats);
-    $('hSpeed').textContent = `×${fmt(speed())}${testSpeed > 1 ? ` (test ×${testSpeed})` : ''}`;
+    $('hPal').textContent = `Palier ${meta.pal} · ${PALIERS[meta.pal].name}`;
+    $('hEcl').textContent = eclW(meta.eclats);
+    $('hSpeed').textContent = `vitesse ×${fmt(speed())}${testSpeed > 1 ? ` (test ×${testSpeed})` : ''}`;
     $('hSing').textContent = meta.sings;
     $('hTime').textContent = fmtT(run.t / speed());
     for (const k in ui.upg) {
@@ -1209,14 +1355,14 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     msF = nf; msP = np;
     // Objectif (barre du haut), Nova et singularité (dock)
     const box = $('objBox'), nb = $('novaBtn'), sb = $('singBtn'), top = $('top');
-    const setAct = (b, main, sub) => { if (b.dataset.main !== main) { b.dataset.main = main; b.replaceChildren(h('span', {}, main), h('small', { class: 'sub' })); } b.querySelector('.sub').textContent = sub; };
+    const setAct = (b, main, sub) => { if (b.dataset.main !== main) { b.dataset.main = main; b.replaceChildren(h('span', {}, main), h('small', { class: 'sub' })); } b.querySelector('.sub').replaceChildren(...rich(sub)); };
     if (run.challenge) {
       const ch = CHALLENGES[run.challenge], tg = meta.chTargets[run.challenge];
       box.classList.add('challenge'); top.classList.add('challenge');
       $('objLabel').textContent = `Défi ${ch.name}`;
       $('objValue').textContent = `${fmt(run.produced)} / ${fmt(tg)}`;
       $('objBar').style.width = Math.max(0, Math.min(1, logp(run.produced) / logp(tg))) * 100 + '%';
-      $('objNote').textContent = `${ch.desc}. Récompense : ${ch.reward}.`;
+      $('objNote').replaceChildren(...rich(`${ch.desc}. Récompense : ${ch.reward}.`));
       sb.hidden = true; nb.hidden = true; $('abandonBtn').hidden = false;
     } else {
       box.classList.remove('challenge'); top.classList.remove('challenge');
@@ -1226,19 +1372,19 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       $('objValue').textContent = `${fmt(run.produced)} / ${fmt(obj)}`;
       $('objBar').style.width = (prog * 100).toFixed(1) + '%';
       let note = '';
-      if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = `Prochain noyau : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} produits. `; }
-      note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : `La Nova s'allume à ${fmt(nm)} produits dans la run.`;
-      $('objNote').textContent = note;
+      if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = `Prochain élément : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} d'énergie produite. `; }
+      note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : `La Nova s'allume au seuil de ${fmt(nm)} d'énergie produite dans la run.`;
+      $('objNote').replaceChildren(...rich(note));
       nb.hidden = false; $('abandonBtn').hidden = true; sb.hidden = false;
       setBtn(nb, g >= 1); nb.classList.toggle('armed', novaArmed); nb.style.setProperty('--p', (Math.max(0, Math.min(1, logp(run.produced) / logp(nm))) * 100).toFixed(1) + '%');
-      setAct(nb, novaArmed ? 'Confirmer la Nova' : 'Nova', novaArmed ? 'la run recommence' : g >= 1 ? `+${fmt(g)} éclat${g > 1 ? 's' : ''}` : `à ${fmt(nm)}`);
+      setAct(nb, novaArmed ? 'Confirmer la Nova' : 'Nova', novaArmed ? 'la run recommence' : g >= 1 ? `+${eclW(g)}` : `seuil ${fmt(nm)}`);
       const ok = canSing(); setBtn(sb, ok); sb.classList.toggle('armed', singArmed); sb.style.setProperty('--p', (prog * 100).toFixed(1) + '%');
-      setAct(sb, singArmed ? 'Confirmer' : isFinal() ? 'Singularité finale' : 'Singularité', singArmed ? (isFinal() ? 'l\'étoile devient un trou noir' : 'l\'arbre repart de zéro') : ok ? (isFinal() ? 'fin de l\'Acte 1' : `→ ${PALIERS[meta.pal + 1].name}`) : `${Math.floor(prog * 100)} % de l'objectif`);
+      setAct(sb, singArmed ? 'Confirmer' : isFinal() ? 'Singularité finale' : 'Singularité', singArmed ? (isFinal() ? 'l\'étoile devient un trou noir' : treePermanent(meta) ? 'tes constellations restent' : 'le ciel s\'éteint') : ok ? (isFinal() ? 'fin de l\'Acte 1' : `→ ${PALIERS[meta.pal + 1].name}`) : `${Math.floor(prog * 100)} % de l'objectif`);
     }
     if (full || $('bdDetails').open) {
       const bd = breakdown(meta, run), pen = costPenalty(meta, run);
       $('breakdown').replaceChildren(...bd.parts.map(x => h('div', { class: x.reaction ? 're' : '' }, h('span', {}, x.label), h('span', {}, x.base ? fmt(x.v) + ' /s' : '×' + fmt(x.v)))),
-        ...(speed() > 1 ? [h('div', {}, h('span', {}, 'Vitesse du temps'), h('span', {}, '×' + fmt(speed()) + ' (tout avance plus vite)'))] : []),
+        ...(speed() > 1 ? [h('div', {}, h('span', {}, 'Vitesse'), h('span', {}, '×' + fmt(speed()) + ' (tout avance plus vite)'))] : []),
         ...(pen > 1 ? [h('div', {}, h('span', {}, 'Pénalité de coût (Antimatière)'), h('span', {}, '×' + fmt(pen)))] : []),
         h('div', { class: 'tot' }, h('span', {}, 'Production'), h('span', {}, fmt(bd.total) + ' /s')));
     }
@@ -1276,7 +1422,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   const setTopH = () => document.documentElement.style.setProperty('--top-h', $('top').offsetHeight + 'px');
   new ResizeObserver(setTopH).observe($('top')); setTopH();
   function toast(html, color) {
-    const t = h('div', { class: 'toast', style: color ? `--c:${color}` : null }); t.innerHTML = html;
+    const t = h('div', { class: 'toast', style: color ? `--c:${color}` : null }); t.innerHTML = html.replace(/((?:\+?\d[\d\s,.e]*\s)?)(éclats?)/gi, '<span class="ecw">$1' + EC_HTML + '$2</span>');
     const box = $('toasts'); box.append(t);
     while (box.children.length > 3) box.firstChild.remove();
     setTimeout(() => t.remove(), 5000);
@@ -1315,7 +1461,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const pulse = (color, s = 1) => waves.push({ t: 0, color, s });
     function burst(color, nb) { for (let i = 0; i < nb; i++) sparks.push({ a: Math.random() * TAU, d: 0.45 + Math.random() * 0.1, v: 0.5 + Math.random() * 0.8, color, life: 1 }); }
     function fuse(color, isNew) { waves.push({ t: 0, color, s: 1.6 }); burst(color, isNew ? 90 : 40); if (isNew) flashes.push({ t: 0, text: 'Réaction découverte', color }); }
-    function unlock(color) { waves.push({ t: 0, color, s: 1.8 }); burst(color, 70); flashes.push({ t: 0, text: 'Nouveau noyau', color }); }
+    function unlock(color) { waves.push({ t: 0, color, s: 1.8 }); burst(color, 70); flashes.push({ t: 0, text: 'Nouvel élément', color }); }
     function singularity(text) { for (let i = 0; i < 5; i++) waves.push({ t: -i * 0.14, color: '#ffffff', s: 2.2 }); burst('#ffffff', 160); flashes.push({ t: 0, text, color: '#ffffff' }); lastTier = null; fullCount = 0; inflow.length = 0; }
     function warp(k) { warpT = 1.6; warpK = k; for (let i = 0; i < 3; i++) waves.push({ t: -i * 0.12, color: '#9b6bff', s: 1.6 }); }
     function comet() { burst('#9fe8ff', 60); waves.push({ t: 0, color: '#9fe8ff', s: 1.4 }); flashes.push({ t: 0, text: 'Comète capturée', color: '#9fe8ff' }); }
@@ -1324,7 +1470,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       return cometPos.some(([cx, cy]) => Math.hypot(cx - x, cy - y) < W * 0.07);
     }
     function flash(text, color) { flashes.push({ t: 0, text, color }); waves.push({ t: 0, color, s: 1 }); }
-    function nova(g) { for (let i = 0; i < 3; i++) waves.push({ t: -i * 0.12, color: '#f2c46b', s: 1.9 }); burst('#f2c46b', 120); flashes.push({ t: 0, text: `Nova · +${fmt(g)} éclats`, color: '#f2c46b' }); inflow.length = 0; }
+    function nova(g) { for (let i = 0; i < 3; i++) waves.push({ t: -i * 0.12, color: '#f2c46b', s: 1.9 }); burst('#f2c46b', 120); flashes.push({ t: 0, text: `Nova · +${fmt(g)} `, ecl: `éclat${g > 1 ? 's' : ''}`, color: '#f2c46b' }); inflow.length = 0; }
 
     // --- Fond : champ d'étoiles qui s'étire avec la vitesse du temps ---
     function drawStars(dt) {
@@ -1371,7 +1517,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       ctx.save(); ctx.lineWidth = 1.6; ctx.lineCap = 'round';
       for (let i = 0; i < max; i++) {
         const a = shieldA + i * seg;
-        ctx.strokeStyle = i < used ? rgba('#f2c46b', 0.55) : 'rgba(120,135,180,0.14)';
+        ctx.strokeStyle = i < used ? rgba('#ff9e6b', 0.55) : 'rgba(120,135,180,0.14)';
         ctx.beginPath(); ctx.arc(c, c, R, a + seg * 0.12, a + seg * 0.88); ctx.stroke();
       }
       ctx.restore();
@@ -1535,7 +1681,14 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i]; f.t += dt; if (f.t > 2.2) { flashes.splice(i, 1); continue; }
         const a = f.t < 0.2 ? f.t / 0.2 : 1 - Math.max(0, f.t - 1.4) / 0.8;
-        ctx.fillStyle = rgba(f.color, a); ctx.fillText(f.text, c, W * (0.92 - 0.06 * i) - f.t * 8);
+        const fy = W * (0.92 - 0.06 * i) - f.t * 8;
+        ctx.fillStyle = rgba(f.color, a);
+        if (f.ecl) {
+          const w1 = ctx.measureText(f.text).width, w2 = ctx.measureText(f.ecl).width, sq = W * 0.026, gap = sq * 0.45, x0 = c - (w1 + sq + gap + w2) / 2;
+          ctx.textAlign = 'left'; ctx.fillText(f.text, x0, fy);
+          ctx.fillStyle = rgba('#f2c46b', a); ctx.fillRect(x0 + w1, fy - sq / 2, sq, sq);
+          ctx.fillStyle = rgba(f.color, a); ctx.fillText(f.ecl, x0 + w1 + sq + gap, fy); ctx.textAlign = 'center';
+        } else ctx.fillText(f.text, c, fy);
       }
       requestAnimationFrame(frame);
     }
