@@ -302,6 +302,19 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .cat .star b { font-weight: 600; font-size: 11.5px; overflow-wrap: anywhere; }
 .cat .star span { color: var(--muted); font-size: 10.5px; }
 .cat .star.unk b { color: var(--muted); font-family: var(--f-mono); }
+.exp-fam { display: grid; gap: 6px; }
+.exp-fam + .exp-fam { margin-top: 10px; }
+.exps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.exp { border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; background: var(--panel-2); display: grid; gap: 2px; min-width: 0; }
+.exp b { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.exp span { font-size: 11px; color: var(--muted); }
+.exp.done { border-color: color-mix(in srgb, var(--good) 55%, var(--line)); background: color-mix(in srgb, var(--good) 9%, var(--panel-2)); }
+.exp.done b::before { content: "✓ "; color: var(--good); }
+.exp:not(.done) b { color: var(--muted); }
+.pal-stats { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 4px 10px; font-size: 12.5px; align-items: baseline; }
+.pal-stats .h { color: var(--muted); font-size: 11px; }
+.pal-stats .v { font-family: var(--f-mono); text-align: right; }
+.cat .line .bonus { grid-column: 2 / -1; font-size: 10.5px; color: var(--good); }
 .rx { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .rx .r { padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); display: grid; gap: 3px; font-size: 12px; min-width: 0; }
 .rx .r b { font-size: 13px; }
@@ -330,6 +343,20 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .mini div { display: grid; gap: 2px; } .mini b { font-family: var(--f-mono); font-weight: 500; }
 
 /* Messages */
+.tuto { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--dock-h) + var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); z-index: 31; width: min(440px, calc(100% - 32px));
+  background: var(--panel-2); border: 1px solid var(--cyan); border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 34px rgba(0,0,0,.55); display: grid; gap: 8px; animation: tin .25s ease-out; }
+.tuto .t-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.tuto b { color: var(--cyan); font-size: 14px; }
+.tuto .t-step { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.tuto p { margin: 0; font-size: 13.5px; line-height: 1.45; }
+.tuto .t-btns { display: flex; justify-content: flex-end; gap: 8px; }
+.tuto .btn { min-height: 34px; padding: 4px 12px; }
+.tuto-glow { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 10px; animation: tglow 1.6s ease-in-out infinite; }
+@keyframes tglow { 50% { outline-color: color-mix(in srgb, var(--cyan) 25%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .tuto-glow { animation: none; } }
+body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h, 150px) + 24px + env(safe-area-inset-bottom, 0px)); }
+.vol { display: grid; grid-template-columns: 90px minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: 13px; }
+.vol input { width: 100%; accent-color: var(--cyan); }
 .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--dock-h) + var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; z-index: 30; width: min(440px, calc(100% - 32px)); pointer-events: none; }
 .toast { background: var(--panel-2); border: 1px solid var(--c, var(--cyan)); border-radius: 10px; padding: 10px 14px; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,.5); animation: tin .25s ease-out; }
 .toast b { color: var(--c, var(--cyan)); }
@@ -525,10 +552,13 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 
     <section class="panel" id="p-log" role="tabpanel" aria-labelledby="t-log" hidden>
       <div class="card"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
-        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre <span class="ecw">1 <i class="ec" aria-hidden="true"></i>éclat</span> au début de chaque palier.</p>
+        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre <span class="ecw">1 <i class="ec" aria-hidden="true"></i>éclat</span> au début de chaque palier. Une ligne complète fait coûter l'élément 1 de stabilité en moins.</p>
         <div class="cat" id="cat"></div></div>
       <div class="card"><h2>Paliers</h2><div class="pals" id="pals"></div></div>
       <div class="card"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div><div class="rx" id="rx"></div></div>
+      <div class="card"><div class="head"><h2>Exploits</h2><span class="small" id="expCount"></span></div>
+        <p class="small" id="expInfo"></p><div id="exps"></div></div>
+      <div class="card"><h2>Temps par palier</h2><div class="pal-stats" id="palStats"></div></div>
       <div class="card"><h2>Partie</h2><div class="stats" id="stats"></div></div>
     </section>
   </section>
@@ -540,6 +570,13 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
     <div class="mini">
       <div><span class="label">Singularités</span><b id="hSing">0</b></div>
       <div><span class="label">Durée de la run</span><b id="hTime">0:00</b></div>
+    </div>
+    <div class="set"><span class="label">Tutoriel</span>
+      <div class="dev"><button class="btn" type="button" id="tutoReset">Revoir le tutoriel</button><button class="btn" type="button" id="tutoOff">Désactiver</button></div>
+    </div>
+    <div class="set" id="soundSet" hidden><span class="label">Sons</span>
+      <div class="vol"><span>Effets</span><input type="range" min="0" max="100" step="5" id="volFx" aria-label="Volume des effets"><span class="mono" id="volFxV"></span></div>
+      <div class="vol"><span>Ambiance</span><input type="range" min="0" max="100" step="5" id="volAmb" aria-label="Volume de l'ambiance"><span class="mono" id="volAmbV"></span></div>
     </div>
     <div class="set"><span class="label">Notation des nombres</span>
       <div class="seg" role="group" aria-label="Notation des nombres" id="notation">
@@ -571,6 +608,18 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
         <button class="btn" type="button" data-dev="relics">+3 reliques de chaque</button>
       </div>
     </div>
+    <div class="set"><span class="label">Sauvegarde</span>
+      <p class="small" id="saveInfo">Exporte ta partie pour la garder à l'abri ou la reprendre sur un autre appareil.</p>
+      <div class="dev">
+        <button class="btn" type="button" id="exportBtn">Exporter</button>
+        <button class="btn" type="button" id="importBtn">Importer</button>
+      </div>
+      <textarea id="saveBox" class="journal" hidden aria-label="Sauvegarde en texte"></textarea>
+      <div class="dev" id="importRow" hidden>
+        <button class="btn" type="button" id="importGo">Charger cette sauvegarde</button>
+        <label class="btn" for="importFile">Depuis un fichier<input type="file" id="importFile" accept=".txt,.json,text/plain" hidden></label>
+      </div>
+    </div>
     <div class="set"><span class="label">Journal de partie</span>
       <p class="small" id="journalInfo">Chaque Nova, singularité, effondrement, étoile et recherche est noté avec le temps de jeu, plus un instantané de la run toutes les 5 min. Copie-le et colle-le dans la conversation pour l'équilibrage.</p>
       <button class="btn" type="button" id="journalBtn">Copier le journal</button>
@@ -579,6 +628,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
     <button class="btn warn" type="button" id="wipe">Tout effacer</button>
   </div>
 </div>
+<div class="tuto" id="tuto" role="status" aria-live="polite" hidden></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <div class="win" id="win" hidden>
   <div class="wbox">
@@ -595,8 +645,10 @@ const ENV = (typeof process !== 'undefined' && process.env) ? process.env : {};
 // Acte 2 : effondrement galactique, données, masse du trou noir, recherche, acquis, sondes, reliques, défis galactiques.
 // Acte 1 : run → Nova (éclats) → constellations (une par palier ; le ciel s'éteint à chaque singularité).
 const sat = (t, tau) => 1 - Math.exp(-t / tau);
-const ORDER = ['dust', 'plasma', 'dark', 'anti', 'neutro', 'chronon', 'graviton', 'quark'];
-const EXOTIC = ['chronon', 'graviton', 'quark'];
+const ORDER = ['dust', 'plasma', 'dark', 'anti', 'neutro', 'chronon', 'graviton', 'quark', 'tachyon', 'strange'];
+const EXOTIC = ['chronon', 'graviton', 'quark', 'tachyon', 'strange'];
+// Élan : effet fort au départ de la run, divisé par 2 à chaque demi-vie (2 min, 4 avec Paradoxe), jusqu'à un plancher
+const elan = (c, start, floor) => Math.max(floor, start * Math.pow(0.5, (c.age || 0) / (c.half || 120)));
 const ELEMENTS = {
   dust:     { name: 'Poussière stellaire', short: 'Po', trait: 'Stable',   instab: 1 },
   plasma:   { name: 'Plasma',              short: 'Pl', trait: 'Rapide',   instab: 2 },
@@ -606,44 +658,48 @@ const ELEMENTS = {
   chronon:  { name: 'Chronon',             short: 'Ch', trait: 'Temporel', instab: 3, pal: 2 },
   graviton: { name: 'Graviton',            short: 'Gr', trait: 'Lourd',    instab: 2, pal: 3 },
   quark:    { name: 'Quark',               short: 'Qk', trait: 'Lié',      instab: 3, pal: 4 },
+  tachyon:  { name: 'Tachyon',             short: 'Ta', trait: 'Fugace',   instab: 3, pal: 5 },
+  strange:  { name: 'Matière étrange',     short: 'Mé', trait: 'Contagieuse', instab: 4, pal: 6 },
 };
-const CORE = { dust: c => 1, plasma: c => 2.5, dark: c => 1 + 3 * sat(c.t, 1200), anti: c => 6, neutro: c => 1 + 0.5 * c.n, chronon: c => 1.5, graviton: c => 1.5, quark: c => 1.5 };
-const FUSED = { dust: c => 1.4, plasma: c => 1.7, dark: c => 1 + 1.2 * sat(c.t, 1200), anti: c => 3, neutro: c => 1.6, chronon: c => 1.2, graviton: c => 1.2, quark: c => 1.2 };
+const CORE = { dust: c => 1, plasma: c => 2.5, dark: c => 1 + 3 * sat(c.t, 1200), anti: c => 6, neutro: c => 1 + 0.5 * c.n, chronon: c => 1.5, graviton: c => 1.5, quark: c => 1.5, tachyon: c => elan(c, 8, 1.5), strange: c => 1 };
+const FUSED = { dust: c => 1.4, plasma: c => 1.7, dark: c => 1 + 1.2 * sat(c.t, 1200), anti: c => 3, neutro: c => 1.6, chronon: c => 1.2, graviton: c => 1.2, quark: c => 1.2, tachyon: c => elan(c, 3, 1.2), strange: c => 1 };
 const EL_FX = {
   dust:     { core: 'production ×1', fused: 'production ×1,4' },
   plasma:   { core: 'production ×2,5', fused: 'production ×1,7' },
-  dark:     { core: 'production jusqu\'à ×4 avec la durée de la run', fused: 'production jusqu\'à ×2,2 avec la durée de la run' },
+  dark:     { core: 'production jusqu\'à ×4 avec la durée de la run', fused: 'production jusqu\'à ×2,2 avec la durée de la run', growCore: [4, 1200], growFused: [2.2, 1200] },
   anti:     { core: 'production ×6, mais pénalité de coût ×4', fused: 'production ×3, mais pénalité de coût ×2' },
   neutro:   { core: 'production +50 % par élément fusionné', fused: 'production ×1,6' },
   chronon:  { core: 'production ×1,5 · les effets liés au temps progressent ×3 plus vite', fused: 'production ×1,2 · les effets liés au temps progressent ×2 plus vite' },
   graviton: { core: 'production ×1,5 · chaque élément fusionné coûte 1 de stabilité en moins', fused: 'production ×1,2 · le noyau ne coûte plus de stabilité' },
   quark:    { core: 'production ×1,5 · les éléments fusionnés réagissent aussi entre eux', fused: 'production ×1,2 · les éléments fusionnés réagissent entre eux à 50 %' },
+  tachyon:  { core: 'production ×8 au départ de la run, divisée par 2 toutes les 2 min, jusqu\'à ×1,5', fused: 'production ×3 au départ de la run, divisée par 2 toutes les 2 min, jusqu\'à ×1,2' },
+  strange:  { core: 'effet de toutes les réactions ×2', fused: 'copie l\'effet de fusion du meilleur autre élément fusionné' },
 };
 const RUN1_UNLOCK = { plasma: 1e3, dark: 1e5, anti: 1e7, neutro: 1e9 };
 const key = (a, b) => [a, b].sort().join('+');
 const REACTIONS = {
   [key('dust', 'plasma')]:  { name: 'Ignition', desc: 'production ×2', f: c => 2 },
-  [key('dust', 'dark')]:    { name: 'Accrétion', desc: 'production jusqu\'à ×2 avec le temps', f: c => 1 + 1 * sat(c.t, 600) },
+  [key('dust', 'dark')]:    { name: 'Accrétion', desc: 'production jusqu\'à ×2 avec le temps', grow: [2, 600], f: c => 1 + 1 * sat(c.t, 600) },
   [key('dust', 'anti')]:    { name: 'Annihilation douce', desc: 'pénalité de coût de l\'Antimatière divisée par deux', f: c => 1, pen: 0.5 },
   [key('dust', 'neutro')]:  { name: 'Compactage', desc: 'coût en stabilité −2', f: c => 1, stab: 2 },
-  [key('plasma', 'dark')]:  { name: 'Combustion lente', desc: 'production jusqu\'à ×2,2 avec le temps', f: c => 1 + 1.2 * sat(c.t, 900) },
+  [key('plasma', 'dark')]:  { name: 'Combustion lente', desc: 'production jusqu\'à ×2,2 avec le temps', grow: [2.2, 900], f: c => 1 + 1.2 * sat(c.t, 900) },
   [key('plasma', 'anti')]:  { name: 'Déflagration', desc: 'production ×3', f: c => 3 },
   [key('plasma', 'neutro')]:{ name: 'Flash de l\'hélium', desc: 'le Flux compte double', f: c => 1, flux: 2 },
-  [key('dark', 'anti')]:    { name: 'Implosion', desc: 'production jusqu\'à ×4,5 avec le temps, pénalité de coût doublée', f: c => 1 + 3.5 * sat(c.t, 1200), pen: 2 },
+  [key('dark', 'anti')]:    { name: 'Implosion', desc: 'production jusqu\'à ×4,5 avec le temps, pénalité de coût doublée', grow: [4.5, 1200, 'pénalité de coût doublée'], f: c => 1 + 3.5 * sat(c.t, 1200), pen: 2 },
   [key('dark', 'neutro')]:  { name: 'Écorce sombre', desc: 'production ×2,5', f: c => 2.5 },
   [key('anti', 'neutro')]:  { name: 'Confinement', desc: 'production ×2,5, pénalité de coût divisée par deux', f: c => 2.5, pen: 0.5 },
   // Quark
   [key('quark', 'dust')]:     { name: 'Hadronisation', desc: 'production ×2', f: c => 2 },
   [key('quark', 'plasma')]:   { name: 'Soupe de quarks', desc: 'les réactions entre fusionnés passent à 100 %', f: c => 1, innerFull: true },
-  [key('quark', 'dark')]:     { name: 'Étrangeté', desc: 'production jusqu\'à ×3 avec le temps', f: c => 1 + 2 * sat(c.t, 900) },
+  [key('quark', 'dark')]:     { name: 'Étrangeté', desc: 'production jusqu\'à ×3 avec le temps', grow: [3, 900], f: c => 1 + 2 * sat(c.t, 900) },
   [key('quark', 'anti')]:     { name: 'Antiquark', desc: 'production ×3, pénalité de coût ×1,5', f: c => 3, pen: 1.5 },
   [key('quark', 'neutro')]:   { name: 'Matière dégénérée', desc: 'production ×1,5 par élément fusionné', f: c => Math.pow(1.5, c.n) },
   [key('quark', 'chronon')]:  { name: 'Chromodynamique', desc: 'effet des réactions ×1,5', f: c => 1, react: 1.5 },
   [key('quark', 'graviton')]: { name: 'Liaison forte', desc: 'coût en stabilité −2', f: c => 1, stab: 2 },
   // Chronon
-  [key('chronon', 'dust')]:     { name: 'Sédimentation', desc: 'production jusqu\'à ×3, lentement', f: c => 1 + 2 * sat(c.t, 2400) },
+  [key('chronon', 'dust')]:     { name: 'Sédimentation', desc: 'production jusqu\'à ×3 avec le temps', grow: [3, 2400], f: c => 1 + 2 * sat(c.t, 2400) },
   [key('chronon', 'plasma')]:   { name: 'Éclair', desc: 'production ×4 pendant les 2 premières minutes de la run, puis ×1,5', f: c => (c.age < 120 ? 4 : 1.5) },
-  [key('chronon', 'dark')]:     { name: 'Âge sombre', desc: 'production jusqu\'à ×5 avec le temps', f: c => 1 + 4 * sat(c.t, 1500) },
+  [key('chronon', 'dark')]:     { name: 'Âge sombre', desc: 'production jusqu\'à ×5 avec le temps', grow: [5, 1500], f: c => 1 + 4 * sat(c.t, 1500) },
   [key('chronon', 'anti')]:     { name: 'Inversion', desc: 'la pénalité de coût baisse au fil de la run (jusqu\'à ÷4)', f: c => 1, penT: true },
   [key('chronon', 'neutro')]:   { name: 'Horloge à neutrons', desc: 'vitesse ×1,5', f: c => 1, speed: 1.5 },
   [key('chronon', 'graviton')]: { name: 'Dilatation', desc: 'vitesse ×1,5', f: c => 1, speed: 1.5 },
@@ -653,6 +709,25 @@ const REACTIONS = {
   [key('graviton', 'dark')]:   { name: 'Halo', desc: 'la Matière noire coûte 2 de stabilité en moins', f: c => 1, darkStab: 2 },
   [key('graviton', 'anti')]:   { name: 'Puits', desc: 'pénalité de coût divisée par deux', f: c => 1, pen: 0.5 },
   [key('graviton', 'neutro')]: { name: 'Écrasement', desc: 'production +50 % par élément fusionné', f: c => 1 + 0.5 * c.n },
+  // Tachyon : la famille « élan », forte au départ de la run
+  [key('tachyon', 'dust')]:     { name: 'Sillage', desc: 'production ×4 au départ de la run, divisée par 2 toutes les 2 min', f: c => elan(c, 4, 1) },
+  [key('tachyon', 'plasma')]:   { name: 'Avant-coureur', desc: 'production ×6 pendant la première minute de la run', f: c => (c.age || 0) < 60 ? 6 : 1 },
+  [key('tachyon', 'dark')]:     { name: 'Écho du futur', desc: 'production ×2,5', f: c => 2.5 },
+  [key('tachyon', 'anti')]:     { name: 'Antérograde', desc: 'pénalité de coût divisée par 4 pendant les 3 premières minutes de la run', f: c => 1, penEarly: [0.25, 180] },
+  [key('tachyon', 'neutro')]:   { name: 'Éjection', desc: 'Flux ×2 pendant les 3 premières minutes de la run', f: c => 1, fluxEarly: [2, 180] },
+  [key('tachyon', 'chronon')]:  { name: 'Paradoxe', desc: 'l\'élan du Tachyon dure deux fois plus longtemps', f: c => 1, elanX2: true },
+  [key('tachyon', 'graviton')]: { name: 'Fronde', desc: 'vitesse ×2 pendant les 2 premières minutes de la run', f: c => 1, speedEarly: [2, 120] },
+  [key('tachyon', 'quark')]:    { name: 'Saveur fugace', desc: 'réactions entre fusionnés à 100 % pendant les 3 premières minutes de la run', f: c => 1, innerEarly: 180 },
+  // Matière étrange : la famille « contagion »
+  [key('strange', 'dust')]:     { name: 'Graine étrange', desc: 'Flux ×2', f: c => 1, flux: 2 },
+  [key('strange', 'plasma')]:   { name: 'Plasma étrange', desc: 'production ×3', f: c => 3 },
+  [key('strange', 'dark')]:     { name: 'Matière miroir', desc: 'la Matière noire est à son maximum dès le départ de la run', f: c => 1, darkFull: true },
+  [key('strange', 'anti')]:     { name: 'Strangelet', desc: 'plus de pénalité de coût, production ×2', f: c => 2, penZero: true },
+  [key('strange', 'neutro')]:   { name: 'Étoile étrange', desc: 'production +100 % par élément fusionné', f: c => 1 + c.n },
+  [key('strange', 'chronon')]:  { name: 'Boucle', desc: 'les effets liés au temps progressent ×2 plus vite', f: c => 1, time: 2 },
+  [key('strange', 'graviton')]: { name: 'Compression étrange', desc: 'coût en stabilité −3', f: c => 1, stab: 3 },
+  [key('strange', 'quark')]:    { name: 'Quark étrange', desc: 'réactions entre fusionnés à 100 %, effet des réactions ×1,5', f: c => 1, innerFull: true, react: 1.5 },
+  [key('strange', 'tachyon')]:  { name: 'Instabilité', desc: 'production ×10 pendant la première minute de la run, puis ×0,5', f: c => (c.age || 0) < 60 ? 10 : 0.5 },
 };
 const UPG = { flux: { base: 10, mul: 1.15 }, power: { base: 50, mul: 5 } };
 
@@ -709,8 +784,12 @@ const KEYS = [
   { id: 'K3', ch: 'sober',    name: 'Puissance maîtrisée', desc: 'Jalons de Puissance ×1,35 au lieu de ×1,25', cost: 10, powerMs: 1.35 },
   { id: 'K4', ch: 'noecho',   name: 'Liaisons profondes', desc: 'Effet des réactions entre éléments fusionnés +50 %', cost: 20, innerBonus: 0.5 },
   { id: 'K5', ch: 'forced',   name: 'Antimatière apprivoisée', desc: 'Pénalité de coût de l\'Antimatière divisée par deux', cost: 20, pen: 0.5 },
+  { id: 'K6', ch: 'eph',      name: 'Élan', desc: 'Production ×3 pendant les 3 premières minutes de chaque run', cost: 6, elanK: 3 },
+  { id: 'K7', ch: 'cold',     name: 'Vitesse éprouvée', desc: 'Vitesse ×1,5', cost: 6, speed: 1.5 },
+  { id: 'K8', ch: 'bare',     name: 'Outillage', desc: 'Améliorations de run deux fois moins chères', cost: 8, upCost: 0.5 },
+  { id: 'K9', ch: 'chaos',    name: 'Polyvalence', desc: 'Le noyau se change même quand des éléments sont fusionnés', cost: 8, freeCore: true },
 ];
-const ALL_NODES = [...TREE.flatMap(b => b.nodes.map(n => ({ ...n, branch: b.id, pal: b.pal }))), ...KEYS.map(n => ({ ...n, branch: 'K', pal: 5 }))];
+const ALL_NODES = [...TREE.flatMap(b => b.nodes.map(n => ({ ...n, branch: b.id, pal: b.pal }))), ...KEYS.map(n => ({ ...n, branch: 'K', pal: 3 }))];
 const NODE = Object.fromEntries(ALL_NODES.map(n => [n.id, n]));
 // Étoiles acquises par la morphologie de la galaxie (Acte 2) : elles brillent d'office
 const ACQ_NODES = { A1: 2, A2: 2, A3: 2, A4: 2, A5: 3 };
@@ -723,9 +802,13 @@ const MEMORY_CH = ['pure', 'unstable', 'sober'];
 const treePermanent = m => MEMORY_CH.every(k => (m.challengesDone || []).includes(k));
 
 const CHALLENGES = {
-  pure:     { name: 'Pur', desc: 'Aucune fusion possible', reward: 'Loi clé Pureté renforcée', tier: 5, rel: Number(ENV.CPU || 1e-6) },
-  unstable: { name: 'Instable', desc: 'Stabilité divisée par deux', reward: 'Loi clé Stabilité éprouvée (+2)', tier: 5, rel: Number(ENV.CUN || 1e13) },
-  sober:    { name: 'Sobriété', desc: 'Puissance limitée à 25 niveaux', reward: 'Loi clé Puissance maîtrisée', tier: 5, rel: Number(ENV.CSO || 0.1) },
+  eph:      { name: 'Éphémère', desc: 'La run s\'arrête au bout de 3 minutes : atteins la cible avant', reward: 'Loi clé Élan', tier: 3, rel: Number(ENV.CEP || 1e8), limit: 180 },
+  cold:     { name: 'Froid', desc: 'Vitesse ×1, quel que soit le palier', reward: 'Loi clé Vitesse éprouvée', tier: 3, rel: Number(ENV.CCO || 1e7) },
+  bare:     { name: 'Dépouillé', desc: 'Aucune amélioration de run', reward: 'Loi clé Outillage', tier: 4, rel: Number(ENV.CBA || 3.16e3) },
+  chaos:    { name: 'Désordre', desc: 'Le noyau change tout seul toutes les 2 minutes', reward: 'Loi clé Polyvalence', tier: 4, rel: Number(ENV.CCH || 1e8) },
+  pure:     { name: 'Pur', desc: 'Aucune fusion possible', reward: 'Loi clé Pureté renforcée', tier: 5, rel: Number(ENV.CPU || 3.16e-10) },
+  unstable: { name: 'Instable', desc: 'Stabilité divisée par deux', reward: 'Loi clé Stabilité éprouvée (+2)', tier: 5, rel: Number(ENV.CUN || 3.16e10) },
+  sober:    { name: 'Sobriété', desc: 'Puissance limitée à 25 niveaux', reward: 'Loi clé Puissance maîtrisée', tier: 5, rel: Number(ENV.CSO || 3.16e-3) },
   noecho:   { name: 'Sans réaction', desc: 'Les réactions n\'ont aucun effet', reward: 'Loi clé Liaisons profondes', tier: 6, rel: Number(ENV.CNE || 1e-11) },
   forced:   { name: 'Noyau imposé', desc: 'Poussière stellaire imposée au noyau', reward: 'Loi clé Antimatière apprivoisée', tier: 6, rel: Number(ENV.CFO || 1e18) },
 };
@@ -734,15 +817,17 @@ const PALIERS = [
   { n: 0, name: 'Nébuleuse', unlock: 'Nova et constellation Matière ; les cinq premiers éléments se découvrent pendant la run' },
   { n: 1, name: 'Protoétoile', unlock: 'Fusion (2 emplacements) et constellation Stabilité' },
   { n: 2, name: 'Étoile', unlock: 'Chronon et constellation Réactions' },
-  { n: 3, name: 'Géante', unlock: 'Graviton, 3e emplacement et constellation Temps' },
-  { n: 4, name: 'Supernova', unlock: 'Quark et constellation Automatisation' },
-  { n: 5, name: 'Étoile à neutrons', unlock: '4e emplacement, constellation Exotique, défis Pur, Instable et Sobriété' },
-  { n: 6, name: 'Trou noir', unlock: 'Constellation Singularité, défis Sans réaction et Noyau imposé' },
+  { n: 3, name: 'Géante', unlock: 'Graviton, 3e emplacement, constellation Temps, défis Éphémère et Froid' },
+  { n: 4, name: 'Supernova', unlock: 'Quark, constellation Automatisation, défis Dépouillé et Désordre' },
+  { n: 5, name: 'Étoile à neutrons', unlock: 'Tachyon, 4e emplacement, constellation Exotique, défis Pur, Instable et Sobriété' },
+  { n: 6, name: 'Trou noir', unlock: 'Matière étrange, constellation Singularité, défis Sans réaction et Noyau imposé' },
 ];
 const LAST_PAL = 6;
 const SPEED_BASE = 2;
 // Objectifs et seuils de Nova par palier (réglés au simulateur)
-const OBJS = (ENV.OBJS ? ENV.OBJS.split(',') : ['1e15', '1e19', '1e24', '1e32', '1e39', '1e57', '1e72']).map(Number);
+const OBJS = (ENV.OBJS ? ENV.OBJS.split(',') : ['1e15', '1e19', '1e24', '1e32', '3.16e42', '1e60', '1e85']).map(Number);
+// v14 : une Nova demande au moins une minute de run (l'étoile doit mûrir)
+const NOVA_AGE = Number(ENV.NAGE || 60);
 const NOVA_MIN = (ENV.NOVA ? ENV.NOVA.split(',') : ['1e8', '1e10', '1e11', '1e12', '1e13', '1e14', '1e15']).map(Number);
 const NOVA_EXP = Number(ENV.NE || 0.33);
 const SLOTS = [0, 2, 2, 3, 3, 4, 4];
@@ -761,13 +846,15 @@ const RUN_UPS = [
   { id: 'over',    name: 'Surcharge', desc: 'Production ×3', f: 0.82 },
   { id: 'crit',    name: 'Masse critique', desc: 'Production +5 % par puissance de 10 produite dans la run', f: 0.92 },
 ];
-const hasUp = (r, id) => (r.ups || []).includes(id);
+const hasUp = (r, id) => r.challenge !== 'bare' && (r.ups || []).includes(id);
 const STAR_TYPES = {
   dust:     ['Naine brune', 'Naine rouge', 'Naine jaune', 'Géante jaune'],
   plasma:   ['Étoile bleue', 'Géante bleue', 'Supergéante bleue', 'Hypergéante'],
   dark:     ['Étoile sombre', 'Naine noire', 'Quasi-étoile', 'Étoile primordiale'],
   anti:     ['Étoile miroir', 'Étoile d\'antimatière', 'Kilonova', 'Blazar'],
   neutro:   ['Pulsar', 'Magnétar', 'Étoile à quarks', 'Étoile étrange'],
+  tachyon:  ['Étoile fugitive', 'Étoile en fuite', 'Étoile hypervéloce', 'Sursaut'],
+  strange:  ['Étoile hybride', 'Étoile Q', 'Étoile à préons', 'Objet de Thorne-Żytkow'],
   chronon:  ['Étoile figée', 'Étoile pulsante', 'Céphéide', 'Étoile éternelle'],
   graviton: ['Étoile dense', 'Lentille stellaire', 'Étoile massive', 'Étoile d\'effondrement'],
   quark:    ['Étoile hadronique', 'Étoile de couleur', 'Étoile de gluons', 'Plasma primordial'],
@@ -776,15 +863,21 @@ const starKey = r => `${r.core}:${Math.min(3, r.fused.length)}`;
 const starName = k => { const [c, b] = k.split(':'); return STAR_TYPES[c][Number(b)]; };
 const lineDone = (m, core) => [0, 1, 2, 3].every(b => (m.catalog || []).includes(`${core}:${b}`));
 const objective = (pal, m) => OBJS[pal] * (m ? gchMalus(m) : 1);
-const challengeTarget = (k) => OBJS[CHALLENGES[k].tier - 1] * CHALLENGES[k].rel;
+// Cibles des défis en ordres de grandeur, proportionnelles à l'objectif de référence :
+// défis des paliers 3 à 5 → objectif de leur palier ; défis du palier 6 → objectif du palier 5 (la force en entrant au palier 6).
+// Mesurées le 22 octobre sur le joueur de référence (runs de 3 min) : 15 à 25 min chacun, Éphémère se joue en 3 min.
+const CH_LOG = { eph: 32 / 32, cold: 31 / 32, bare: 35.5 / 39, chaos: 40 / 39, pure: 29.5 / 57, unstable: 49.5 / 57, sober: 36.5 / 57, noecho: 42 / 57, forced: 69.5 / 57 };
+// Sobriété et Désordre plafonnent (Puissance limitée, noyau au hasard) : cible fixe pour Sobriété, et juste au-dessus de l'objectif pour Désordre
+const challengeTarget = (k) => { if (ENV['T_' + k]) return Number(ENV['T_' + k]); if (k === 'sober') return 3.16e37; if (k === 'chaos') return OBJS[4] * 3;
+  const t = CHALLENGES[k].tier, ref = OBJS[t === 6 ? 5 : t]; return Math.pow(10, CH_LOG[k] * Math.log10(ref)); };
 const runFloor = pal => pal ? NOVA_MIN[pal] / 100 : 10;
-const upCost = (m, up) => { const lo = runFloor(palier(m)), hi = objective(palier(m), m); return lo * Math.pow(hi / lo, up.f); };
+const upCost = (m, up) => { const lo = runFloor(palier(m)), hi = objective(palier(m), m); return lo * Math.pow(hi / lo, up.f) * prodOf(m, 'upCost'); };
 const observeAt = m => NOVA_MIN[palier(m)];
 const speedOf = pal => Math.pow(SPEED_BASE, pal);
 const palier = m => m.pal || 0;
 const owned = m => [...(m.ownedList || ['dust']).filter(x => !ELEMENTS[x].pal), ...EXOTIC.filter(x => palier(m) >= ELEMENTS[x].pal)];
-const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1), 1);
-const runSpeed = (m, r) => speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp'));
+const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1) * (x.speedEarly && (r.age || 0) < x.speedEarly[1] ? x.speedEarly[0] : 1), 1);
+const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp'));
 const maxFused = m => m.gActive === 'nue' ? 0 : SLOTS[palier(m)] + sumOf(m, 'slot') + (gch(m, 'nue') ? 1 : 0);
 function stabMax(m, r) {
   let s = m.gActive === 'fragile' ? 4 : 4 + sumOf(m, 'stab') + (gch(m, 'fragile') ? 2 : 0);
@@ -793,7 +886,7 @@ function stabMax(m, r) {
   return Math.max(0, s);
 }
 const elInstab = (m, x, r) => {
-  let v = ELEMENTS[x].instab;
+  let v = ELEMENTS[x].instab - (lineDone(m, x) ? 1 : 0);
   if (x === 'dark') v -= sumOf(m, 'darkStab') + (r ? reactionsOf(m, r).reduce((a, re) => a + (re.darkStab || 0), 0) : 0);
   return Math.max(0, v);
 };
@@ -809,6 +902,9 @@ function innerK(m, r) {
   let k = r.core === 'quark' ? 1 : r.fused.includes('quark') ? 0.5 : 0;
   if (!k) return 0;
   if (r.fused.some(x => key(r.core, x) === key('quark', 'plasma')) || (r.core === 'quark' && r.fused.includes('plasma')) || (r.fused.includes('quark') && r.fused.includes('plasma'))) k = 1;
+  // Quark étrange (toujours) et Saveur fugace (au départ de la run) : réactions entre fusionnés à 100 %
+  const pair = (a, b) => (r.core === a && r.fused.includes(b)) || (r.core === b && r.fused.includes(a)) || (r.fused.includes(a) && r.fused.includes(b));
+  if (pair('strange', 'quark') || (pair('tachyon', 'quark') && (r.age || 0) < 180)) k = 1;
   return k + sumOf(m, 'innerBonus');
 }
 function reactionsOf(m, r) {
@@ -829,7 +925,7 @@ function costPenalty(m, r) {
   let p = 1;
   if (r.core === 'anti') p *= 4; if (r.fused.includes('anti')) p *= 2;
   if (p === 1) return 1;
-  for (const x of reactionsOf(m, r)) { if (x.pen) p *= x.pen; if (x.penT) p /= 1 + 3 * sat(r.t, 1200); }
+  for (const x of reactionsOf(m, r)) { if (x.penZero) return 1; if (x.pen) p *= x.pen; if (x.penT) p /= 1 + 3 * sat(r.t, 1200); if (x.penEarly && (r.age || 0) < x.penEarly[1]) p *= x.penEarly[0]; }
   p *= prodOf(m, 'pen');
   return Math.max(1, p);
 }
@@ -839,29 +935,32 @@ function cost(m, r, u) {
   const lv = u === 'flux' ? r.lv.flux - 1 - sumOf(m, 'seed') : r.lv[u];
   return UPG[u].base * Math.pow(UPG[u].mul, Math.max(0, lv)) * pen * (u === 'power' ? (hasUp(r, 'cap') ? 0.5 : 1) * prodOf(m, 'powerCost') : 1);
 }
-const timeFactor = (m, r) => prodOf(m, 'time') * (r.core === 'chronon' ? 3 : r.fused.includes('chronon') ? 2 : 1) * (gch(m, 'entropie') ? 2 : 1);
+const timeFactor = (m, r) => prodOf(m, 'time') * (r.core === 'chronon' ? 3 : r.fused.includes('chronon') ? 2 : 1) * (gch(m, 'entropie') ? 2 : 1) * (r.fused.some(x => key(r.core, x) === key('strange', 'chronon')) ? 2 : 1);
 const specs = m => nodesWith(m, 'spec').map(n => n.spec);
 function breakdown(m, r) {
-  const c = { t: r.t * timeFactor(m, r), n: r.fused.length, age: r.age || 0 };
   const re = r.challenge === 'noecho' ? [] : reactionsOf(m, r);
+  const c = { t: r.t * timeFactor(m, r), n: r.fused.length, age: r.age || 0, half: re.some(x => x.elanX2) ? 240 : 120 };
+  const cDark = re.some(x => x.darkFull) ? { ...c, t: 1e9 } : c, cOf = x => x === 'dark' ? cDark : c;
   const parts = [];
-  const fluxK = re.reduce((a, x) => a * (x.flux || 1), 1);
+  const fluxK = re.reduce((a, x) => a * (x.flux || 1) * (x.fluxEarly && c.age < x.fluxEarly[1] ? x.fluxEarly[0] : 1), 1);
   parts.push({ id: 'flux', label: 'Flux', v: r.lv.flux * fluxK, base: true });
   const fm = fluxMilestones(r.lv.flux); if (fm) parts.push({ id: 'fluxms', label: `Jalons de Flux (${fm})`, v: Math.pow(2, fm) });
   if (hasUp(r, 'coils')) parts.push({ id: 'coils', label: 'Bobines supraconductrices', v: 2 });
   parts.push({ id: 'power', label: 'Puissance', v: Math.pow(2, r.lv.power) });
   const pm = powerMilestones(r.lv.power); if (pm) parts.push({ id: 'powms', label: `Jalons de Puissance (${pm})`, v: Math.pow(powerMsMult(m), pm) });
-  parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: CORE[r.core](c) * (hasUp(r, 'coreres') ? 1.5 : 1) });
+  parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: CORE[r.core](cOf(r.core)) * (hasUp(r, 'coreres') ? 1.5 : 1) });
   if (relicLv(m, 'binaire') >= 0 && r.fused[0]) parts.push({ id: 'binaire', label: 'Double noyau · ' + ELEMENTS[r.fused[0]].name, v: CORE[r.fused[0]](c) * (hasUp(r, 'coreres') ? 1.5 : 1) });
   const exoK = prodOf(m, 'exo');
-  for (const x of r.fused) { let v = FUSED[x](c) * (hasUp(r, 'catal') ? 1.25 : 1); if (EXOTIC.includes(x)) v = 1 + (v - 1) * exoK; parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné', v }); }
-  const synK = 1 + sumOf(m, 'syn'), reactK = prodOf(m, 'react') * re.reduce((a, x) => a * (x.react || 1), 1), harmK = hasUp(r, 'harm') ? 1.5 : 1, exoR = prodOf(m, 'exoReact');
-  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1), reaction: true }); } }
+  const fusedV = x => { let v = FUSED[x](cOf(x)) * (hasUp(r, 'catal') ? 1.25 : 1); if (EXOTIC.includes(x)) v = 1 + (v - 1) * exoK; return v; };
+  for (const x of r.fused) { const v = x === 'strange' ? Math.max(1, ...r.fused.filter(y => y !== 'strange').map(fusedV)) : fusedV(x); parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné' + (x === 'strange' ? ' (copie)' : ''), v }); }
+  const synK = 1 + sumOf(m, 'syn'), reactK = prodOf(m, 'react') * re.reduce((a, x) => a * (x.react || 1), 1) * (r.core === 'strange' ? 2 : 1), harmK = hasUp(r, 'harm') ? 1.5 : 1, exoR = prodOf(m, 'exoReact');
+  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: v < 1 ? v : 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1), reaction: true }); } }
   const sp = specs(m), n = r.fused.length;
   const usePur = sp.includes('purity'), useCat = sp.includes('catalysis');
   if (usePur && n <= 1) parts.push({ id: 'purity', label: 'Pureté', v: has(m, 'K1') ? 6 : 3 });
   if (useCat && n) parts.push({ id: 'catalysis', label: 'Catalyse', v: Math.pow(1.35, n) });
   const mult = prodOf(m, 'mult'); if (mult > 1) parts.push({ id: 'tree', label: 'Constellations', v: mult });
+  if (has(m, 'K6') && c.age < 180) parts.push({ id: 'elan', label: 'Élan', v: 3 });
   if (has(m, 'T5')) parts.push({ id: 'patience', label: 'Patience', v: Math.min(4, 1 + 0.1 * (r.age || 0) / 60) });
   if (r.boostLeft > 0) parts.push({ id: 'comet', label: 'Queue de comète', v: cometTail(m) });
   if (res(m, 'echo')) parts.push({ id: 'echo', label: 'Écho galactique', v: Math.pow(RESEARCH.echo.k, res(m, 'echo')) });
@@ -942,12 +1041,14 @@ const gch = (m, id) => (m.gch || {})[id] || 0;
 function gchMalus(m) { if (!m.gActive) return 1; return Math.pow(10, 5 * gch(m, m.gActive)) * (m.gActive === 'mur' ? 1e10 : 1); }
 // Seuil d'effondrement : 1e72 pour la première galaxie, puis 1e74 × (masse ÷ 10)^4 ; la masse = toutes les données gagnées
 const mass = m => m.dataTotal || 0;
+const SEUIL0 = Number(ENV.S0 || 1e83);   // v14.2 : recalé sur la production de l'Acte 1 réglée (trou noir à 1e85)
+const FIRST_COLLAPSE_BONUS = 100;      // données offertes en fin d'Acte 1 (sans compter dans la masse)
 function seuil(m) {
-  const j = relicLv(m, 'jet'), base = (m.galaxy || 1) > 1 ? 1e74 * Math.pow(Math.max(1, mass(m) / 10), 4) : OBJS[LAST_PAL];
+  const j = relicLv(m, 'jet'), base = (m.galaxy || 1) > 1 ? SEUIL0 * Math.pow(Math.max(1, mass(m) / 10), 4) : OBJS[LAST_PAL];
   return base * gchMalus(m) * (j >= 0 ? RELICS.jet.w[j] : 1);
 }
 // Constellations complètes (pour le bonus de données)
-const SKY_BRANCHES = () => [...TREE, { pal: 5, id: 'K', name: 'Lois clés', nodes: KEYS }];
+const SKY_BRANCHES = () => [...TREE, { pal: 3, id: 'K', name: 'Lois clés', nodes: KEYS }];
 const branchDone = (m, b) => b.nodes.every(n => (n.repeat ? nodeCount(m, n.id) > 0 : has(m, n.id)) || (n.excl && has(m, n.excl)));
 const skiesDone = m => SKY_BRANCHES().filter(b => branchDone(m, b)).length;
 // Données : 10 × (ordres de grandeur au-dessus du seuil + 1) × multiplicateurs
@@ -956,14 +1057,60 @@ function dataMult(m) {
   let extra = 0; for (const id in GCHAL) extra += Math.max(0, gch(m, id) - 1); k *= 1 + 0.25 * extra;
   if (m.gActive) k *= 1 + gch(m, m.gActive) + 1;
   const j = relicLv(m, 'jet'); if (j >= 0) k *= RELICS.jet.v[j];
-  return k * (1 + 0.1 * skiesDone(m));
+  return k * (1 + 0.1 * skiesDone(m)) * exploitMult(m);
 }
 const dataRaw = (m, produced) => { const s = seuil(m); return produced < s ? 0 : 10 * (Math.log10(produced / s) + 1) * dataMult(m); };
 const dataGain = (m, produced) => Math.floor(dataRaw(m, produced));
+// ---------- Exploits ----------
+// check(m, r, ev) : ev = événement en cours ({ type: 'sing' | 'col' | 'comet' | 'away', ... }) ou null pour l'état
+const EXPLOIT_BONUS = 0.01;
+const exploitMult = m => 1 + EXPLOIT_BONUS * ((m.exploits || []).length);
+const reactionsWith = x => Object.keys(REACTIONS).filter(k => k.split('+').includes(x));
+const EXPLOITS = [
+  // Progression
+  { id: 'p_nova', fam: 'Progression', name: 'Première lueur', desc: 'Déclencher une Nova', check: m => (m.novas || 0) >= 1 },
+  ...[1, 2, 3, 4, 5, 6].map(k => ({ id: 'p_pal' + k, fam: 'Progression', name: ['', 'Protoétoile', 'Étoile', 'Géante', 'Supernova', 'Étoile à neutrons', 'Trou noir'][k], desc: `Atteindre le palier ${k}`, check: m => (m.galaxy || 1) > 1 || palier(m) >= k })),
+  { id: 'p_col', fam: 'Progression', name: 'Dévoreur', desc: 'Premier effondrement galactique', check: m => (m.galaxy || 1) >= 2 },
+  { id: 'p_res', fam: 'Progression', name: 'Chercheur', desc: 'Première recherche', check: m => Object.values(m.research || {}).some(v => v > 0) },
+  { id: 'p_g5', fam: 'Progression', name: 'Spirale barrée', desc: 'Atteindre la galaxie 5', check: m => (m.galaxy || 1) >= 5 },
+  { id: 'p_acq', fam: 'Progression', name: 'Elliptique', desc: 'Obtenir tous les acquis (galaxie 7)', check: m => (m.galaxy || 1) >= 7 },
+  { id: 'p_g10', fam: 'Progression', name: 'Dixième galaxie', desc: 'Atteindre la galaxie 10', check: m => (m.galaxy || 1) >= 10 },
+  // Maîtrise
+  { id: 'm_fast', fam: 'Maîtrise', name: 'Singularité éclair', desc: 'Passer un palier avec 3 Novas au plus', check: (m, r, ev) => ev && ev.type === 'sing' && ev.pal >= 1 && ev.novas <= 3 },
+  { id: 'm_bare', fam: 'Maîtrise', name: 'Ascète', desc: 'Passer un palier à partir du 2 sans rien fusionner', check: (m, r, ev) => ev && ev.type === 'sing' && ev.pal >= 2 && ev.fused === 0 },
+  { id: 'm_long', fam: 'Maîtrise', name: 'Patience', desc: 'Faire durer une run 30 min', check: (m, r) => (r.age || 0) >= 1800 },
+  { id: 'm_full', fam: 'Maîtrise', name: 'Pleine charge', desc: 'Remplir 4 emplacements de fusion', check: (m, r) => r.fused.length >= 4 },
+  { id: 'm_mem', fam: 'Maîtrise', name: 'Mémoire', desc: 'Obtenir Mémoire stellaire', check: m => treePermanent(m) },
+  { id: 'm_ch', fam: 'Maîtrise', name: 'Éprouvé', desc: 'Réussir les cinq défis de l\'Acte 1', check: m => Object.keys(CHALLENGES).every(k => (m.challengesDone || []).includes(k)) },
+  { id: 'm_sky', fam: 'Maîtrise', name: 'Cartographe', desc: 'Compléter une constellation', check: m => skiesDone(m) >= 1 },
+  { id: 'm_sky4', fam: 'Maîtrise', name: 'Astronome', desc: 'Compléter quatre constellations à la fois', check: m => skiesDone(m) >= 4 },
+  { id: 'm_g10m', fam: 'Maîtrise', name: 'Effondrement express', desc: 'Faire s\'effondrer une galaxie en moins de 10 min', check: (m, r, ev) => ev && ev.type === 'col' && ev.galTime < 600 },
+  { id: 'm_gch', fam: 'Maîtrise', name: 'Sous contrainte', desc: 'Réussir un défi galactique', check: m => Object.values(m.gch || {}).some(v => v > 0) },
+  { id: 'm_gch3', fam: 'Maîtrise', name: 'Obstiné', desc: 'Atteindre le niveau 3 d\'un défi galactique', check: m => Object.values(m.gch || {}).some(v => v >= 3) },
+  { id: 'm_wind', fam: 'Maîtrise', name: 'Vent solaire', desc: 'Recevoir 10 000 éclats du vent stellaire', check: m => (m.windTotal || 0) >= 1e4 },
+  // Collection
+  { id: 'c_cat10', fam: 'Collection', name: 'Observateur', desc: 'Cataloguer 10 étoiles', check: m => (m.catalog || []).length >= 10 },
+  { id: 'c_cat20', fam: 'Collection', name: 'Catalogueur', desc: 'Cataloguer 20 étoiles', check: m => (m.catalog || []).length >= 20 },
+  { id: 'c_catall', fam: 'Collection', name: 'Messier', desc: `Cataloguer les ${ORDER.length * 4} étoiles`, check: m => (m.catalog || []).length >= ORDER.length * 4 },
+  { id: 'c_line', fam: 'Collection', name: 'Lignée', desc: 'Compléter une ligne du catalogue', check: m => ORDER.some(x => lineDone(m, x)) },
+  { id: 'c_rx10', fam: 'Collection', name: 'Chimiste', desc: 'Découvrir 10 réactions', check: m => (m.discovered || []).length >= 10 },
+  { id: 'c_rxel', fam: 'Collection', name: 'Spécialiste', desc: 'Découvrir toutes les réactions d\'un élément', check: m => ORDER.some(x => reactionsWith(x).every(k => (m.discovered || []).includes(k))) },
+  { id: 'c_rxall', fam: 'Collection', name: 'Tableau complet', desc: `Découvrir les ${Object.keys(REACTIONS).length} réactions`, check: m => Object.keys(REACTIONS).every(k => (m.discovered || []).includes(k)) },
+  { id: 'c_rel', fam: 'Collection', name: 'Archéologue', desc: 'Trouver une relique', check: m => RELIC_IDS.some(id => bestRarity(m, id) >= 0) },
+  { id: 'c_leg', fam: 'Collection', name: 'Légende', desc: 'Posséder une relique légendaire', check: m => RELIC_IDS.some(id => bestRarity(m, id) >= 3) },
+  { id: 'c_relall', fam: 'Collection', name: 'Musée', desc: 'Trouver les huit reliques', check: m => RELIC_IDS.every(id => bestRarity(m, id) >= 0) },
+  // Curiosités (cachées)
+  { id: 'x_comets', fam: 'Curiosités', hidden: true, name: 'Pluie d\'étoiles filantes', desc: 'Capturer 3 comètes en 10 secondes', check: (m, r, ev) => ev && ev.type === 'comet' && ev.burst >= 3 },
+  { id: 'x_away', fam: 'Curiosités', hidden: true, name: 'Hibernation', desc: 'Revenir après plus d\'une journée d\'absence', check: (m, r, ev) => ev && ev.type === 'away' && ev.sec >= 86400 },
+  { id: 'x_dust', fam: 'Curiosités', hidden: true, name: 'Retour aux sources', desc: 'Passer le palier 5 avec la Poussière stellaire au noyau', check: (m, r, ev) => ev && ev.type === 'sing' && ev.pal >= 5 && ev.core === 'dust' },
+  { id: 'x_big', fam: 'Curiosités', hidden: true, name: 'Big Bang', desc: 'Produire 1e100 en une seule run', check: (m, r) => r.produced >= 1e100 },
+  { id: 'x_nova1k', fam: 'Curiosités', hidden: true, name: 'Feu d\'artifice', desc: 'Déclencher 1 000 Novas', check: m => (m.novas || 0) >= 1000 },
+  { id: 'x_night', fam: 'Curiosités', hidden: true, name: 'Veilleur', desc: 'Jouer 10 heures', check: m => (m.realTime || 0) >= 36000 },
+];
 // ---------- Nova et éclats ----------
 const novaMin = m => { const pr = relicLv(m, 'prisme'); return NOVA_MIN[palier(m)] * (pr >= 0 ? RELICS.prisme.w[pr] : 1); };
 const NOVA_K = Number(ENV.NK || 1);
-const novaMult = m => { const br = relicLv(m, 'braise'); return prodOf(m, 'eclats') * Math.pow(RESEARCH.ray.k, res(m, 'ray')) * (gch(m, 'ciel') ? 2 : 1) * (br >= 0 ? 1 - RELICS.braise.w[br] : 1); };
+const novaMult = m => { const br = relicLv(m, 'braise'); return exploitMult(m) * prodOf(m, 'eclats') * Math.pow(RESEARCH.ray.k, res(m, 'ray')) * (gch(m, 'ciel') ? 2 : 1) * (br >= 0 ? 1 - RELICS.braise.w[br] : 1); };
 const novaRaw = (m, produced) => produced < novaMin(m) ? 0 : NOVA_K * Math.pow(Math.log10(produced / novaMin(m)) + 1, 2) * novaMult(m);
 const novaGain = (m, produced) => Math.floor(novaRaw(m, produced));
 // Vent stellaire : au-delà du seuil de Nova, éclats par seconde = WIND_K × le meilleur rythme de Nova de la run
@@ -994,14 +1141,14 @@ function nodeState(m, n) {
 const freshMeta = () => ({ catalog: [], bank: 0, comets: 0, cometIn: 180, pal: 0, ownedList: ['dust'], core: 'dust', record: 0, sings: 0, novas: 0, discovered: [], tree: [], eclats: 0, eclatsTotal: 0, challengesDone: [], chTargets: {}, won: false, totalTime: 0, realTime: 0, best: 0, lastLines: [],
   galaxy: 1, data: 0, dataTotal: 0, research: {}, relics: {}, equip: [], probes: [], pclock: 0, gch: {}, gActive: null, plans: {}, pilot: true, lightOrder: [], lastOrder: [], autoCollapse: false, palAge: 0, galTime: 0 });
 if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
-  acquired, ACQ_NODES, MORPHS, morph, ACQUIS, hasAcq, RESEARCH, res, researchCost, EXPEDITIONS, expTime, probes, RARITIES, RELICS, RELIC_IDS, relicSlots, bestRarity, relicLv, cometTail, GCHAL, GCH_FROM, gch, gchMalus, mass, seuil, branchDone, skiesDone, dataMult, dataRaw, dataGain, novaMult, WIND_K, windRate };
+  acquired, ACQ_NODES, MORPHS, morph, ACQUIS, hasAcq, RESEARCH, res, researchCost, EXPEDITIONS, expTime, probes, RARITIES, RELICS, RELIC_IDS, relicSlots, bestRarity, relicLv, cometTail, GCHAL, GCH_FROM, gch, gchMalus, mass, seuil, branchDone, skiesDone, dataMult, dataRaw, dataGain, novaMult, WIND_K, windRate, NOVA_AGE, FIRST_COLLAPSE_BONUS, EXPLOITS, exploitMult, EXPLOIT_BONUS };
 
 </script>
 <script>
 (() => {
   const VERSION = 'singularity-v9';
   const OFFLINE_CAP = 3600, BANK_CAP = 72 * 3600;
-  const EL_COLOR = { dust: '#e8dcc0', plasma: '#52e4f0', dark: '#9b6bff', anti: '#ff5fa2', neutro: '#b8c7ff', chronon: '#f2c46b', graviton: '#7f8cff', quark: '#ff8a5c' };
+  const EL_COLOR = { dust: '#e8dcc0', plasma: '#52e4f0', dark: '#9b6bff', anti: '#ff5fa2', neutro: '#b8c7ff', chronon: '#f2c46b', graviton: '#7f8cff', quark: '#ff8a5c', tachyon: '#8ef7c4', strange: '#d8f56b' };
   const $ = id => document.getElementById(id);
   const h = (tag, attrs = {}, ...kids) => {
     const e = document.createElement(tag);
@@ -1056,6 +1203,16 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     return hh ? `${hh} h ${String(m).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
   }
 
+  // Effet qui grandit avec le temps de la run : ×1 au départ, ×max à la longue.
+  // On donne deux repères concrets en temps réel, à la vitesse actuelle et avec le Chronon de ce build.
+  function growText(g, rr) {
+    const [max, tau, extra] = g, k = Math.max(1e-9, speed() * timeFactor(meta, rr || run));
+    const half = 1 + (max - 1) / 2, near = 1 + 0.9 * (max - 1);
+    return `production de ×1 à ×${nf1.format(max)} au fil de la run : ×${nf1.format(half)} après ${fmtD(tau * Math.LN2 / k)}, ×${nf1.format(near)} après ${fmtD(tau * Math.LN10 / k)}${extra ? ' · ' + extra : ''}`;
+  }
+  const reactText = (k, rr) => { const R = REACTIONS[k]; if (!R.grow) return R.desc; const [a, b] = k.split('+'); return growText(R.grow, rr || { core: a, fused: [b], t: 0 }); };
+  const mirror = rr => rr && ((rr.core === 'strange' && rr.fused.includes('dark')) || (rr.core === 'dark' && rr.fused.includes('strange')));
+  const elText = (x, which, rr) => { const F = EL_FX[x], g = which === 'core' ? F.growCore : F.growFused; if (g && x === 'dark' && mirror(rr)) return `production ×${nf1.format(g[0])} dès le départ de la run (Matière miroir)`; return g ? growText(g, rr) : F[which]; };
   // durée lisible : « 7 min 30 », « 1 h 08 »
   function fmtD(sec) {
     sec = Math.max(0, Math.round(sec));
@@ -1067,7 +1224,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   let run = newRun(meta);
   let testSpeed = 1;
   const speed = () => runSpeed(meta, run);
-  function save() { store.set(VERSION, JSON.stringify({ meta, run, savedAt: Date.now() })); }
+  function save() { if (typeof importing !== 'undefined' && importing) return; store.set(VERSION, JSON.stringify({ meta, run, savedAt: Date.now() })); }
   function load() {
     try { const d = JSON.parse(store.get(VERSION) || 'null'); return d && d.meta && d.run && d.run.lv ? d : null; } catch (e) { return null; }
   }
@@ -1118,7 +1275,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   }
   function buyUp(id, el) {
     const up = RUN_UPS.find(x => x.id === id);
-    if (run.ups.includes(id) || !(run.energy >= upCost(meta, up))) return;
+    if (run.challenge === 'bare' || run.ups.includes(id) || !(run.energy >= upCost(meta, up))) return;
     const g = id === 'cap' ? 'Puissance ÷2' : id === 'comp' ? 'Vitesse ×1,25' : gainOf({ ...run, ups: [...run.ups, id] });
     run.energy -= upCost(meta, up); run.ups.push(id);
     if (el) floatAt(el, g, '#b89bff');
@@ -1133,7 +1290,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function canCore(x) {
     if (!owned(meta).includes(x) || x === run.core) return false;
     if (run.challenge === 'forced') return false;
-    if (meta.pal >= 1 && run.fused.length) return false;
+    if (meta.pal >= 1 && run.fused.length && !has(meta, 'K9')) return false;
     return instab(meta, run, [], x) <= stabMax(meta, run);
   }
   function setCore(x) {
@@ -1157,7 +1314,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     for (const r of fresh) meta.discovered.push(r.k);
     const re = REACTIONS[key(run.core, x)];
     fx.fuse(EL_COLOR[x], fresh.length > 0);
-    toast(fresh.length ? `Réaction${fresh.length > 1 ? 's' : ''} découverte${fresh.length > 1 ? 's' : ''} : ${fresh.map(r => `<b>${r.name}</b> · ${r.desc}`).join(' ; ')}` : `${ELEMENTS[x].name} fusionné · <b>${re.name}</b>`, EL_COLOR[x]);
+    toast(fresh.length ? `Réaction${fresh.length > 1 ? 's' : ''} découverte${fresh.length > 1 ? 's' : ''} : ${fresh.map(r => `<b>${r.name}</b> · ${reactText(r.k, run)}`).join(' ; ')}` : `${ELEMENTS[x].name} fusionné · <b>${re.name}</b>`, EL_COLOR[x]);
     structure(); refresh(true); save();
   }
   function unlockRun1() {
@@ -1173,12 +1330,13 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   }
   // ---------- Nova ----------
   let novaArmed = false, novaTimer = null;
+  const novaWait = () => Math.max(0, NOVA_AGE - (run.age || 0));
   function nova(auto) {
-    const g = curGain(); if (g < 1) return;
+    const g = curGain(); if (g < 1 || novaWait() > 0) return;
     if (!auto && !novaArmed) { novaArmed = true; refresh(false); novaTimer = setTimeout(() => { novaArmed = false; refresh(true); }, 3500); return; }
     clearTimeout(novaTimer); novaArmed = false;
-    logEv('nova', { g, age: Math.round(run.age || 0), prod: lg(run.produced), auto: !!auto });
-    meta.eclats += g; meta.eclatsTotal = (meta.eclatsTotal || 0) + g; meta.eclatsPal = (meta.eclatsPal || 0) + g; meta.novas = (meta.novas || 0) + 1;
+    logEv('nova', { g, age: Math.round(run.age || 0), prod: lg(run.produced), auto: !!auto }); sound('nova', { auto: !!auto, value: g });
+    meta.eclats += g; meta.eclatsTotal = (meta.eclatsTotal || 0) + g; meta.eclatsPal = (meta.eclatsPal || 0) + g; meta.novas = (meta.novas || 0) + 1; meta.novasPal = (meta.novasPal || 0) + 1;
     meta.best = Math.max(meta.best, P());
     const fl = run.lv.flux, br = relicLv(meta, 'braise');
     run = newRun(meta);
@@ -1196,7 +1354,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.record = Math.max(meta.record, run.produced); meta.best = Math.max(meta.best, P()); meta.sings++;
     meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
     logEv('sing', { prod: lg(run.produced), age: Math.round(run.age || 0), palTime: Math.round(meta.palAge || 0), ecl: Math.floor(meta.eclats), sky: meta.tree.length, vent: meta.windTotal || 0, auto: !!auto });
-    meta.pal++; meta.palAge = 0;
+    recordPal(); checkExploits({ type: 'sing', pal: meta.pal, novas: meta.novasPal || 0, fused: run.fused.length, core: run.core });
+    meta.pal++; meta.palAge = 0; meta.novasPal = 0; sound('singularite', { auto: !!auto }); sound('palier', { auto: true });
     const perm = treePermanent(meta);
     if (!perm) { meta.tree = []; meta.lightOrder = []; }
     meta.eclats = (perm ? meta.eclats : 0) + catalogEclats(meta); meta.eclatsPal = 0;
@@ -1232,6 +1391,114 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const fallback = () => { const ta = $('journalBox'); ta.value = txt; ta.hidden = false; ta.focus(); ta.select(); toast(`Journal affiché (${n} entrées) : sélectionne et copie-le à la main`, '#8a93ae', 'dev'); };
     try { navigator.clipboard.writeText(txt).then(() => toast(`Journal copié : ${n} entrées, colle-le dans la conversation`, '#8a93ae', 'dev'), fallback); } catch (e) { fallback(); }
   }
+  // ---------- Sons : points d'accroche ----------
+  // Le jeu ne joue aucun son lui-même. Il annonce ses moments forts par un événement sur window :
+  //   window.addEventListener('singularity:sound', e => { const { type, auto, value, pal, galaxy, volume } = e.detail; ... })
+  // type : nova, singularite, effondrement, comete, etoile, exploit, defi, sonde, palier (pour l'ambiance), clic
+  // volume : { fx, amb } entre 0 et 1, réglés par le joueur. Rien n'est envoyé pendant un rattrapage (absence, réserve, banc de test rapide).
+  // Un module de sons s'annonce avec window.dispatchEvent(new Event('singularity:audio-ready')) : le réglage du volume apparaît alors.
+  const vol = { fx: +(store.get('singularity-vol-fx') ?? 70) / 100, amb: +(store.get('singularity-vol-amb') ?? 40) / 100 };
+  const lastSound = {};
+  function sound(type, detail = {}) {
+    if (quiet || testSpeed > 60) return;
+    const now = performance.now(); if (detail.auto && now - (lastSound[type] || 0) < 1000) return; lastSound[type] = now;
+    try { window.dispatchEvent(new CustomEvent('singularity:sound', { detail: { type, pal: meta.pal, galaxy: meta.galaxy || 1, volume: { ...vol }, ...detail } })); } catch (e) {}
+  }
+  function setupSound() {
+    const show = () => { $('soundSet').hidden = false; };
+    window.addEventListener('singularity:audio-ready', show);
+    for (const [k, id] of [['fx', 'volFx'], ['amb', 'volAmb']]) {
+      const el = $(id), lab = $(id + 'V'); el.value = Math.round(vol[k] * 100); lab.textContent = el.value;
+      el.addEventListener('input', () => { vol[k] = el.value / 100; lab.textContent = el.value; store.set('singularity-vol-' + k, el.value); sound('volume', { auto: true }); });
+    }
+  }
+  // ---------- Tutoriel : des bulles déclenchées par l'état du jeu, jamais par un minuteur ----------
+  const TUTO = [
+    { id: 'flux', title: 'Le Flux', text: 'Ton étoile produit de l\'énergie. Achète du Flux : chaque niveau ajoute de la production.', glow: () => document.querySelector('#upgRows .upg:nth-child(1)'),
+      when: () => meta.pal === 0 && (meta.novas || 0) === 0, done: () => run.lv.flux >= 5 || (meta.novas || 0) > 0 },
+    { id: 'power', title: 'La Puissance', text: 'La Puissance double toute ta production à chaque niveau. Elle coûte cher, mais c\'est elle qui fait grimper les chiffres.', glow: () => document.querySelector('#upgRows .upg:nth-child(2)'),
+      when: () => run.energy >= cost(meta, run, 'power') * 0.5, done: () => run.lv.power >= 1 || (meta.novas || 0) > 0 },
+    { id: 'element', title: 'Un nouvel élément', text: 'Tu viens de découvrir un élément. Dans l\'onglet Éléments, place-le au noyau : chaque élément change ta production à sa façon.', glow: () => $('t-el'),
+      when: () => meta.ownedList.length >= 2, done: () => run.core !== 'dust' || meta.pal > 0 },
+    { id: 'nova', title: 'La Nova', text: 'La Nova est prête : elle relance la run et rapporte des éclats. Tu ne perds que la run en cours, pas tes éclats.', glow: () => $('novaBtn'),
+      when: () => curGain() >= 1 && novaWait() <= 0, done: () => (meta.novas || 0) > 0 },
+    { id: 'sky', title: 'Le ciel', text: 'Avec tes éclats, allume une étoile dans l\'onglet Ciel. Chaque étoile est une loi qui reste jusqu\'à la prochaine singularité.', glow: () => $('t-law'),
+      when: () => (meta.novas || 0) > 0 && meta.eclats >= 1, done: () => meta.tree.length > 0 || meta.pal > 0 },
+    { id: 'sing', title: 'La singularité', text: 'Ta run a atteint l\'objectif du palier. La singularité fait passer ton étoile au palier suivant, plus rapide, avec de nouvelles mécaniques.', glow: () => $('singBtn'),
+      when: () => canSing(), done: () => meta.pal > 0 },
+    { id: 'fusion', title: 'La fusion', text: 'Au palier 1, tu peux fusionner des éléments autour du noyau. Deux éléments ensemble déclenchent une réaction : à toi de trouver les meilleures.', glow: () => $('t-el'),
+      when: () => meta.pal >= 1, done: () => run.fused.length > 0 || meta.pal >= 2 },
+  ];
+  let tutoShown = null;
+  function tutoTick() {
+    const T = meta.tuto || (meta.tuto = { done: [] });
+    if (T.off || (meta.galaxy || 1) > 1) { tutoHide(); return; }
+    for (const t of TUTO) if (!T.done.includes(t.id) && safe(t.done)) { T.done.push(t.id); if (tutoShown === t.id) tutoHide(); }
+    if (tutoShown) return;
+    const t = TUTO.find(x => !T.done.includes(x.id) && safe(x.when)); if (t) tutoShow(t);
+  }
+  const safe = f => { try { return !!f(); } catch (e) { return false; } };
+  function tutoShow(t) {
+    tutoShown = t.id; const box = $('tuto'), i = TUTO.indexOf(t) + 1;
+    box.replaceChildren(h('div', { class: 't-head' }, h('b', {}, t.title), h('span', { class: 't-step' }, `${i} / ${TUTO.length}`)), h('p', {}, ...rich(t.text)),
+      h('div', { class: 't-btns' }, h('button', { class: 'btn', type: 'button', onclick: () => { (meta.tuto.done).push(t.id); tutoHide(); save(); } }, 'Compris')));
+    box.hidden = false; document.body.classList.add('has-tuto'); document.body.style.setProperty('--tuto-h', box.offsetHeight + 'px');
+    document.querySelectorAll('.tuto-glow').forEach(x => x.classList.remove('tuto-glow')); const g = t.glow && t.glow(); if (g) g.classList.add('tuto-glow');
+  }
+  function tutoHide() {
+    tutoShown = null; $('tuto').hidden = true; document.body.classList.remove('has-tuto');
+    document.querySelectorAll('.tuto-glow').forEach(x => x.classList.remove('tuto-glow'));
+  }
+  // ---------- Exploits ----------
+  function checkExploits(ev) {
+    const got = meta.exploits || (meta.exploits = []); let any = false;
+    for (const E of EXPLOITS) {
+      if (got.includes(E.id)) continue;
+      let ok = false; try { ok = !!E.check(meta, run, ev); } catch (e) { ok = false; }
+      if (!ok) continue;
+      got.push(E.id); any = true; logEv('exploit', { id: E.id }); sound('exploit', { auto: true });
+      toast(`Exploit : <b>${E.name}</b> · ${E.desc} · +${Math.round(EXPLOIT_BONUS * 100)} % d'éclats et de données`, '#6ee7a8', 'exploit');
+    }
+    if (any) { markTab('log'); ui.dirty = true; }
+  }
+  function buildExploits() {
+    const got = meta.exploits || [], fams = [...new Set(EXPLOITS.map(E => E.fam))];
+    $('expCount').textContent = `${got.length} / ${EXPLOITS.length}`;
+    $('expInfo').replaceChildren(...rich(`Chaque exploit donne +${Math.round(EXPLOIT_BONUS * 100)} % d'éclats et de données, pour toujours. Bonus actuel : +${Math.round((exploitMult(meta) - 1) * 100)} %.`));
+    $('exps').replaceChildren(...fams.map(f => h('div', { class: 'exp-fam' }, h('span', { class: 'label' }, f),
+      h('div', { class: 'exps' }, ...EXPLOITS.filter(E => E.fam === f).map(E => { const done = got.includes(E.id), secret = E.hidden && !done;
+        return h('div', { class: 'exp' + (done ? ' done' : '') }, h('b', {}, secret ? '???' : E.name), h('span', {}, secret ? 'Exploit caché' : E.desc)); })))));
+  }
+  // ---------- Temps par palier ----------
+  function recordPal() {
+    const t = meta.palAge || 0, k = `${meta.galaxy > 1 ? 'g' : 'a'}${meta.pal}`;
+    const ps = meta.palStats || (meta.palStats = {}), cur = ps[k] || { last: 0, best: Infinity, n: 0 };
+    ps[k] = { last: t, best: Math.min(cur.best ?? Infinity, t), n: (cur.n || 0) + 1 };
+  }
+  function buildPalStats() {
+    const ps = meta.palStats || {}, rows = [h('span', { class: 'h' }, ''), h('span', { class: 'h v' }, 'Dernière'), h('span', { class: 'h v' }, 'Meilleure'), h('span', { class: 'h v' }, 'Fois')];
+    const cell = x => h('span', { class: 'v' }, x && isFinite(x.best) ? fmtD(x.last) : '—'), best = x => h('span', { class: 'v' }, x && isFinite(x.best) ? fmtD(x.best) : '—'), nb = x => h('span', { class: 'v' }, x ? String(x.n) : '0');
+    for (const p of PALIERS) { const x = ps[`a${p.n}`]; rows.push(h('span', {}, `${p.n} · ${p.name}`), cell(x), best(x), nb(x)); }
+    if (meta.galaxy > 1) {
+      for (const p of PALIERS) { const x = ps[`g${p.n}`]; if (x) rows.push(h('span', {}, `Galaxie, ${p.n} · ${p.name}`), cell(x), best(x), nb(x)); }
+      rows.push(h('span', {}, h('b', {}, 'Galaxie entière')), h('span', { class: 'v' }, meta.gLast ? fmtD(meta.gLast) : '—'), h('span', { class: 'v' }, isFinite(meta.gBest) && meta.gBest ? fmtD(meta.gBest) : '—'), h('span', { class: 'v' }, String(meta.galaxy - 1)));
+    }
+    $('palStats').replaceChildren(...rows);
+  }
+  // ---------- Temps restant estimé : pente des 30 dernières secondes de la run ----------
+  let etaHist = [], etaAge = 0;
+  function etaTick() {
+    const a = run.age || 0; if (a < etaAge) etaHist = []; etaAge = a;
+    if (!etaHist.length || a - etaHist[etaHist.length - 1][0] >= 1) etaHist.push([a, Math.log10(Math.max(1, run.produced))]);
+    while (etaHist.length > 2 && a - etaHist[0][0] > 30) etaHist.shift();
+  }
+  function etaText(obj) {
+    if (etaHist.length < 5 || run.produced >= obj) return '';
+    const [a0, l0] = etaHist[0], [a1, l1] = etaHist[etaHist.length - 1], slope = (l1 - l0) / Math.max(1e-9, a1 - a0);
+    if (!(slope > 0)) return '';
+    const sec = (Math.log10(obj) - l1) / slope / Math.max(1, testSpeed);
+    return sec < 6 * 3600 ? `${isFinal() ? 'Seuil' : 'Objectif'} dans ${sec < 60 ? 'moins d\'une minute' : '~' + fmtD(sec)} au rythme actuel de la run. ` : '';
+  }
   // ---------- Effondrement galactique ----------
   let colArmed = false, colTimer = null;
   function collapse(auto) {
@@ -1243,21 +1510,24 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
     if (gDone) { meta.gch[gDone] = gch(meta, gDone) + 1; meta.gActive = null; }
     logEv('col', { d, prod: lg(run.produced), seuil: lg(seuil(meta)), galTime: Math.round(meta.galTime || 0), gch: gDone || null, auto: !!auto });
-    meta.data += d; meta.dataTotal += d; meta.galaxy++; meta.won = true;
+    recordPal(); checkExploits({ type: 'col', galTime: meta.galTime || 0 });
+    meta.gBest = Math.min(meta.gBest || Infinity, meta.galTime || Infinity); meta.gLast = meta.galTime || 0;
+    sound('effondrement', { auto: !!auto, value: d });
+    meta.data += d + (g0 === 1 ? FIRST_COLLAPSE_BONUS : 0); meta.dataTotal += d; meta.galaxy++; meta.won = true; meta.novasPal = 0;
     if (meta.lightOrder.length) meta.lastOrder = [...meta.lightOrder];
     resetGalaxy();
     fx.singularity('Effondrement galactique'); fx.warp(3);
     const acq = ACQUIS.find(a => a.g === meta.galaxy);
     toast(`Galaxie ${meta.galaxy} · <b>${morph(meta)}</b> · +${datW(d)}${skies ? ` (dont +${skies * 10} % pour ${skies} constellation${skies > 1 ? 's' : ''} complète${skies > 1 ? 's' : ''})` : ''}${gDone ? ` · défi <b>${GCHAL[gDone].name}</b> réussi` : ''}${acq ? ` · acquis : <b>${acq.name}</b>` : ''}`, '#9b6bff');
     markTab('gal'); if (meta.galaxy === GCH_FROM) markTab('ch');
-    if (g0 === 1) showFirstCollapse(d);
+    if (g0 === 1) showFirstCollapse(d + FIRST_COLLAPSE_BONUS);
     structure(); refresh(true); save();
   }
   // Nouvelle galaxie : palier de départ (Saut stellaire), ciel éteint sauf les paliers sautés, éclats du catalogue
   function resetGalaxy() {
     const start = Math.min(4, res(meta, 'leap'));
     // les lois clés restent allumées (ce sont les récompenses des défis) ; le reste du ciel s'éteint
-    meta.pal = start; meta.palAge = 0; meta.galTime = 0; meta.eclatsPal = 0; meta.tree = meta.tree.filter(id => NODE[id] && NODE[id].branch === 'K');
+    meta.pal = start; meta.palAge = 0; meta.galTime = 0; meta.novasPal = 0; meta.eclatsPal = 0; meta.tree = meta.tree.filter(id => NODE[id] && NODE[id].branch === 'K');
     if (start) for (const id of meta.lastOrder) {
       const n = NODE[id];
       if (n && n.branch !== 'K' && n.pal < start && !n.repeat && !meta.tree.includes(id) && !(n.excl && meta.tree.includes(n.excl))) meta.tree.push(id);
@@ -1356,9 +1626,9 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     A: { pts: { A1: [12, 70, 'b'], A2: [26, 32, 'r'], A3: [50, 22, 't'], A4: [74, 32, 'r'], A5: [88, 70, 'b'] }, fig: [['A5', 'A1']] },
     E: { pts: { E1: [16, 26, 'r'], E2: [42, 42, 'r'], E3: [24, 70, 'b'], E4: [62, 72, 'r'], E5: [84, 30, 't'] }, fig: [['E5', 'E2']] },
     X: { pts: { X1: [50, 14, 'r'], X2: [80, 46, 'b'], X3: [50, 80, 'r'], X4: [20, 46, 'b'] }, fig: [['X4', 'X1']] },
-    K: { pts: { K1: [12, 66, 'b'], K2: [28, 26, 'r'], K3: [50, 48, 'b'], K4: [72, 26, 'r'], K5: [88, 66, 'b'] }, fig: [['K5', 'K1']] },
+    K: { pts: { K6: [16, 12, 'b'], K8: [50, 12, 'b'], K3: [84, 12, 'b'], K7: [16, 44, 'b'], K9: [50, 44, 'b'], K2: [84, 44, 'b'], K1: [16, 76, 'b'], K4: [50, 76, 'b'], K5: [84, 76, 'b'] }, edges: [['K6', 'K8'], ['K8', 'K3'], ['K3', 'K2'], ['K2', 'K9'], ['K9', 'K7'], ['K7', 'K1'], ['K1', 'K4'], ['K4', 'K5']], fig: [['K6', 'K9'], ['K9', 'K5']] },
   };
-  const SKY_BR = [...TREE, { pal: 5, id: 'K', name: 'Lois clés', nodes: KEYS }];
+  const SKY_BR = [...TREE, { pal: 3, id: 'K', name: 'Lois clés', nodes: KEYS }];
   const isLit = id => { const n = NODE[id]; return n.repeat ? nodeCount(meta, id) > 0 : has(meta, id); };
   const litCount = b => b.nodes.filter(n => isLit(n.id)).length;
   const skyDone = b => b.nodes.every(n => isLit(n.id) || (n.excl && has(meta, n.excl)));
@@ -1367,7 +1637,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function buyNode(id) {
     const n = NODE[id]; if (nodeState(meta, n) !== 'can') return;
     const br = SKY_BR.find(b => b.id === n.branch), wasDone = skyDone(br);
-    logEv('star', { id, cost: nodeCost(meta, n) });
+    logEv('star', { id, cost: nodeCost(meta, n) }); sound('etoile', { value: meta.tree.length });
     meta.eclats -= nodeCost(meta, n); meta.tree.push(id); meta.lightOrder.push(id);
     fx.pulse('#f2c46b', 1.1);
     toast(`Loi allumée : <b>${n.name}</b> · ${n.desc}`, '#f2c46b');
@@ -1394,9 +1664,18 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   }
   function checkChallenge() {
     const k = run.challenge; if (!k) return;
+    if (CHALLENGES[k].limit && run.produced < meta.chTargets[k] && (run.age || 0) >= CHALLENGES[k].limit) {
+      toast(`Défi ${CHALLENGES[k].name} : temps écoulé à ${fmt(run.produced)} sur ${fmt(meta.chTargets[k])}. Nouvelle run.`, '#f2c46b'); run = newRun(meta); structure(); refresh(true); save(); return;
+    }
+    if (k === 'chaos') {
+      const due = Math.floor((run.age || 0) / 120); if (due > (run.chaosN || 0)) {
+        run.chaosN = due; const pool = owned(meta).filter(x => x !== run.core && !run.fused.includes(x)), x = pool[Math.floor(Math.random() * pool.length)];
+        if (x) { run.core = x; if (instab(meta, run) > stabMax(meta, run)) run.fused = []; toast(`Désordre : le noyau devient <b>${ELEMENTS[x].name}</b>`, EL_COLOR[x], 'chaos'); ui.dirty = true; }
+      }
+    }
     if (run.produced >= meta.chTargets[k]) {
       const wasPerm = treePermanent(meta);
-      meta.challengesDone.push(k); logEv('defi', { k, age: Math.round(run.age || 0) });
+      meta.challengesDone.push(k); logEv('defi', { k, age: Math.round(run.age || 0) }); sound('defi');
       fx.singularity('Défi réussi');
       toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, à allumer dans le ciel (constellation Lois clés)`, '#6ee7a8');
       if (!wasPerm && treePermanent(meta)) setTimeout(() => toast('<b>Mémoire stellaire</b> · tes constellations restent allumées d\'un palier à l\'autre', '#f2c46b'), 600);
@@ -1419,7 +1698,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function autos() {
     if (has(meta, 'A1')) buy('flux', true);
     if (has(meta, 'A2')) buy('power', true);
-    if (has(meta, 'A3')) for (const up of RUN_UPS) if (!run.ups.includes(up.id) && run.energy >= upCost(meta, up)) { run.energy -= upCost(meta, up); run.ups.push(up.id); ui.dirty = true; }
+    if (has(meta, 'A3') && run.challenge !== 'bare') for (const up of RUN_UPS) if (!run.ups.includes(up.id) && run.energy >= upCost(meta, up)) { run.energy -= upCost(meta, up); run.ups.push(up.id); ui.dirty = true; }
     if (has(meta, 'A5') && !isFinal() && canSing()) singularity(true);
     if (hasAcq(meta, 'pilot') && meta.pilot && !run.challenge) pilotTick();
     if (hasAcq(meta, 'relight')) relightTick();
@@ -1436,6 +1715,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     if (meta.catalog.includes(k)) return;
     meta.catalog.push(k);
     const [c] = k.split(':');
+    if (lineDone(meta, c) && !quiet) setTimeout(() => toast(`<b>Ligne complète : ${ELEMENTS[c].name}</b> · cet élément coûte désormais 1 de stabilité en moins`, EL_COLOR[c]), 700);
     if (!quiet) { fx.flash(starName(k), EL_COLOR[c]); toast(`Nouvelle étoile cataloguée : <b>${starName(k)}</b> · +1 éclat offert au début de chaque palier`, EL_COLOR[c], 'cat'); }
     markTab('log'); if (!quiet) structure();
   }
@@ -1451,10 +1731,11 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.comets--;
     const roll = Math.random(), say = auto ? () => {} : msg => toast(msg, '#9fe8ff', 'comet');
     if (auto) { quietLog.comets++; meta.cometsAuto = (meta.cometsAuto || 0) + 1; }
+    else { const now = performance.now(); ui.cometHits = (ui.cometHits || []).filter(t => now - t < 10000); ui.cometHits.push(now); checkExploits({ type: 'comet', burst: ui.cometHits.length }); }
     if (roll < 0.4 || relicLv(meta, 'comete') >= 0) { run.boostLeft = 60; say(`Comète capturée : <b>Queue de comète</b> · production ×${fmt(cometTail(meta))} pendant 60 s`); }
     else if (roll < 0.8) { const g = P() * speed() * 180; run.energy += g; run.produced += g; say(`Comète capturée : <b>Salve d'énergie</b> · +${fmt(g)} (3 min de production)`); }
     else { meta.bank = Math.min(BANK_CAP, meta.bank + 900); say('Comète capturée : <b>Fragment de temps</b> · +15 min dans la réserve'); }
-    if (!quiet) fx.comet();
+    if (!quiet) fx.comet(); sound('comete', { auto: !!auto });
     if (!auto) { refresh(true); save(); }
   }
   // résumé d'un rattrapage : palier, galaxie, comètes
@@ -1557,8 +1838,9 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
           actions.append(h('button', { class: 'btn' + (canFuse(x) ? ' ok' : '') + (armed ? ' armed' : ''), type: 'button', disabled: !canFuse(x), onclick: () => fuse(x) }, armed ? 'Confirmer la fusion' : 'Fusionner', h('small', {}, why)));
         }
       }
-      const fxRows = [h('span', {}, 'Au noyau'), h('span', {}, EL_FX[x].core), h('span', {}, 'Fusionné'), h('span', {}, meta.pal >= 1 ? EL_FX[x].fused : '—')];
-      if (!isCore && meta.pal >= 1) { const k = key(run.core, x), known = meta.discovered.includes(k); fxRows.push(h('span', {}, 'Avec le noyau'), h('span', {}, known ? `${REACTIONS[k].name} · ${REACTIONS[k].desc}` : '? Réaction inconnue')); }
+      const asCore = { core: x, fused: run.fused.filter(y => y !== x) }, asFused = { core: run.core, fused: run.fused.includes(x) ? run.fused : [...run.fused, x] };
+      const fxRows = [h('span', {}, 'Au noyau'), h('span', {}, elText(x, 'core', asCore)), h('span', {}, 'Fusionné'), h('span', {}, meta.pal >= 1 ? elText(x, 'fused', asFused) : '—')];
+      if (!isCore && meta.pal >= 1) { const k = key(run.core, x), known = meta.discovered.includes(k); fxRows.push(h('span', {}, 'Avec le noyau'), h('span', {}, known ? `${REACTIONS[k].name} · ${reactText(k, asFused)}` : '? Réaction inconnue')); }
       els.append(h('div', { class: 'el', style: `--c:${EL_COLOR[x]}` }, h('div', { class: 'orb' }, E.short),
         h('div', { class: 'body' }, h('div', { class: 'title' }, h('b', {}, E.name), h('span', { class: 'tag' }, E.trait), h('span', { class: 'ins' }, `coûte ${elInstab(meta, x, run)} de stabilité`)), h('div', { class: 'fx' }, ...fxRows),
           isCore ? h('span', { class: 'state' }, 'Au noyau') : isFused ? h('span', { class: 'state' }, 'Fusionné jusqu\'à la prochaine Nova') : null),
@@ -1573,7 +1855,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const pickSky = id => { ui.branch = id; ui.sel = null; structure(); };
     const pick = h('div', { class: 'sky-pick', role: 'group', 'aria-label': 'Constellations' });
     for (const b of SKY_BR) {
-      const nCan = b.nodes.filter(n => nodeState(meta, NODE[n.id]) === 'can').length, off = meta.pal < b.pal, done = skyDone(b);
+      const nCan = b.nodes.filter(n => nodeState(meta, NODE[n.id]) === 'can').length, off = b.id === 'K' ? meta.galaxy === 1 && meta.pal < b.pal : meta.pal < b.pal, done = skyDone(b);
       const lab = b.id === 'K' ? 'Clés' : `P${b.pal}`, state = off ? 'verrouillée' : done ? 'complète' : `${litCount(b)} sur ${skyTotal(b)} allumées`;
       pick.append(h('button', { class: 'sp' + (off ? ' off' : '') + (done ? ' done' : '') + (nCan ? ' can' : ''), type: 'button', title: b.name, 'aria-label': `${b.name}, ${state}${nCan ? `, ${nCan} à allumer` : ''}`, 'aria-pressed': String(ui.branch === b.id), onclick: () => pickSky(b.id) },
         h('b', {}, lab), h('small', {}, off ? '—' : done ? '✓' : `${litCount(b)}/${skyTotal(b)}`)));
@@ -1648,7 +1930,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
           h('button', { class: 'gp', type: 'button', 'aria-pressed': String(ui.chView === id), onclick: () => { ui.chView = id; structure(); } }, h('b', {}, name), h('small', {}, sub))))));
     }
     if (gOpen && ui.chView === 'gal') pc.append(gchCard());
-    else if (meta.pal < 5 && meta.galaxy === 1) pc.append(lockCard(5));
+    else if (meta.pal < 3 && meta.galaxy === 1) pc.append(lockCard(3));
     else {
       const list = h('div', { class: 'els' });
       for (const [k, ch] of Object.entries(CHALLENGES)) {
@@ -1665,7 +1947,9 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const cat = $('cat'); cat.replaceChildren();
     for (const c of ORDER) {
       const line = h('div', { class: 'line' + (lineDone(meta, c) ? ' done' : ''), style: `--c:${EL_COLOR[c]}` }, h('div', { class: 'orb' }, ELEMENTS[c].short));
+      const lineBonus = lineDone(meta, c) ? h('div', { class: 'bonus' }, `Ligne complète : ${ELEMENTS[c].name} coûte 1 de stabilité en moins`) : null;
       [0, 1, 2, 3].forEach(b => { const k = `${c}:${b}`, found = meta.catalog.includes(k); line.append(h('div', { class: 'star' + (found ? ' found' : ' unk') }, h('b', {}, found ? STAR_TYPES[c][b] : '?'), h('span', {}, `${b === 3 ? '3+' : b} fusion${b > 1 ? 's' : ''}`))); });
+      if (lineBonus) line.append(lineBonus);
       cat.append(line);
     }
     $('catCount').replaceChildren(...rich(`${meta.catalog.length} / ${ORDER.length * 4} · +${eclW(meta.catalog.length)} à chaque palier`));
@@ -1673,9 +1957,10 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     for (const p of PALIERS) pals.append(h('div', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '' }, h('span', {}, String(p.n)), h('span', {}, h('b', {}, p.name), h('br'), h('small', {}, `${p.unlock} · vitesse ×${speedOf(p.n)}`))));
     const rx = $('rx'); rx.replaceChildren();
     const ks = Object.keys(REACTIONS);
-    for (const k of ks) { const [a, b] = k.split('+'), known = meta.discovered.includes(k); rx.append(h('div', { class: 'r' + (known ? '' : ' unk') }, h('b', {}, known ? REACTIONS[k].name : '???'), h('span', { class: 'pair' }, `${ELEMENTS[a].name} + ${ELEMENTS[b].name}`), known ? h('span', {}, REACTIONS[k].desc) : null)); }
+    for (const k of ks) { const [a, b] = k.split('+'), known = meta.discovered.includes(k); rx.append(h('div', { class: 'r' + (known ? '' : ' unk') }, h('b', {}, known ? REACTIONS[k].name : '???'), h('span', { class: 'pair' }, `${ELEMENTS[a].name} + ${ELEMENTS[b].name}`), known ? h('span', {}, reactText(k)) : null)); }
     $('rxCount').textContent = `${meta.discovered.length} / ${ks.length} découvertes`;
-    $('t-ch').classList.toggle('locked', meta.pal < 5 && meta.galaxy === 1);
+    buildExploits(); buildPalStats();
+    $('t-ch').classList.toggle('locked', meta.pal < 3 && meta.galaxy === 1);
     $('t-gal').classList.toggle('locked', meta.galaxy === 1);
     buildGalaxy();
     const tr = $('track'); tr.replaceChildren();
@@ -1979,17 +2264,17 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       $('objLabel').textContent = isFinal() ? 'Seuil d\'effondrement' : `Objectif → ${PALIERS[meta.pal + 1].name}`;
       $('objValue').textContent = `${fmt(run.produced)} / ${fmt(obj)}`;
       $('objBar').style.width = (prog * 100).toFixed(1) + '%';
-      let note = '';
+      const eta = etaText(obj); let note = eta;
       if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = `Prochain élément : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} d'énergie produite. `; }
       if (meta.gActive) note += `Défi galactique ${GCHAL[meta.gActive].name} : réussi à l'effondrement. `;
       const wpm = windPerMin();
       if (wpm > 0) note += `Vent stellaire : +${wpm >= 10 ? fmt(wpm) : nf1.format(wpm)} éclats/min, la run continue. `;
       if (isFinal() && run.produced >= obj) { const L = Math.log10(run.produced / obj); note += `Seuil dépassé de ${nf1.format(L)} ordre${L >= 2 ? 's' : ''} de grandeur : chaque ordre de plus rapporte des données. `; }
-      else if (!wpm) note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : has(meta, 'A4') && !run.challenge ? `Le vent stellaire se lève au seuil de Nova, ${fmt(nm)} d'énergie produite dans la run.` : `La Nova s'allume au seuil de ${fmt(nm)} d'énergie produite dans la run.`;
+      else if (!wpm && !eta) note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : has(meta, 'A4') && !run.challenge ? `Le vent stellaire se lève au seuil de Nova, ${fmt(nm)} d'énergie produite dans la run.` : `La Nova s'allume au seuil de ${fmt(nm)} d'énergie produite dans la run.`;
       $('objNote').replaceChildren(...rich(note));
       nb.hidden = false; $('abandonBtn').hidden = true; sb.hidden = false;
-      setBtn(nb, g >= 1); nb.classList.toggle('armed', novaArmed); nb.style.setProperty('--p', (Math.max(0, Math.min(1, logp(run.produced) / logp(nm))) * 100).toFixed(1) + '%');
-      setAct(nb, novaArmed ? 'Confirmer la Nova' : 'Nova', novaArmed ? 'la run recommence' : g >= 1 ? `+${eclW(g)}` : `seuil ${fmt(nm)}`);
+      const nw = novaWait(); setBtn(nb, g >= 1 && nw <= 0); nb.classList.toggle('armed', novaArmed); nb.style.setProperty('--p', (Math.max(0, Math.min(1, logp(run.produced) / logp(nm))) * 100).toFixed(1) + '%');
+      setAct(nb, novaArmed ? 'Confirmer la Nova' : 'Nova', novaArmed ? 'la run recommence' : g >= 1 ? (nw > 0 ? `l'étoile mûrit encore ${fmtT(nw)}` : `+${eclW(g)}`) : `seuil ${fmt(nm)}`);
       if (isFinal()) {
         const ok = canCollapse(), d = colGain(), start = Math.min(4, res(meta, 'leap'));
         setBtn(sb, ok); sb.classList.toggle('armed', colArmed); sb.style.setProperty('--p', (prog * 100).toFixed(1) + '%');
@@ -2033,7 +2318,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   });
   // Réglages
   const openSheet = open => { $('sheet').hidden = !open; $('menuBtn').setAttribute('aria-expanded', String(open)); if (open) { refresh(true); $('sheetClose').focus(); } };
-  $('menuBtn').addEventListener('click', () => openSheet(true));
+  $('menuBtn').addEventListener('click', () => { saveInfo(); openSheet(true); });
   $('sheetClose').addEventListener('click', () => openSheet(false));
   $('sheet').addEventListener('click', e => { if (e.target === $('sheet')) openSheet(false); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('sheet').hidden) openSheet(false); });
@@ -2387,7 +2672,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   }
   function devEnd1() { for (let i = 0; i < 12 && !isFinal(); i++) devPal(); if (run.challenge) run = newRun(meta); run.produced = Math.max(run.produced, seuil(meta) * 1e3); run.energy = Math.max(run.energy, run.produced); }
   const DEV = {
-    nova: () => { if (run.challenge) return; run.produced = Math.max(run.produced, novaMin(meta) * 1e4); nova(true); },
+    nova: () => { if (run.challenge) return; run.produced = Math.max(run.produced, novaMin(meta) * 1e4); run.age = Math.max(run.age || 0, NOVA_AGE); nova(true); },
     pal: devPal,
     ecl: () => { meta.eclats += 100; meta.eclatsTotal = (meta.eclatsTotal || 0) + 100; },
     chal: () => { for (const [k, ch] of Object.entries(CHALLENGES)) { if (!meta.challengesDone.includes(k)) meta.challengesDone.push(k); meta.chTargets[k] = meta.chTargets[k] || challengeTarget(k); } },
@@ -2404,6 +2689,41 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     toast(`Menu dev : <b>${b.textContent.trim()}</b>`, '#8a93ae', 'dev');
   });
   $('journalBtn').addEventListener('click', copyJournal);
+  setupSound();
+  $('tutoReset').addEventListener('click', () => { meta.tuto = { done: [] }; tutoHide(); save(); toast('Le tutoriel reprendra au prochain moment utile', '#8a93ae', 'dev'); });
+  $('tutoOff').addEventListener('click', () => { meta.tuto = { ...(meta.tuto || { done: [] }), off: true }; tutoHide(); save(); toast('Tutoriel désactivé', '#8a93ae', 'dev'); });
+  // ---------- Sauvegarde : export et import ----------
+  const SAVE_TAG = 'SINGULARITY1:';
+  const encodeSave = () => SAVE_TAG + btoa(unescape(encodeURIComponent(JSON.stringify({ meta, run, savedAt: Date.now() }))));
+  function decodeSave(txt) {
+    let s = String(txt || '').trim(); if (s.startsWith(SAVE_TAG)) s = s.slice(SAVE_TAG.length);
+    const d = JSON.parse(s.startsWith('{') ? s : decodeURIComponent(escape(atob(s.replace(/\s+/g, '')))));
+    if (!d || !d.meta || !d.run || !d.run.lv) throw new Error('format');
+    return d;
+  }
+  function saveInfo() {
+    const t = meta.lastExport; $('saveInfo').textContent = t ? `Dernier export : ${new Date(t).toLocaleDateString('fr-FR')}${Date.now() - t > 7 * 86400e3 ? ' · pense à en refaire un' : ''}.` : 'Exporte ta partie pour la garder à l\'abri ou la reprendre sur un autre appareil.';
+  }
+  $('exportBtn').addEventListener('click', () => {
+    meta.lastExport = Date.now(); save();
+    const txt = encodeSave(), box = $('saveBox'); box.value = txt; box.hidden = false; box.readOnly = true; $('importRow').hidden = true;
+    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' })); a.download = `singularity-${new Date().toISOString().slice(0, 10)}.txt`; document.body.append(a); a.click(); a.remove(); } catch (e) {}
+    const done = () => toast('Sauvegarde copiée : colle-la dans un fichier ou une note', '#8a93ae', 'save'), manual = () => { box.focus(); box.select(); toast('Sauvegarde affichée : sélectionne-la et copie-la', '#8a93ae', 'save'); };
+    try { navigator.clipboard.writeText(txt).then(done, manual); } catch (e) { manual(); }
+    saveInfo();
+  });
+  $('importBtn').addEventListener('click', () => { const box = $('saveBox'); box.value = ''; box.readOnly = false; box.hidden = false; box.placeholder = 'Colle ici ta sauvegarde exportée'; $('importRow').hidden = false; box.focus(); });
+  let importArmed = false, importTimer = null;
+  function doImport(txt) {
+    let d; try { d = decodeSave(txt); } catch (e) { toast('Cette sauvegarde est illisible : vérifie qu\'elle est complète', '#ff8a8a', 'save'); return; }
+    if (!importArmed) { importArmed = true; $('importGo').textContent = 'Confirmer : ta partie actuelle sera remplacée'; importTimer = setTimeout(() => { importArmed = false; $('importGo').textContent = 'Charger cette sauvegarde'; }, 4000); return; }
+    clearTimeout(importTimer); importArmed = false;
+    store.set(VERSION, JSON.stringify(d)); importing = true; location.reload();
+  }
+  let importing = false;
+  $('importGo').addEventListener('click', () => doImport($('saveBox').value));
+  $('importFile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { $('saveBox').value = t; importArmed = false; doImport(t); }); });
+  saveInfo();
   $('novaBtn').addEventListener('click', () => nova(false));
   $('gen').addEventListener('click', e => { if (fx.hitComet(e)) captureComet(); });
   $('abandonBtn').addEventListener('click', abandonChallenge);
@@ -2416,12 +2736,15 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       meta = Object.assign(freshMeta(), d.meta); run = d.run;
       // v12.2 : cibles de Pur et Sobriété abaissées ; Double spécialisation devient Puissance maîtrisée (Pureté et Catalyse redeviennent exclusives)
       for (const k of Object.keys(meta.chTargets || {})) if (!meta.challengesDone.includes(k)) meta.chTargets[k] = Math.min(meta.chTargets[k], challengeTarget(k));
+      // v14.2 : les défis des paliers 3 et 4 s'ouvrent pour les parties qui les ont dépassés
+      for (const [k, ch] of Object.entries(CHALLENGES)) if (!meta.chTargets[k] && (meta.galaxy > 1 || meta.pal >= ch.tier)) meta.chTargets[k] = challengeTarget(k);
       if (has(meta, 'R2') && has(meta, 'R3')) { const drop = meta.tree.indexOf('R2') < meta.tree.indexOf('R3') ? 'R3' : 'R2'; meta.tree = meta.tree.filter(x => x !== drop); meta.eclats = (meta.eclats || 0) + NODE[drop].cost; }
       // v13 : l'Acte 2 arrive pour ceux qui avaient fini l'Acte 1
       if (meta.won && meta.galaxy === 1 && !live) setTimeout(() => toast('<b>L\'Acte 2 est arrivé</b> · au palier 6, dépasse le seuil d\'effondrement : ton trou noir avalera la galaxie', '#9b6bff'), 1200);
       const awayAll = !live && d.savedAt ? Math.max(0, (Date.now() - d.savedAt) / 1000) : 0;
       // les sondes voyagent en temps réel, même jeu fermé (sans plafond)
       ui.lastBack = probeBack(); meta.pclock = (meta.pclock || 0) + awayAll;
+      if (awayAll > 0) setTimeout(() => checkExploits({ type: 'away', sec: awayAll }), 1500);
       meta.probes = (meta.probes || []).slice(0, 3);
       const away = Math.min(OFFLINE_CAP, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - OFFLINE_CAP));
       if (away > 30) {
@@ -2441,7 +2764,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     let lastT = performance.now(), n = 0;
     setInterval(() => {
       const now = performance.now(), realStep = Math.min(1, (now - lastT) / 1000), dt = realStep * testSpeed; lastT = now;
-      meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick();
+      meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick(); etaTick();
+      if (n % 10 === 0) { checkExploits(null); tutoTick(); }
       const back = probeBack();
       if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toast(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
       ui.lastBack = back;
