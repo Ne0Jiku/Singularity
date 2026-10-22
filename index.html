@@ -392,6 +392,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .relic.on { background: color-mix(in srgb, var(--violet) 10%, var(--panel-2)); }
 .relic .btns { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .relic .cnt { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.journal { width: 100%; min-height: 120px; font-family: var(--f-mono); font-size: 11px; background: var(--panel-2); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
 .dev { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .dev .btn { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 4px; min-height: 44px; padding: 8px 10px; }
 .win .wbox { text-align: left; }
@@ -569,6 +570,11 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
         <button class="btn" type="button" data-dev="probes">Sondes de retour</button>
         <button class="btn" type="button" data-dev="relics">+3 reliques de chaque</button>
       </div>
+    </div>
+    <div class="set"><span class="label">Journal de partie</span>
+      <p class="small" id="journalInfo">Chaque Nova, singularité, effondrement, étoile et recherche est noté avec le temps de jeu, plus un instantané de la run toutes les 5 min. Copie-le et colle-le dans la conversation pour l'équilibrage.</p>
+      <button class="btn" type="button" id="journalBtn">Copier le journal</button>
+      <textarea id="journalBox" class="journal" hidden readonly aria-label="Journal de partie"></textarea>
     </div>
     <button class="btn warn" type="button" id="wipe">Tout effacer</button>
   </div>
@@ -1171,6 +1177,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const g = curGain(); if (g < 1) return;
     if (!auto && !novaArmed) { novaArmed = true; refresh(false); novaTimer = setTimeout(() => { novaArmed = false; refresh(true); }, 3500); return; }
     clearTimeout(novaTimer); novaArmed = false;
+    logEv('nova', { g, age: Math.round(run.age || 0), prod: lg(run.produced), auto: !!auto });
     meta.eclats += g; meta.eclatsTotal = (meta.eclatsTotal || 0) + g; meta.eclatsPal = (meta.eclatsPal || 0) + g; meta.novas = (meta.novas || 0) + 1;
     meta.best = Math.max(meta.best, P());
     const fl = run.lv.flux, br = relicLv(meta, 'braise');
@@ -1188,6 +1195,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     clearTimeout(singTimer); singArmed = false;
     meta.record = Math.max(meta.record, run.produced); meta.best = Math.max(meta.best, P()); meta.sings++;
     meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
+    logEv('sing', { prod: lg(run.produced), age: Math.round(run.age || 0), palTime: Math.round(meta.palAge || 0), ecl: Math.floor(meta.eclats), sky: meta.tree.length, vent: meta.windTotal || 0, auto: !!auto });
     meta.pal++; meta.palAge = 0;
     const perm = treePermanent(meta);
     if (!perm) { meta.tree = []; meta.lightOrder = []; }
@@ -1202,6 +1210,28 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     structure(); refresh(true); save();
   }
 
+  // ---------- Journal de partie (équilibrage) ----------
+  // chaque entrée : [temps réel joué en s, temps de jeu en s (absence et banc de test compris), type, galaxie, palier, détail]
+  const lg = x => Math.round(Math.log10(Math.max(1, x)) * 10) / 10;
+  function logEv(type, data) {
+    const j = meta.journal || (meta.journal = []);
+    j.push([Math.round(meta.realTime || 0), Math.round(meta.totalTime || 0), type, meta.galaxy || 1, meta.pal, data]);
+    if (j.length > 3000) j.splice(0, j.length - 3000);
+  }
+  // instantané toutes les 5 min de jeu réel : où en est la run
+  let lastSnap = 0;
+  function snapTick() {
+    const rt = meta.realTime || 0; if (rt - lastSnap < 300) return; lastSnap = rt;
+    logEv('snap', { prod: lg(run.produced), ps: lg(P() * speed()), flux: run.lv.flux, pow: run.lv.power, ups: run.ups.length, ecl: Math.floor(meta.eclats), sky: meta.tree.length, vent: meta.windTotal || 0, core: run.core, fused: run.fused.join('+'), age: Math.round(run.age || 0) });
+  }
+  function journalText() {
+    return JSON.stringify({ v: 'v13.4', exportedAt: new Date().toISOString(), galaxy: meta.galaxy, pal: meta.pal, realTime: Math.round(meta.realTime || 0), totalTime: Math.round(meta.totalTime || 0), novas: meta.novas, sings: meta.sings, research: meta.research, journal: meta.journal || [] });
+  }
+  function copyJournal() {
+    const txt = journalText(), n = (meta.journal || []).length;
+    const fallback = () => { const ta = $('journalBox'); ta.value = txt; ta.hidden = false; ta.focus(); ta.select(); toast(`Journal affiché (${n} entrées) : sélectionne et copie-le à la main`, '#8a93ae', 'dev'); };
+    try { navigator.clipboard.writeText(txt).then(() => toast(`Journal copié : ${n} entrées, colle-le dans la conversation`, '#8a93ae', 'dev'), fallback); } catch (e) { fallback(); }
+  }
   // ---------- Effondrement galactique ----------
   let colArmed = false, colTimer = null;
   function collapse(auto) {
@@ -1212,6 +1242,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.record = Math.max(meta.record, run.produced); meta.best = Math.max(meta.best, P()); meta.sings++;
     meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
     if (gDone) { meta.gch[gDone] = gch(meta, gDone) + 1; meta.gActive = null; }
+    logEv('col', { d, prod: lg(run.produced), seuil: lg(seuil(meta)), galTime: Math.round(meta.galTime || 0), gch: gDone || null, auto: !!auto });
     meta.data += d; meta.dataTotal += d; meta.galaxy++; meta.won = true;
     if (meta.lightOrder.length) meta.lastOrder = [...meta.lightOrder];
     resetGalaxy();
@@ -1272,7 +1303,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function buyResearch(id) {
     const R = RESEARCH[id], c = researchCost(meta, id);
     if (res(meta, id) >= R.max || meta.data < c) return;
-    meta.data -= c; meta.research[id] = res(meta, id) + 1;
+    meta.data -= c; meta.research[id] = res(meta, id) + 1; logEv('res', { id, lv: meta.research[id], cost: c });
     fx.pulse('#9b6bff', 1.2);
     toast(`Recherche : <b>${R.name}</b> niveau ${meta.research[id]} · ${R.desc}${id === 'leap' ? ' · prend effet à la prochaine galaxie' : ''}`, '#9b6bff');
     structure(); refresh(true); save();
@@ -1336,6 +1367,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function buyNode(id) {
     const n = NODE[id]; if (nodeState(meta, n) !== 'can') return;
     const br = SKY_BR.find(b => b.id === n.branch), wasDone = skyDone(br);
+    logEv('star', { id, cost: nodeCost(meta, n) });
     meta.eclats -= nodeCost(meta, n); meta.tree.push(id); meta.lightOrder.push(id);
     fx.pulse('#f2c46b', 1.1);
     toast(`Loi allumée : <b>${n.name}</b> · ${n.desc}`, '#f2c46b');
@@ -1364,7 +1396,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const k = run.challenge; if (!k) return;
     if (run.produced >= meta.chTargets[k]) {
       const wasPerm = treePermanent(meta);
-      meta.challengesDone.push(k);
+      meta.challengesDone.push(k); logEv('defi', { k, age: Math.round(run.age || 0) });
       fx.singularity('Défi réussi');
       toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, à allumer dans le ciel (constellation Lois clés)`, '#6ee7a8');
       if (!wasPerm && treePermanent(meta)) setTimeout(() => toast('<b>Mémoire stellaire</b> · tes constellations restent allumées d\'un palier à l\'autre', '#f2c46b'), 600);
@@ -2371,6 +2403,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     DEV[b.dataset.dev](); structure(); refresh(true); save();
     toast(`Menu dev : <b>${b.textContent.trim()}</b>`, '#8a93ae', 'dev');
   });
+  $('journalBtn').addEventListener('click', copyJournal);
   $('novaBtn').addEventListener('click', () => nova(false));
   $('gen').addEventListener('click', e => { if (fx.hitComet(e)) captureComet(); });
   $('abandonBtn').addEventListener('click', abandonChallenge);
@@ -2408,7 +2441,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     let lastT = performance.now(), n = 0;
     setInterval(() => {
       const now = performance.now(), realStep = Math.min(1, (now - lastT) / 1000), dt = realStep * testSpeed; lastT = now;
-      meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt;
+      meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick();
       const back = probeBack();
       if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toast(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
       ui.lastBack = back;
