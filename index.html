@@ -4,9 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SINGULARITY</title>
+<meta name="theme-color" content="#05070e">
+<meta name="description" content="SINGULARITY : un jeu incrémental cosmique. Fais grandir une étoile jusqu'au trou noir, puis avale des galaxies.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-32.png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Singularity">
+
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+@font-face { font-family: 'Michroma'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/michroma-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Michroma'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/michroma-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-500-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-sans-latin-500-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-600-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-mono-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-mono-latin-ext-500-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-latin-ext-600-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+</style>
 <style>
 /* Mise en page : téléphone d'abord. Barre du haut fixe (énergie + objectif), étoile au centre, Nova et Singularité
    dans un dock au pouce, onglets en barre du bas. Sur grand écran : l'étoile à gauche, les onglets à droite. Thème sombre unique. */
@@ -663,6 +688,10 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
         <button class="btn" type="button" data-dev="relics">+3 reliques de chaque</button>
         <button class="btn" type="button" data-dev="anom">Anomalie suivante</button>
       </div>
+    </div>
+    <div class="set" id="installSet" hidden><span class="label">Application</span>
+      <p class="small" id="installInfo"></p>
+      <div class="dev"><button class="btn ok" type="button" id="installBtn" hidden>Installer SINGULARITY</button></div>
     </div>
     <div class="set"><span class="label">Notes de version</span><div class="notes" id="patchNotes"></div></div>
     <div class="set"><span class="label">Sauvegarde</span>
@@ -1616,6 +1645,11 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   }
   // ---------- Notes de version (menu) : la plus récente en premier ----------
   const PATCHNOTES = [
+    ['0.19.0', '23 octobre', 'Application installable', [
+      'SINGULARITY s\'installe comme une application (PWA) : icône sur l\'écran d\'accueil, plein écran, et jeu jouable sans connexion.',
+      'Bouton « Installer » dans le menu sur Android, Chrome et Edge ; sur iPhone, Partager puis « Sur l\'écran d\'accueil ».',
+      'Quand une nouvelle version est en ligne, le jeu le signale : il suffit de le fermer et de le rouvrir.',
+      'Nouvelle icône : un trou noir et son disque d\'accrétion.']],
     ['0.18.3', '23 octobre', 'Tutoriel complété', [
       'Le tutoriel couvre maintenant les nouveautés, au moment où elles arrivent : Vent stellaire et Alizés, satellites, recherche, sondes, reliques et ensembles, anomalies, Boussole, builds par palier, défis galactiques.',
       'Les parties déjà avancées verront ces bulles une fois, à la prochaine occasion. « Désactiver » dans le menu les coupe toutes.']],
@@ -2682,6 +2716,20 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   const openSheet = open => { $('sheet').hidden = !open; $('menuBtn').setAttribute('aria-expanded', String(open)); if (open) { refresh(true); $('sheetClose').focus(); } };
   $('menuBtn').addEventListener('click', () => { saveInfo(); openSheet(true); });
   buildNotes();
+  // ---------- Application (PWA) : installation et mises à jour ----------
+  let installEvt = null;
+  const standalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+  function installUi() {
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), canSW = 'serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.endsWith('claude.ai') && !location.hostname.endsWith('claudeusercontent.com');
+    $('installSet').hidden = standalone() || !(installEvt || (ios && canSW));
+    $('installBtn').hidden = !installEvt;
+    $('installInfo').textContent = installEvt ? 'Installe le jeu : une icône sur ton écran d\'accueil, le plein écran, et le jeu marche sans connexion.' : 'Sur iPhone et iPad : bouton Partager de Safari, puis « Sur l\'écran d\'accueil ». Le jeu marchera sans connexion.';
+  }
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installUi(); });
+  window.addEventListener('appinstalled', () => { installEvt = null; installUi(); toast('SINGULARITY est installé', '#8a93ae', 'dev'); });
+  $('installBtn').addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; installUi(); });
+  window.addEventListener('singularity:update', () => toast('<b>Nouvelle version prête</b> · ferme et rouvre le jeu pour l\'installer (ta partie est sauvegardée)', '#52e4f0', 'update'));
+  installUi();
   $('sheetClose').addEventListener('click', () => openSheet(false));
   $('buildClose').addEventListener('click', () => openBuilds(false));
   $('buildSheet').addEventListener('click', e => { if (e.target === $('buildSheet')) openBuilds(false); });
@@ -3160,5 +3208,21 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
 })();
 </script>
 
+<script>
+(function () {
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+  if (!('serviceWorker' in navigator) || !(location.protocol === 'https:' || location.hostname === 'localhost')) return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      reg.addEventListener('updatefound', function () {
+        var w = reg.installing; if (!w) return;
+        w.addEventListener('statechange', function () {
+          if (w.state === 'installed' && navigator.serviceWorker.controller) window.dispatchEvent(new CustomEvent('singularity:update'));
+        });
+      });
+    }).catch(function () {});
+  });
+})();
+</script>
 </body>
 </html>
