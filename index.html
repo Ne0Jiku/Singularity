@@ -343,6 +343,8 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .mini div { display: grid; gap: 2px; } .mini b { font-family: var(--f-mono); font-weight: 500; }
 
 /* Messages */
+.anom-line { color: #ffb36b; }
+.anom-line b { color: #ffb36b; }
 .tuto { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--dock-h) + var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); z-index: 31; width: min(440px, calc(100% - 32px));
   background: var(--panel-2); border: 1px solid var(--cyan); border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 34px rgba(0,0,0,.55); display: grid; gap: 8px; animation: tin .25s ease-out; }
 .tuto .t-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
@@ -384,6 +386,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
 .gal-map .ls.max i { background: #ffffff; box-shadow: 0 0 12px #ffffff, 0 0 26px var(--violet); }
 .gal-map .ll { background: color-mix(in srgb, #03050b 70%, transparent); padding: 1px 5px; border-radius: 6px; max-width: 150px; }
 .gal-map .ll.t, .gal-map .ll.b { max-width: 150px; }
+@media (max-width: 480px) { .gal-map .ll, .gal-map .ll.t, .gal-map .ll.b { font-size: 10px; max-width: 78px; width: auto; padding: 1px 4px; } .gal-map .arm { font-size: 9.5px; } }
 .arm { position: absolute; z-index: 1; font-size: 10.5px; font-style: italic; color: var(--muted); pointer-events: none; white-space: nowrap; }
 .morphs { display: grid; gap: 2px; }
 .mo { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 10px; border: 1px solid transparent; }
@@ -514,6 +517,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
       <div class="track" id="track"></div>
       <p class="small" id="palNow"></p>
       <p class="small" id="palNext"></p>
+      <p class="small anom-line" id="palAnom" hidden></p>
     </div>
   </section>
 
@@ -606,6 +610,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
         <button class="btn" type="button" data-dev="dat">+1 000 <span class="dtw"><i class="dt" aria-hidden="true"></i>données</span></button>
         <button class="btn" type="button" data-dev="probes">Sondes de retour</button>
         <button class="btn" type="button" data-dev="relics">+3 reliques de chaque</button>
+        <button class="btn" type="button" data-dev="anom">Anomalie suivante</button>
       </div>
     </div>
     <div class="set"><span class="label">Sauvegarde</span>
@@ -763,7 +768,7 @@ const TREE = [
     { id: 'A1', name: 'Auto-Flux', desc: 'Achète le Flux automatiquement', cost: 5, auto: 'flux' },
     { id: 'A2', name: 'Auto-Puissance', desc: 'Achète la Puissance automatiquement', cost: 10, auto: 'power' },
     { id: 'A3', name: 'Auto-améliorations', desc: 'Achète les améliorations de run automatiquement', cost: 20, auto: 'ups' },
-    { id: 'A4', name: 'Vent stellaire', desc: 'Au-delà du seuil de Nova, la run rapporte des éclats en continu, sans recommencer', cost: 40, auto: 'wind' },
+    { id: 'A4', name: 'Vent stellaire', desc: 'Au-delà du seuil de Nova, la run rapporte des éclats en continu, sans recommencer ; le vent faiblit à mesure que la run s\'allonge', cost: 40, auto: 'wind' },
     { id: 'A5', name: 'Auto-singularité', desc: 'Déclenche la singularité dès que l\'objectif est atteint', cost: 80, auto: 'sing' } ] },
   { pal: 5, id: 'E', name: 'Exotique', nodes: [
     { id: 'E1', name: 'Matière exotique', desc: 'Effet des éléments exotiques fusionnés ×2', cost: 6, exo: 2 },
@@ -866,9 +871,9 @@ const objective = (pal, m) => OBJS[pal] * (m ? gchMalus(m) : 1);
 // Cibles des défis en ordres de grandeur, proportionnelles à l'objectif de référence :
 // défis des paliers 3 à 5 → objectif de leur palier ; défis du palier 6 → objectif du palier 5 (la force en entrant au palier 6).
 // Mesurées le 22 octobre sur le joueur de référence (runs de 3 min) : 15 à 25 min chacun, Éphémère se joue en 3 min.
-const CH_LOG = { eph: 32 / 32, cold: 31 / 32, bare: 35.5 / 39, chaos: 40 / 39, pure: 29.5 / 57, unstable: 49.5 / 57, sober: 36.5 / 57, noecho: 42 / 57, forced: 69.5 / 57 };
+const CH_LOG = { eph: 32 / 32, cold: 31 / 32, bare: 35.5 / 39, chaos: 40 / 39, pure: 29.5 / 57, unstable: 49.5 / 57, sober: 36.5 / 57, noecho: 42 / 57, forced: 67 / 57 };
 // Sobriété et Désordre plafonnent (Puissance limitée, noyau au hasard) : cible fixe pour Sobriété, et juste au-dessus de l'objectif pour Désordre
-const challengeTarget = (k) => { if (ENV['T_' + k]) return Number(ENV['T_' + k]); if (k === 'sober') return 3.16e37; if (k === 'chaos') return OBJS[4] * 3;
+const challengeTarget = (k) => { if (ENV['T_' + k]) return Number(ENV['T_' + k]); if (k === 'sober') return 3.16e37; if (k === 'chaos') return OBJS[4];
   const t = CHALLENGES[k].tier, ref = OBJS[t === 6 ? 5 : t]; return Math.pow(10, CH_LOG[k] * Math.log10(ref)); };
 const runFloor = pal => pal ? NOVA_MIN[pal] / 100 : 10;
 const upCost = (m, up) => { const lo = runFloor(palier(m)), hi = objective(palier(m), m); return lo * Math.pow(hi / lo, up.f) * prodOf(m, 'upCost'); };
@@ -877,8 +882,9 @@ const speedOf = pal => Math.pow(SPEED_BASE, pal);
 const palier = m => m.pal || 0;
 const owned = m => [...(m.ownedList || ['dust']).filter(x => !ELEMENTS[x].pal), ...EXOTIC.filter(x => palier(m) >= ELEMENTS[x].pal)];
 const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1) * (x.speedEarly && (r.age || 0) < x.speedEarly[1] ? x.speedEarly[0] : 1), 1);
-const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp'));
-const maxFused = m => m.gActive === 'nue' ? 0 : SLOTS[palier(m)] + sumOf(m, 'slot') + (gch(m, 'nue') ? 1 : 0);
+const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp')) * anomSpeed(m);
+const anomSpeed = m => { const a = anom(m); return !a ? 1 : a === 'nursery' ? 1.5 : ANOMALIES[a].speed || 1; };
+const maxFused = m => m.gActive === 'nue' ? 0 : SLOTS[palier(m)] + sumOf(m, 'slot') + (gch(m, 'nue') ? 1 : 0) + (anomIs(m, 'merger') && SLOTS[palier(m)] > 0 ? 1 : 0);
 function stabMax(m, r) {
   let s = m.gActive === 'fragile' ? 4 : 4 + sumOf(m, 'stab') + (gch(m, 'fragile') ? 2 : 0);
   const dn = relicLv(m, 'binaire'); if (dn >= 0) s -= RELICS.binaire.v[dn];
@@ -948,13 +954,14 @@ function breakdown(m, r) {
   if (hasUp(r, 'coils')) parts.push({ id: 'coils', label: 'Bobines supraconductrices', v: 2 });
   parts.push({ id: 'power', label: 'Puissance', v: Math.pow(2, r.lv.power) });
   const pm = powerMilestones(r.lv.power); if (pm) parts.push({ id: 'powms', label: `Jalons de Puissance (${pm})`, v: Math.pow(powerMsMult(m), pm) });
-  parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: CORE[r.core](cOf(r.core)) * (hasUp(r, 'coreres') ? 1.5 : 1) });
+  const ae = anomEl(m), ab = (x, v) => x === ae ? anomBoost(v) : v;
+  parts.push({ id: 'core', label: 'Noyau · ' + ELEMENTS[r.core].name, v: ab(r.core, CORE[r.core](cOf(r.core)) * (hasUp(r, 'coreres') ? 1.5 : 1)) });
   if (relicLv(m, 'binaire') >= 0 && r.fused[0]) parts.push({ id: 'binaire', label: 'Double noyau · ' + ELEMENTS[r.fused[0]].name, v: CORE[r.fused[0]](c) * (hasUp(r, 'coreres') ? 1.5 : 1) });
   const exoK = prodOf(m, 'exo');
   const fusedV = x => { let v = FUSED[x](cOf(x)) * (hasUp(r, 'catal') ? 1.25 : 1); if (EXOTIC.includes(x)) v = 1 + (v - 1) * exoK; return v; };
-  for (const x of r.fused) { const v = x === 'strange' ? Math.max(1, ...r.fused.filter(y => y !== 'strange').map(fusedV)) : fusedV(x); parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné' + (x === 'strange' ? ' (copie)' : ''), v }); }
+  for (const x of r.fused) { const v = ab(x, x === 'strange' ? Math.max(1, ...r.fused.filter(y => y !== 'strange').map(fusedV)) : fusedV(x)); parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné' + (x === 'strange' ? ' (copie)' : ''), v }); }
   const synK = 1 + sumOf(m, 'syn'), reactK = prodOf(m, 'react') * re.reduce((a, x) => a * (x.react || 1), 1) * (r.core === 'strange' ? 2 : 1), harmK = hasUp(r, 'harm') ? 1.5 : 1, exoR = prodOf(m, 'exoReact');
-  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: v < 1 ? v : 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1), reaction: true }); } }
+  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: v < 1 ? v : 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1) * (ae && x.k.split('+').includes(ae) ? ANOM_EL_K : 1) * (anomIs(m, 'jet') ? 1.1 : 1), reaction: true }); } }
   const sp = specs(m), n = r.fused.length;
   const usePur = sp.includes('purity'), useCat = sp.includes('catalysis');
   if (usePur && n <= 1) parts.push({ id: 'purity', label: 'Pureté', v: has(m, 'K1') ? 6 : 3 });
@@ -991,15 +998,15 @@ const ACQUIS = [
 const hasAcq = (m, id) => (m.galaxy || 1) >= ACQUIS.find(a => a.id === id).g;
 // Recherche : la carte de la Voie lactée (x, y en % de la carte, côté de l'étiquette)
 const RESEARCH = {
-  yield:  { arm: 'Bulbe',        name: 'Rendement',              desc: 'Données ×1,5 par niveau',                                  base: 60, mul: 4,   max: Infinity, k: 1.5,  at: [50, 45.6, 't'] },
-  echo:   { arm: 'Persée',       name: 'Écho galactique',        desc: 'Production ×10 par niveau',                                base: 15, mul: 3,   max: Infinity, k: 10,   at: [49.2, 13.2, 'l'] },
-  ray:    { arm: 'Persée',       name: 'Rayonnement',            desc: 'Éclats gagnés par Nova ×1,5 par niveau',                   base: 15, mul: 1.8, max: 5, k: 1.5,  at: [20.7, 24, 'b'] },
-  warp:   { arm: 'Sagittaire',   name: 'Distorsion',             desc: 'Vitesse ×1,5 par niveau',                                  base: 12, mul: 1.8, max: 6, k: 1.5,  at: [23.2, 46.6, 'b'] },
-  leap:   { arm: 'Orion',        name: 'Saut stellaire',         desc: 'La galaxie commence un palier plus loin, avec le ciel des paliers sautés allumé', base: 45, mul: 1.8, max: 4, k: 1, at: [50.8, 78, 'b'] },
-  firm:   { arm: 'Orion',        name: 'Firmament',              desc: 'Chaque palier commence avec 5 éclats de plus par niveau',  base: 12, mul: 1.8, max: 5, k: 5,    at: [79.3, 67.2, 'b'] },
-  hangar: { arm: 'Écu-Centaure', name: 'Hangar',                 desc: 'Une sonde de plus',                                        base: 40, mul: 3,   max: 2, k: 1,    at: [66.2, 54.1, 'b'], probes: true },
-  scope:  { arm: 'Écu-Centaure', name: 'Télescope',              desc: 'Expéditions 25 % plus courtes',                            base: 20, mul: 2,   max: 3, k: 0.75, at: [78.8, 30.4, 'b'], probes: true },
-  slot:   { arm: 'Écu-Centaure', name: 'Emplacement de relique', desc: 'Un emplacement de relique de plus',                        base: 90, mul: 3,   max: 2, k: 1,    at: [67.9, 10.1, 'b'], probes: true },
+  yield:  { arm: 'Bulbe',        name: 'Rendement',              desc: 'Données ×1,5 par niveau',                                  base: 60, mul: 4,   max: Infinity, k: 1.5,  at: [50, 50, 'b'] },
+  echo:   { arm: 'Persée',       name: 'Écho galactique',        desc: 'Production ×10 par niveau',                                base: 15, mul: 3,   max: Infinity, k: 10,   at: [48.9, 67, 'b'] },
+  ray:    { arm: 'Persée',       name: 'Rayonnement',            desc: 'Éclats gagnés par Nova ×1,5 par niveau',                   base: 15, mul: 1.8, max: 5, k: 1.5,  at: [24.2, 32.7, 'b'] },
+  warp:   { arm: 'Sagittaire',   name: 'Distorsion',             desc: 'Vitesse ×1,5 par niveau',                                  base: 12, mul: 1.8, max: 6, k: 1.5,  at: [24.7, 70.4, 'b'] },
+  leap:   { arm: 'Orion',        name: 'Saut stellaire',         desc: 'La galaxie commence un palier plus loin, avec le ciel des paliers sautés allumé', base: 45, mul: 1.8, max: 4, k: 1, at: [78.2, 42.5, 'b'] },
+  firm:   { arm: 'Orion',        name: 'Firmament',              desc: 'Chaque palier commence avec 5 éclats de plus par niveau',  base: 12, mul: 1.8, max: 5, k: 5,    at: [85.2, 60.5, 'b'] },
+  hangar: { arm: 'Écu-Centaure', name: 'Hangar',                 desc: 'Une sonde de plus',                                        base: 40, mul: 3,   max: 2, k: 1,    at: [45.9, 35.8, 't'], probes: true },
+  scope:  { arm: 'Écu-Centaure', name: 'Télescope',              desc: 'Expéditions 25 % plus courtes',                            base: 20, mul: 2,   max: 3, k: 0.75, at: [61.7, 32, 'b'], probes: true },
+  slot:   { arm: 'Écu-Centaure', name: 'Emplacement de relique', desc: 'Un emplacement de relique de plus',                        base: 90, mul: 3,   max: 2, k: 1,    at: [74.1, 71, 'b'], probes: true },
 };
 const res = (m, id) => (m.research || {})[id] || 0;
 const researchCost = (m, id) => Math.round(RESEARCH[id].base * Math.pow(RESEARCH[id].mul, res(m, id)));
@@ -1037,6 +1044,35 @@ const GCHAL = {
   mur:      { name: 'Mur', desc: 'Objectifs et seuil d\'effondrement ×1e10', reward: 'Données ×2' },
 };
 const GCH_FROM = 3;
+// ---------- Anomalies galactiques (v15.0) ----------
+// Dès la galaxie 3, chaque galaxie tire une anomalie à l'effondrement : elle change le build à viser, sans rien bloquer.
+const ANOMALY_FROM = 3;
+const ANOMALIES = {
+  comets:  { name: 'Essaim de comètes',         desc: 'Comètes 3 fois plus fréquentes' },
+  halo:    { name: 'Halo sombre',               desc: 'Matière noire et ses réactions ×1,5', el: 'dark' },
+  void:    { name: 'Vide intergalactique',      desc: 'Vitesse ×0,5, données ×1,5', speed: 0.5, data: 1.5 },
+  gamma:   { name: 'Sursaut gamma',             desc: 'La première Nova de chaque palier rapporte ×10' },
+  lens:    { name: 'Lentille gravitationnelle', desc: 'Graviton et ses réactions ×1,5', el: 'graviton' },
+  dwarf:   { name: 'Naine satellite',           desc: 'Seuil d\'effondrement ÷10, données ×0,7', seuil: 0.1, data: 0.7 },
+  gwind:   { name: 'Vent galactique',           desc: 'Vent stellaire au rythme plein (×2)' },
+  merger:  { name: 'Fusion de galaxies',        desc: 'Un emplacement de fusion de plus, seuil d\'effondrement ×' + (ENV.MS || '1e18') }, 
+  jet:     { name: 'Jet relativiste',           desc: 'Toutes les réactions ×1,1' },
+  strange: { name: 'Bulle étrange',             desc: 'Matière étrange et ses réactions ×1,5', el: 'strange' },
+  fossil:  { name: 'Galaxie fossile',           desc: 'Étoiles du ciel à moitié prix, données ×0,8', data: 0.8 },
+  nursery: { name: 'Pouponnière d\'étoiles',    desc: 'Vitesse ×1,5' },
+};
+const anom = m => ((m.galaxy || 1) >= ANOMALY_FROM && m.anomaly && ANOMALIES[m.anomaly]) ? m.anomaly : null;
+const anomIs = (m, id) => anom(m) === id;
+const anomEl = m => { const a = anom(m); return a ? ANOMALIES[a].el || null : null; };
+const ANOM_EL_K = Number(ENV.AEK || 1.5);
+const anomBoost = v => v > 1 ? 1 + (v - 1) * ANOM_EL_K : v;
+// Tirage : jamais deux fois la même d'affilée ; rnd injectable pour le simulateur
+function drawAnomaly(m, rnd = Math.random) {
+  const ids = Object.keys(ANOMALIES).filter(id => id !== m.anomaly);
+  return ids[Math.floor(rnd() * ids.length)];
+}
+const gammaK = m => anomIs(m, 'gamma') && !(m.novasPal || 0) ? 10 : 1;
+const windK = m => anomIs(m, 'gwind') ? 1 : WIND_K;
 const gch = (m, id) => (m.gch || {})[id] || 0;
 function gchMalus(m) { if (!m.gActive) return 1; return Math.pow(10, 5 * gch(m, m.gActive)) * (m.gActive === 'mur' ? 1e10 : 1); }
 // Seuil d'effondrement : 1e72 pour la première galaxie, puis 1e74 × (masse ÷ 10)^4 ; la masse = toutes les données gagnées
@@ -1045,7 +1081,8 @@ const SEUIL0 = Number(ENV.S0 || 1e83);   // v14.2 : recalé sur la production de
 const FIRST_COLLAPSE_BONUS = 100;      // données offertes en fin d'Acte 1 (sans compter dans la masse)
 function seuil(m) {
   const j = relicLv(m, 'jet'), base = (m.galaxy || 1) > 1 ? SEUIL0 * Math.pow(Math.max(1, mass(m) / 10), 4) : OBJS[LAST_PAL];
-  return base * gchMalus(m) * (j >= 0 ? RELICS.jet.w[j] : 1);
+  const a = anom(m);
+  return base * gchMalus(m) * (a === 'merger' ? Number(ENV.MS || 1e18) : 1) * (j >= 0 ? RELICS.jet.w[j] : 1) * (a && ANOMALIES[a].seuil || 1);
 }
 // Constellations complètes (pour le bonus de données)
 const SKY_BRANCHES = () => [...TREE, { pal: 3, id: 'K', name: 'Lois clés', nodes: KEYS }];
@@ -1057,7 +1094,8 @@ function dataMult(m) {
   let extra = 0; for (const id in GCHAL) extra += Math.max(0, gch(m, id) - 1); k *= 1 + 0.25 * extra;
   if (m.gActive) k *= 1 + gch(m, m.gActive) + 1;
   const j = relicLv(m, 'jet'); if (j >= 0) k *= RELICS.jet.v[j];
-  return k * (1 + 0.1 * skiesDone(m)) * exploitMult(m);
+  const a = anom(m);
+  return k * (1 + 0.1 * skiesDone(m)) * exploitMult(m) * (a && ANOMALIES[a].data || 1);
 }
 const dataRaw = (m, produced) => { const s = seuil(m); return produced < s ? 0 : 10 * (Math.log10(produced / s) + 1) * dataMult(m); };
 const dataGain = (m, produced) => Math.floor(dataRaw(m, produced));
@@ -1113,15 +1151,18 @@ const NOVA_K = Number(ENV.NK || 1);
 const novaMult = m => { const br = relicLv(m, 'braise'); return exploitMult(m) * prodOf(m, 'eclats') * Math.pow(RESEARCH.ray.k, res(m, 'ray')) * (gch(m, 'ciel') ? 2 : 1) * (br >= 0 ? 1 - RELICS.braise.w[br] : 1); };
 const novaRaw = (m, produced) => produced < novaMin(m) ? 0 : NOVA_K * Math.pow(Math.log10(produced / novaMin(m)) + 1, 2) * novaMult(m);
 const novaGain = (m, produced) => Math.floor(novaRaw(m, produced));
-// Vent stellaire : au-delà du seuil de Nova, éclats par seconde = WIND_K × le meilleur rythme de Nova de la run
+// Vent stellaire : au-delà du seuil de Nova, éclats par seconde = WIND_K × le rythme de Nova du moment (v15.0.3, avant : le meilleur de la run)
 // (rythme = ce que rapporterait la Nova ÷ (âge de la run + 30 s pour la relancer))
 const WIND_K = 0.5;
 const windRate = (m, r) => { const g = novaRaw(m, r.produced); return g >= 1 ? g / ((r.age || 0) + 30) : 0; };
+// v15.0.3 : avec Mémoire stellaire le ciel reste allumé, le cadeau du catalogue ne se redonne pas à chaque palier (seul Firmament reste)
+const palierGift = m => treePermanent(m) ? RESEARCH.firm.k * res(m, 'firm') : catalogEclats(m);
 const catalogEclats = m => { const pr = relicLv(m, 'prisme'); return (m.catalog || []).length * (pr >= 0 ? RELICS.prisme.v[pr] : 1) + RESEARCH.firm.k * res(m, 'firm'); };
 // État d'un nœud : have / can / poor / locked
 const nodeCount = (m, id) => (m.tree || []).filter(x => x === id).length;
 function nodeCost(m, n) {
-  const base = n.repeat ? Math.round(n.cost * Math.pow(n.repeat, nodeCount(m, n.id))) : n.cost;
+  const base0 = n.repeat ? Math.round(n.cost * Math.pow(n.repeat, nodeCount(m, n.id))) : n.cost;
+  const base = anomIs(m, 'fossil') && n.branch !== 'K' ? Math.ceil(base0 / 2) : base0;
   const a = relicLv(m, 'astrolabe'); if (a < 0) return base;
   const br = n.branch === 'K' ? KEYS : TREE.find(b => b.id === n.branch).nodes, i = br.findIndex(x => x.id === n.id);
   return i < RELICS.astrolabe.v[a] && !nodeCount(m, n.id) ? 0 : Math.ceil(base * (1 + RELICS.astrolabe.w[a]));
@@ -1140,7 +1181,7 @@ function nodeState(m, n) {
 }
 const freshMeta = () => ({ catalog: [], bank: 0, comets: 0, cometIn: 180, pal: 0, ownedList: ['dust'], core: 'dust', record: 0, sings: 0, novas: 0, discovered: [], tree: [], eclats: 0, eclatsTotal: 0, challengesDone: [], chTargets: {}, won: false, totalTime: 0, realTime: 0, best: 0, lastLines: [],
   galaxy: 1, data: 0, dataTotal: 0, research: {}, relics: {}, equip: [], probes: [], pclock: 0, gch: {}, gActive: null, plans: {}, pilot: true, lightOrder: [], lastOrder: [], autoCollapse: false, palAge: 0, galTime: 0 });
-if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
+if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANOMALY_FROM, anom, anomIs, anomEl, drawAnomaly, gammaK, windK, anomSpeed, ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
   acquired, ACQ_NODES, MORPHS, morph, ACQUIS, hasAcq, RESEARCH, res, researchCost, EXPEDITIONS, expTime, probes, RARITIES, RELICS, RELIC_IDS, relicSlots, bestRarity, relicLv, cometTail, GCHAL, GCH_FROM, gch, gchMalus, mass, seuil, branchDone, skiesDone, dataMult, dataRaw, dataGain, novaMult, WIND_K, windRate, NOVA_AGE, FIRST_COLLAPSE_BONUS, EXPLOITS, exploitMult, EXPLOIT_BONUS };
 
 </script>
@@ -1236,7 +1277,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   const canCollapse = () => !run.challenge && isFinal() && run.produced >= seuil(meta);
   const colGain = () => canCollapse() ? dataGain(meta, run.produced) : 0;
   const colRate = () => colGain() / Math.max(1, (meta.galTime || 0) / 60);
-  const curGain = () => run.challenge ? 0 : novaGain(meta, run.produced);
+  const curGain = () => run.challenge ? 0 : Math.floor(novaRaw(meta, run.produced) * gammaK(meta));
   // max : true = autant que possible, un nombre = au plus ce nombre de niveaux
   function buy(u, max) {
     const limit = max === true ? 3000 : max ? max : 1;
@@ -1291,7 +1332,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     if (!owned(meta).includes(x) || x === run.core) return false;
     if (run.challenge === 'forced') return false;
     if (meta.pal >= 1 && run.fused.length && !has(meta, 'K9')) return false;
-    return instab(meta, run, [], x) <= stabMax(meta, run);
+    // avec Polyvalence, les éléments déjà fusionnés restent : ils doivent tenir dans la stabilité avec le nouveau noyau
+    return instab(meta, run, run.fused, x) <= stabMax(meta, run);
   }
   function setCore(x) {
     if (!canCore(x)) return;
@@ -1358,7 +1400,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.pal++; meta.palAge = 0; meta.novasPal = 0; sound('singularite', { auto: !!auto }); sound('palier', { auto: true });
     const perm = treePermanent(meta);
     if (!perm) { meta.tree = []; meta.lightOrder = []; }
-    meta.eclats = (perm ? meta.eclats : 0) + catalogEclats(meta); meta.eclatsPal = 0;
+    meta.eclats = (perm ? meta.eclats : 0) + palierGift(meta); meta.eclatsPal = 0;
     for (const [k, ch] of Object.entries(CHALLENGES)) if (ch.tier === meta.pal) meta.chTargets[k] = challengeTarget(k);
     run = newRun(meta);
     const pal = PALIERS[meta.pal];
@@ -1394,7 +1436,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   // ---------- Sons : points d'accroche ----------
   // Le jeu ne joue aucun son lui-même. Il annonce ses moments forts par un événement sur window :
   //   window.addEventListener('singularity:sound', e => { const { type, auto, value, pal, galaxy, volume } = e.detail; ... })
-  // type : nova, singularite, effondrement, comete, etoile, exploit, defi, sonde, palier (pour l'ambiance), clic
+  // type : nova, singularite, effondrement, comete, etoile, exploit, defi, palier (pour l'ambiance), volume
   // volume : { fx, amb } entre 0 et 1, réglés par le joueur. Rien n'est envoyé pendant un rattrapage (absence, réserve, banc de test rapide).
   // Un module de sons s'annonce avec window.dispatchEvent(new Event('singularity:audio-ready')) : le réglage du volume apparaît alors.
   const vol = { fx: +(store.get('singularity-vol-fx') ?? 70) / 100, amb: +(store.get('singularity-vol-amb') ?? 40) / 100 };
@@ -1514,11 +1556,13 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.gBest = Math.min(meta.gBest || Infinity, meta.galTime || Infinity); meta.gLast = meta.galTime || 0;
     sound('effondrement', { auto: !!auto, value: d });
     meta.data += d + (g0 === 1 ? FIRST_COLLAPSE_BONUS : 0); meta.dataTotal += d; meta.galaxy++; meta.won = true; meta.novasPal = 0;
+    if (meta.galaxy >= ANOMALY_FROM) { meta.anomaly = drawAnomaly(meta); logEv('anomalie', { id: meta.anomaly }); }
     if (meta.lightOrder.length) meta.lastOrder = [...meta.lightOrder];
     resetGalaxy();
     fx.singularity('Effondrement galactique'); fx.warp(3);
     const acq = ACQUIS.find(a => a.g === meta.galaxy);
     toast(`Galaxie ${meta.galaxy} · <b>${morph(meta)}</b> · +${datW(d)}${skies ? ` (dont +${skies * 10} % pour ${skies} constellation${skies > 1 ? 's' : ''} complète${skies > 1 ? 's' : ''})` : ''}${gDone ? ` · défi <b>${GCHAL[gDone].name}</b> réussi` : ''}${acq ? ` · acquis : <b>${acq.name}</b>` : ''}`, '#9b6bff');
+    if (anom(meta)) setTimeout(() => toast(`Anomalie : <b>${ANOMALIES[meta.anomaly].name}</b> · ${ANOMALIES[meta.anomaly].desc}`, '#ffb36b', 'anom'), 900);
     markTab('gal'); if (meta.galaxy === GCH_FROM) markTab('ch');
     if (g0 === 1) showFirstCollapse(d + FIRST_COLLAPSE_BONUS);
     structure(); refresh(true); save();
@@ -1547,6 +1591,13 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       h('p', { class: 'small mono' }, `Acte 1 : ${fmtT(meta.realTime || 0)} · ${meta.sings} singularités · ${meta.novas || 0} Novas`));
     $('winClose').textContent = 'Entrer dans la galaxie 2';
     setTimeout(() => { $('win').hidden = false; }, 900);
+  }
+  // Garde-fou : si la stabilité ou les emplacements baissent en cours de run (relique, anomalie, défi), on retire les dernières fusions
+  function fitStability() {
+    if (!run.fused.length) return;
+    let cut = 0;
+    while (run.fused.length && (run.fused.length > maxFused(meta) || instab(meta, run) > stabMax(meta, run))) { run.fused.pop(); cut++; }
+    if (cut) { toast(`Stabilité dépassée : ${cut} fusion${cut > 1 ? 's retirées' : ' retirée'}`, '#f2c46b', 'stab'); ui.dirty = true; }
   }
   // Pilote automatique : rejoue le noyau et les fusions enregistrés pour ce palier
   function pilotTick() {
@@ -1688,13 +1739,14 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function windTick(dt) {
     if (!has(meta, 'A4') || run.challenge) return;
     const rate = windRate(meta, run); if (!rate) return;
-    if (rate > (run.windBest || 0)) run.windBest = rate;
-    run.windAcc = (run.windAcc || 0) + WIND_K * run.windBest * dt;
+    // v15.0.3 : le vent suit le rythme du moment (il faiblit quand la run s'allonge, une Nova le relance), plus le meilleur rythme de la run
+    run.windBest = rate;
+    run.windAcc = (run.windAcc || 0) + windK(meta) * run.windBest * dt;
     const w = Math.floor(run.windAcc); if (w < 1) return;
     run.windAcc -= w; meta.eclats += w; meta.eclatsTotal = (meta.eclatsTotal || 0) + w; meta.eclatsPal = (meta.eclatsPal || 0) + w; meta.windTotal = (meta.windTotal || 0) + w;
     const now = performance.now(); if (now - windStruct > 2000) { windStruct = now; ui.dirty = true; }
   }
-  const windPerMin = () => has(meta, 'A4') && !run.challenge ? WIND_K * (run.windBest || 0) * 60 : 0;
+  const windPerMin = () => has(meta, 'A4') && !run.challenge ? windK(meta) * (run.windBest || 0) * 60 : 0;
   function autos() {
     if (has(meta, 'A1')) buy('flux', true);
     if (has(meta, 'A2')) buy('power', true);
@@ -1716,10 +1768,10 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     meta.catalog.push(k);
     const [c] = k.split(':');
     if (lineDone(meta, c) && !quiet) setTimeout(() => toast(`<b>Ligne complète : ${ELEMENTS[c].name}</b> · cet élément coûte désormais 1 de stabilité en moins`, EL_COLOR[c]), 700);
-    if (!quiet) { fx.flash(starName(k), EL_COLOR[c]); toast(`Nouvelle étoile cataloguée : <b>${starName(k)}</b> · +1 éclat offert au début de chaque palier`, EL_COLOR[c], 'cat'); }
+    if (!quiet) { fx.flash(starName(k), EL_COLOR[c]); toast(`Nouvelle étoile cataloguée : <b>${starName(k)}</b> · +1 éclat offert à chaque fois que le ciel s\'éteint`, EL_COLOR[c], 'cat'); }
     markTab('log'); if (!quiet) structure();
   }
-  const cometGap = () => { const c = relicLv(meta, 'comete'); return (180 + Math.random() * 180) / prodOf(meta, 'comets') / (c >= 0 ? RELICS.comete.w[c] : 1); };
+  const cometGap = () => { const c = relicLv(meta, 'comete'); return (180 + Math.random() * 180) / prodOf(meta, 'comets') / (c >= 0 ? RELICS.comete.w[c] : 1) / (anomIs(meta, 'comets') ? 3 : 1); };
   function tickComets(realDt) {
     if (meta.comets >= 3) return;
     meta.cometIn -= realDt;
@@ -1734,6 +1786,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     else { const now = performance.now(); ui.cometHits = (ui.cometHits || []).filter(t => now - t < 10000); ui.cometHits.push(now); checkExploits({ type: 'comet', burst: ui.cometHits.length }); }
     if (roll < 0.4 || relicLv(meta, 'comete') >= 0) { run.boostLeft = 60; say(`Comète capturée : <b>Queue de comète</b> · production ×${fmt(cometTail(meta))} pendant 60 s`); }
     else if (roll < 0.8) { const g = P() * speed() * 180; run.energy += g; run.produced += g; say(`Comète capturée : <b>Salve d'énergie</b> · +${fmt(g)} (3 min de production)`); }
+    // pendant un rattrapage (absence, réserve dépensée), un Fragment de temps remplirait la réserve qu'on est en train de vider : il devient une Salve
+    else if (quiet) { const g = P() * speed() * 180; run.energy += g; run.produced += g; }
     else { meta.bank = Math.min(BANK_CAP, meta.bank + 900); say('Comète capturée : <b>Fragment de temps</b> · +15 min dans la réserve'); }
     if (!quiet) fx.comet(); sound('comete', { auto: !!auto });
     if (!auto) { refresh(true); save(); }
@@ -1808,7 +1862,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const gc = $('genCard'); gc.replaceChildren();
     if (meta.pal === 0) {
       gc.append(h('div', { class: 'head' }, h('h2', {}, 'Éléments'), h('span', { class: 'small' }, 'La fusion se débloque au palier 1')),
-        h('p', { class: 'small' }, 'Pendant ta première run, chaque nouvel élément se découvre en produisant de l\'énergie. Essaie-les au noyau, tu peux en changer à tout moment.'), pilotCard());
+        h('p', { class: 'small' }, 'Pendant ta première run, chaque nouvel élément se découvre en produisant de l\'énergie. Essaie-les au noyau, tu peux en changer à tout moment.'), ...[pilotCard()].filter(Boolean));
     } else {
       const used = instab(meta, run), max = stabMax(meta, run);
       const gauge = h('div', { class: 'gauge' }, h('div', { class: 'row' }, h('span', {}, 'Stabilité utilisée'), h('b', {}, `${used} / ${max}`)), h('div', { class: 'bar' }, h('i', { style: `width:${Math.min(100, max ? used / max * 100 : 100)}%` })));
@@ -1819,8 +1873,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       const hint = !anyFuse && !run.fused.length && run.challenge !== 'pure' ? h('p', { class: 'small', style: 'color:var(--bad)' }, 'Aucun élément ne tient dans ta stabilité avec ce noyau. Essaie un noyau qui coûte moins de stabilité, ou allume des lois de la constellation Stabilité.') : null;
       const ik = innerK(meta, run);
       gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyau et fusions'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} emplacements`)), gauge, slots, ...(hint ? [hint] : []),
-        fissionBtn(),
-        pilotCard(),
+        ...[fissionBtn(), pilotCard()].filter(Boolean),
         h('p', { class: 'small' }, run.challenge === 'pure' ? 'Défi Pur : aucune fusion possible.' : `${run.fused.includes('graviton') ? 'Graviton fusionné : le noyau ne coûte plus de stabilité. ' : run.core === 'graviton' ? 'Graviton au noyau : chaque élément fusionné coûte 1 de stabilité en moins. ' : 'Le noyau coûte aussi de la stabilité. '}${ik ? `Quark : les éléments fusionnés réagissent entre eux (${Math.round(ik * 100)} %). ` : ''}Le noyau se change tant que rien n'est fusionné ; une fusion dure jusqu'à la prochaine Nova.`));
     }
     const els = $('els'); els.replaceChildren();
@@ -1917,7 +1970,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const ce = catalogEclats(meta);
     pl.append(h('div', { class: 'card' },
       h('div', { class: 'head' }, h('h2', {}, 'Constellations'), h('span', { class: 'small' }, h('b', { class: 'mono' }, eclW(meta.eclats)), ' à dépenser')),
-      h('p', { class: 'small' }, perm ? 'Mémoire stellaire : tes constellations restent allumées d\'un palier à l\'autre.' : `Chaque loi est une étoile : allume-la avec des éclats, gagnés par Nova. À chaque singularité, le ciel s'éteint${ce ? ` et tu repars avec ${eclW(ce)} offert${ce > 1 ? 's' : ''} par le catalogue` : ''}.`),
+      h('p', { class: 'small' }, perm ? `Mémoire stellaire : tes constellations restent allumées d'un palier à l'autre. Le catalogue offre ses ${eclW(ce)} au début de chaque galaxie, quand le ciel s'éteint.` : `Chaque loi est une étoile : allume-la avec des éclats, gagnés par Nova. À chaque singularité, le ciel s'éteint${ce ? ` et tu repars avec ${eclW(ce)} offert${ce > 1 ? 's' : ''} par le catalogue` : ''}.`),
       pick, skyHead, sky, detail));
     // Défis
     const pc = $('p-ch'); pc.replaceChildren();
@@ -1967,6 +2020,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
     const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
     $('palNow').replaceChildren(h('b', {}, `Palier ${meta.pal} · ${cur.name}`), ` · vitesse ×${fmt(speed())}`);
+    const an = anom(meta), pa = $('palAnom'); pa.hidden = !an;
+    if (an) pa.replaceChildren(h('b', {}, `Anomalie · ${ANOMALIES[an].name}`), ` : ${ANOMALIES[an].desc}${an === 'gamma' ? (meta.novasPal ? ' (déjà utilisée à ce palier)' : ' (prête)') : ''}`);
     $('palNext').textContent = nxt ? `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}` : meta.galaxy === 1 ? 'Dernier palier de l\'Acte 1 : atteins le seuil d\'effondrement, ton trou noir avalera la galaxie.' : 'Dernier palier : dépasse le seuil d\'effondrement pour faire naître la galaxie suivante.';
   }
 
@@ -1981,8 +2036,10 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     '<ellipse cx="20" cy="20" rx="17" ry="13" fill="#c9bfff" fill-opacity="0.15"/><ellipse cx="20" cy="20" rx="11" ry="8" fill="#c9bfff" fill-opacity="0.4"/><ellipse cx="20" cy="20" rx="5" ry="4" fill="#c9bfff"/>',
     '<path d="M20 20L8 4M20 20l12 16" stroke="#c9bfff" stroke-width="1.6" stroke-linecap="round"/><circle cx="20" cy="20" r="5" fill="#c9bfff" fill-opacity="0.35"/><circle cx="20" cy="20" r="2.5" fill="#fff"/>',
   ];
-  const ARMS = ['M193 151 C212 125 208 87 176 69 C144 51 102 65 74 101', 'M165 151 C139 133 101 136 83 168 C65 200 79 242 115 270', 'M165 179 C147 205 150 244 182 261 C214 279 256 265 284 229', 'M193 179 C219 198 258 194 275 162 C293 130 279 88 243 60'];
-  const ARM_LABELS = [['Bras de Persée', 3, 4, 'left'], ['Bras du Sagittaire', 3, 68, 'left'], ['Bras d\'Orion', 58, 92, 'left'], ['Bras de l\'Écu-Centaure', 2, 45, 'right']];
+  // v15.0.1 : spirale barrée vue de biais, deux grands bras et deux éperons (l'ancienne carte à quatre bras crochus évoquait un symbole haineux)
+  const ARMS = [{"d": "M213.4 167.4 L215.3 170.1 L216.8 173.2 L217.9 176.5 L218.5 180.1 L218.7 183.8 L218.3 187.8 L217.4 191.9 L215.9 196.1 L213.7 200.3 L211.0 204.5 L207.6 208.7 L203.6 212.7 L199.0 216.5 L193.8 220.0 L188.1 223.3 L181.9 226.1 L175.1 228.4 L168.0 230.2 L160.5 231.5 L152.8 232.1 L144.9 232.0 L137.0 231.1 L129.0 229.5 L121.2 227.1 L113.7 223.8 L106.5 219.7 L99.9 214.7 L93.8 208.9 L88.5 202.3 L84.1 194.9 L80.6 186.7 L78.3 177.9 L77.2 168.5 L77.4 158.6 L79.0 148.2 L82.0 137.6 L86.6 126.8 L92.8 115.9 L100.5 105.2 L109.9 94.7", "w": 1}, {"d": "M144.6 188.6 L142.7 185.9 L141.2 182.8 L140.1 179.5 L139.5 175.9 L139.3 172.2 L139.7 168.2 L140.6 164.1 L142.1 159.9 L144.3 155.7 L147.0 151.5 L150.4 147.3 L154.4 143.3 L159.0 139.5 L164.2 136.0 L169.9 132.7 L176.1 129.9 L182.9 127.6 L190.0 125.8 L197.5 124.5 L205.2 123.9 L213.1 124.0 L221.0 124.9 L229.0 126.5 L236.8 128.9 L244.3 132.2 L251.5 136.3 L258.1 141.3 L264.2 147.1 L269.5 153.7 L273.9 161.1 L277.4 169.3 L279.7 178.1 L280.8 187.5 L280.6 197.4 L279.0 207.8 L276.0 218.4 L271.4 229.2 L265.2 240.1 L257.5 250.8 L248.1 261.3", "w": 1}, {"d": "M179.5 227.2 L177.3 228.4 L175.0 229.7 L172.7 230.9 L170.2 232.1 L167.7 233.2 L165.1 234.3 L162.4 235.3 L159.6 236.3 L156.7 237.2 L153.8 238.1 L150.7 238.9 L147.6 239.6 L144.4 240.3 L141.1 240.8 L137.7 241.3 L134.3 241.7 L130.7 242.1 L127.2 242.3 L123.5 242.4 L119.8 242.4 L116.0 242.3 L112.2 242.1 L108.3 241.8 L104.4 241.4 L100.4 240.8 L96.4 240.1 L92.4 239.3 L88.4 238.3 L84.3 237.2 L80.2 235.9 L76.1 234.5 L72.0 232.9 L67.9 231.1 L63.8 229.2 L59.8 227.2 L55.8 224.9 L51.8 222.5 L47.8 219.9 L43.9 217.1 L40.1 214.1", "w": 0.6}, {"d": "M257.7 140.0 L259.3 140.8 L261.0 141.7 L262.7 142.6 L264.3 143.6 L266.0 144.6 L267.6 145.7 L269.2 146.8 L270.8 147.9 L272.4 149.1 L273.9 150.3 L275.5 151.6 L277.0 152.9 L278.5 154.3 L280.0 155.7 L281.4 157.2 L282.9 158.7 L284.3 160.2 L285.6 161.8 L287.0 163.5 L288.3 165.2 L289.5 166.9 L290.8 168.7 L291.9 170.6 L293.1 172.5 L294.2 174.4 L295.3 176.4 L296.3 178.4 L297.3 180.5 L298.2 182.7 L299.1 184.8 L300.0 187.1 L300.7 189.3 L301.5 191.7 L302.2 194.0 L302.8 196.4 L303.3 198.9 L303.8 201.4 L304.3 204.0 L304.6 206.6 L304.9 209.2", "w": 0.45}];
+  const BAR = 'M144.6 188.6 L213.4 167.4';
+  const ARM_LABELS = [['Bras de Persée', 26, 6, 'left'], ['Bras du Sagittaire', 2, 91, 'left'], ['Bras d\'Orion', 2, 33, 'right'], ['Bras de l\'Écu-Centaure', 2, 92, 'right']];
   const galViews = () => [['rech', 'Recherche'], ['probes', 'Sondes'], ['relics', 'Reliques'], ['acq', 'Acquis']];
   function pilotCard() {
     if (!hasAcq(meta, 'pilot')) return null;
@@ -2005,6 +2062,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     const head = h('div', { class: 'card' },
       h('div', { class: 'head' }, h('h2', {}, `Galaxie ${meta.galaxy} · ${morph(meta)}`), h('span', { class: 'small' }, 'masse ', h('b', { class: 'mono' }, fmt(mass(meta))), ' · seuil ', h('b', { class: 'mono' }, fmt(seuil(meta))))),
       h('p', { class: 'small' }, nxt ? `Prochain effondrement : ${MORPHS[Math.min(MORPHS.length, meta.galaxy + 1) - 1]}, acquis ${nxt.name}.` : 'Tous les acquis sont là : la boucle continue, chaque galaxie plus massive que la précédente.'),
+      anom(meta) ? h('p', { class: 'small anom-line' }, h('b', {}, `Anomalie : ${ANOMALIES[meta.anomaly].name}. `), ANOMALIES[meta.anomaly].desc + '. Une nouvelle anomalie est tirée à chaque effondrement.') : meta.galaxy + 1 >= ANOMALY_FROM ? h('p', { class: 'small' }, 'Dès la prochaine galaxie, chaque effondrement tire une anomalie qui change les règles de la galaxie.') : null,
       meta.gActive ? h('p', { class: 'small', style: 'color:#b89bff' }, h('b', {}, `Défi galactique en cours : ${GCHAL[meta.gActive].name}, niveau ${gch(meta, meta.gActive) + 1}. `), GCHAL[meta.gActive].desc + '.') : null);
     if (hasAcq(meta, 'autocol')) head.append(h('div', { class: 'seg', role: 'group', 'aria-label': 'Effondrement automatique' },
       h('button', { type: 'button', 'aria-pressed': String(meta.autoCollapse), onclick: () => { meta.autoCollapse = true; structure(); save(); } }, 'Effondrement automatique'),
@@ -2024,8 +2082,8 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   function researchCard() {
     const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', '0 30 358 296'); svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = '<defs><radialGradient id="bulbe" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e6dcff" stop-opacity="0.5"/><stop offset="0.45" stop-color="#9b6bff" stop-opacity="0.16"/><stop offset="1" stop-color="#9b6bff" stop-opacity="0"/></radialGradient></defs><circle cx="179" cy="165" r="70" fill="url(#bulbe)"/>'
-      + ARMS.map(d => `<path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="22" stroke-opacity="0.08"/><path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="1.2" stroke-opacity="0.55" vector-effect="non-scaling-stroke"/>`).join('');
+    svg.innerHTML = '<defs><radialGradient id="bulbe" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e6dcff" stop-opacity="0.5"/><stop offset="0.45" stop-color="#9b6bff" stop-opacity="0.16"/><stop offset="1" stop-color="#9b6bff" stop-opacity="0"/></radialGradient></defs><ellipse cx="179" cy="178" rx="74" ry="52" transform="rotate(-17 179 178)" fill="url(#bulbe)"/><path d="' + BAR + '" stroke="#e6dcff" stroke-opacity="0.22" stroke-width="12" stroke-linecap="round"/>'
+      + ARMS.map(({ d, w }) => `<path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="${(24 * w).toFixed(1)}" stroke-opacity="${(0.06 + 0.04 * w).toFixed(3)}"/><path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="${(0.6 + 0.8 * w).toFixed(2)}" stroke-opacity="${(0.3 + 0.3 * w).toFixed(2)}" vector-effect="non-scaling-stroke"/>`).join('');
     const map = h('div', { class: 'gal-map' }, svg);
     for (const [txt, x, y, side] of ARM_LABELS) map.append(h('span', { class: 'arm', style: `${side}:${x}%;top:${y}%`, 'aria-hidden': 'true' }, txt));
     const ids = Object.keys(RESEARCH);
@@ -2268,7 +2326,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = `Prochain élément : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} d'énergie produite. `; }
       if (meta.gActive) note += `Défi galactique ${GCHAL[meta.gActive].name} : réussi à l'effondrement. `;
       const wpm = windPerMin();
-      if (wpm > 0) note += `Vent stellaire : +${wpm >= 10 ? fmt(wpm) : nf1.format(wpm)} éclats/min, la run continue. `;
+      if (wpm > 0) note += `Vent stellaire : +${wpm >= 10 ? fmt(wpm) : nf1.format(wpm)} éclats/min, la run continue ; il faiblit à mesure que la run s'allonge, une Nova le relance. `;
       if (isFinal() && run.produced >= obj) { const L = Math.log10(run.produced / obj); note += `Seuil dépassé de ${nf1.format(L)} ordre${L >= 2 ? 's' : ''} de grandeur : chaque ordre de plus rapporte des données. `; }
       else if (!wpm && !eta) note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : has(meta, 'A4') && !run.challenge ? `Le vent stellaire se lève au seuil de Nova, ${fmt(nm)} d'énergie produite dans la run.` : `La Nova s'allume au seuil de ${fmt(nm)} d'énergie produite dans la run.`;
       $('objNote').replaceChildren(...rich(note));
@@ -2681,6 +2739,7 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
     gal: () => { devEnd1(); collapse(true); },
     dat: () => { meta.data += 1000; },
     probes: () => { for (const pr of meta.probes || []) if (pr) pr.end = Math.min(pr.end, meta.pclock); },
+    anom: () => { const ids = Object.keys(ANOMALIES); meta.anomaly = ids[(ids.indexOf(meta.anomaly) + 1) % ids.length]; if (meta.galaxy < ANOMALY_FROM) toast('Les anomalies commencent à la galaxie 3', '#8a93ae', 'dev'); else toast(`Anomalie : <b>${ANOMALIES[meta.anomaly].name}</b>`, '#ffb36b', 'anom'); },
     relics: () => { for (const id of RELIC_IDS) (meta.relics[id] = meta.relics[id] || [0, 0, 0, 0])[0] += 3; },
   };
   $('dev').addEventListener('click', e => {
@@ -2728,6 +2787,24 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
   $('gen').addEventListener('click', e => { if (fx.hitComet(e)) captureComet(); });
   $('abandonBtn').addEventListener('click', abandonChallenge);
 
+  // Rattrapage d'une absence : jeu fermé, ou application en arrière-plan (le navigateur suspend alors les minuteurs)
+  function catchUp(awayAll) {
+    if (!(awayAll > 0)) return;
+    // les sondes voyagent en temps réel, même jeu fermé (sans plafond)
+    ui.lastBack = probeBack(); meta.pclock = (meta.pclock || 0) + awayAll;
+    setTimeout(() => checkExploits({ type: 'away', sec: awayAll }), 1500);
+    const away = Math.min(OFFLINE_CAP, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - OFFLINE_CAP));
+    const before = run.produced, pal0 = meta.pal, g0 = meta.galaxy, c0 = quietLog.comets; let left = away;
+    quiet++;
+    while (left > 0) { const s = Math.min(60, left); advance(s, 20); left -= s; }
+    quiet--;
+    meta.bank += Math.max(0, banked);
+    if (away > 30) {
+      const note = catchUpNote(pal0, g0, c0);
+      setTimeout(() => toast(`Pendant ton absence (${fmtT(awayAll)}) : <b>+${fmt(Math.max(0, run.produced - before))}</b> d'énergie produite${note}${banked > 60 ? ` · <b>${fmtT(banked)}</b> mises en réserve` : ''}`), 400);
+    }
+    structure(); refresh(true); save();
+  }
   // ---------- Démarrage ----------
   function start(data) {
     const live = data && data.meta && data.run;
@@ -2739,33 +2816,26 @@ if (typeof module !== 'undefined') module.exports = { ENV, sat, ORDER, EXOTIC, E
       // v14.2 : les défis des paliers 3 et 4 s'ouvrent pour les parties qui les ont dépassés
       for (const [k, ch] of Object.entries(CHALLENGES)) if (!meta.chTargets[k] && (meta.galaxy > 1 || meta.pal >= ch.tier)) meta.chTargets[k] = challengeTarget(k);
       if (has(meta, 'R2') && has(meta, 'R3')) { const drop = meta.tree.indexOf('R2') < meta.tree.indexOf('R3') ? 'R3' : 'R2'; meta.tree = meta.tree.filter(x => x !== drop); meta.eclats = (meta.eclats || 0) + NODE[drop].cost; }
+      // v15.0 : les galaxies déjà en cours reçoivent leur anomalie
+      if (meta.galaxy >= ANOMALY_FROM && !anom(meta)) meta.anomaly = drawAnomaly(meta);
       // v13 : l'Acte 2 arrive pour ceux qui avaient fini l'Acte 1
       if (meta.won && meta.galaxy === 1 && !live) setTimeout(() => toast('<b>L\'Acte 2 est arrivé</b> · au palier 6, dépasse le seuil d\'effondrement : ton trou noir avalera la galaxie', '#9b6bff'), 1200);
       const awayAll = !live && d.savedAt ? Math.max(0, (Date.now() - d.savedAt) / 1000) : 0;
-      // les sondes voyagent en temps réel, même jeu fermé (sans plafond)
-      ui.lastBack = probeBack(); meta.pclock = (meta.pclock || 0) + awayAll;
-      if (awayAll > 0) setTimeout(() => checkExploits({ type: 'away', sec: awayAll }), 1500);
       meta.probes = (meta.probes || []).slice(0, 3);
-      const away = Math.min(OFFLINE_CAP, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - OFFLINE_CAP));
-      if (away > 30) {
-        const before = run.produced, pal0 = meta.pal, g0 = meta.galaxy, c0 = quietLog.comets; let left = away;
-        quiet++;
-        while (left > 0) { const s = Math.min(60, left); advance(s, 20); left -= s; }
-        quiet--;
-        meta.bank += Math.max(0, banked);
-        const note = catchUpNote(pal0, g0, c0);
-        setTimeout(() => toast(`Pendant ton absence (${fmtT(awayAll)}) : <b>+${fmt(Math.max(0, run.produced - before))}</b> d'énergie produite${note}${banked > 60 ? ` · <b>${fmtT(banked)}</b> mises en réserve` : ''}`), 400);
-      }
+      catchUp(awayAll);
     }
     notation === 'suf' && $('notation').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === 'suf')));
     structure(); refresh(true);
     const tab = store.get(VERSION + '-tab');
     selectTab(['gen', 'el', 'law', 'ch', 'log', 'gal'].includes(tab) ? tab : 'gen');
-    let lastT = performance.now(), n = 0;
+    let lastT = performance.now(), lastWall = Date.now(), n = 0;
     setInterval(() => {
+      // plus de 5 s sans tour de boucle (horloge murale, qui avance aussi pendant la veille) : l'appli était en arrière-plan, on rattrape comme une absence
+      const wall = Date.now(), gap = (wall - lastWall) / 1000; lastWall = wall;
+      if (gap > 5) { lastT = performance.now(); catchUp(gap); return; }
       const now = performance.now(), realStep = Math.min(1, (now - lastT) / 1000), dt = realStep * testSpeed; lastT = now;
       meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick(); etaTick();
-      if (n % 10 === 0) { checkExploits(null); tutoTick(); }
+      if (n % 10 === 0) { checkExploits(null); tutoTick(); fitStability(); }
       const back = probeBack();
       if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toast(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
       ui.lastBack = back;
