@@ -193,6 +193,8 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 .orb { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--c, var(--line)); display: grid; place-items: center; font-family: var(--f-display); font-size: 11px; color: var(--c, var(--muted)); box-shadow: 0 0 14px color-mix(in srgb, var(--c, transparent) 45%, transparent); background: var(--panel); flex: none; }
 .slot.core .orb { width: 50px; height: 50px; font-size: 13px; }
 .slot.free .orb { border-style: dashed; box-shadow: none; }
+.slot.sat .orb { width: 32px; height: 32px; font-size: 10px; opacity: .85; }
+.slot.sat small { color: var(--gold); }
 .slot small { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 .plus { color: var(--muted); font-family: var(--f-mono); }
 .els { display: grid; gap: 8px; }
@@ -940,6 +942,9 @@ const eAge = (m, r) => Math.max(0, (r.age || 0) - (r.loopAt || 0)) / (1 + res(m,
 const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1) * (x.speedEarly && eAge(m, r) < x.speedEarly[1] ? x.speedEarly[0] : 1), 1);
 const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp')) * anomSpeed(m) * setMult(m, 'temps') * (gch(m, 'course') ? 1.5 : 1);
 const anomSpeed = m => { const a = anom(m); return !a ? 1 : a === 'nursery' ? 1.5 : ANOMALIES[a].speed || 1; };
+// v0.18.2 : au-delà du 5e, les emplacements sont des satellites. L'élément y garde son effet et sa réaction avec le noyau,
+// mais ne réagit pas avec les autres fusionnés : une réaction par paire ferait exploser la production (+7 ordres par emplacement).
+const SAT_FROM = 5;
 const maxFused = m => m.gActive === 'nue' ? 0 : SLOTS[palier(m)] + sumOf(m, 'slot') + (gch(m, 'nue') ? 1 : 0) + (anomIs(m, 'merger') && SLOTS[palier(m)] > 0 ? 1 : 0);
 function stabMax(m, r) {
   let s = m.gActive === 'fragile' ? 4 : 4 + sumOf(m, 'stab') + (gch(m, 'fragile') ? 2 : 0);
@@ -974,7 +979,9 @@ function innerK(m, r) {
 function reactionsOf(m, r) {
   const out = r.fused.map(x => ({ k: key(r.core, x), ...REACTIONS[key(r.core, x)] }));
   const ik = innerK(m, r);
-  if (ik) for (let i = 0; i < r.fused.length; i++) for (let j = i + 1; j < r.fused.length; j++) { const k = key(r.fused[i], r.fused[j]); out.push({ k, ...REACTIONS[k], inner: ik }); }
+  // seuls les 5 premiers éléments fusionnés réagissent entre eux ; les suivants sont des satellites
+  const NIN = Math.min(r.fused.length, SAT_FROM);
+  if (ik) for (let i = 0; i < NIN; i++) for (let j = i + 1; j < NIN; j++) { const k = key(r.fused[i], r.fused[j]); out.push({ k, ...REACTIONS[k], inner: ik }); }
   return out;
 }
 function newRun(m, challenge = null) {
@@ -1122,7 +1129,7 @@ const setStab = m => { const p = setPower(m, 'matiere'); return p ? Math.round(p
 const cometTail = m => { const cm = relicLv(m, 'comete'); return cm >= 0 ? RELICS.comete.v[cm] : 3; };
 // Défis galactiques : une galaxie entière sous contrainte, réussie à l'effondrement
 const GCHAL = {
-  nue:      { name: 'Étoile nue', desc: 'Aucune fusion', reward: 'Un emplacement de fusion de plus' },
+  nue:      { name: 'Étoile nue', desc: 'Aucune fusion', reward: 'Un emplacement de fusion de plus (au-delà du 5e, c\'est un satellite)' },
   entropie: { name: 'Entropie', desc: 'La production baisse de moitié toutes les 10 min passées dans le palier', reward: 'Les effets liés au temps progressent ×2 plus vite' },
   ciel:     { name: 'Ciel noir', desc: 'Aucune constellation, sauf les étoiles acquises', reward: 'Éclats gagnés par Nova ×2' },
   fragile:  { name: 'Fragile', desc: 'La stabilité reste à 4 : constellations et lois clés n\'y ajoutent rien', reward: 'Stabilité +2' },
@@ -1145,7 +1152,7 @@ const ANOMALIES = {
   gwind:   { name: 'Vent galactique',           desc: 'Vent stellaire ×2' },
   archive: { name: 'Archive galactique',        desc: 'Les données de ton dernier effondrement offertes une seconde fois, dès l\'arrivée', gift: 'data' },
   remnant: { name: 'Reliquat de supernova',     desc: '+250 éclats dès l\'arrivée', gift: 'eclats', amount: 250 },
-  merger:  { name: 'Fusion de galaxies',        desc: 'Un emplacement de fusion de plus, seuil d\'effondrement ×' + (ENV.MS || '1e18') }, 
+  merger:  { name: 'Fusion de galaxies',        desc: 'Un emplacement de fusion de plus (au-delà du 5e, c\'est un satellite)' }, 
   jet:     { name: 'Noyau actif',               desc: 'Toutes les réactions ×1,1' },
   strange: { name: 'Bulle étrange',             desc: 'Matière étrange et ses réactions ×1,5', el: 'strange' },
   fossil:  { name: 'Galaxie fossile',           desc: 'Étoiles du ciel à moitié prix, données ×0,8', data: 0.8 },
@@ -1177,7 +1184,7 @@ const FIRST_COLLAPSE_BONUS = 100;      // données offertes en fin d'Acte 1 (san
 function seuil(m) {
   const j = relicLv(m, 'jet'), base = (m.galaxy || 1) > 1 ? SEUIL0 * Math.pow(Math.max(1, mass(m) / 10), 4) : OBJS[LAST_PAL];
   const a = anom(m);
-  return base * gchMalus(m) * (m.gActive === 'naine' ? 1e-38 : 1) * (a === 'merger' ? Number(ENV.MS || 1e18) : 1) * (j >= 0 ? RELICS.jet.w[j] : 1) * (a && ANOMALIES[a].seuil || 1);
+  return base * gchMalus(m) * (m.gActive === 'naine' ? 1e-38 : 1) * (j >= 0 ? RELICS.jet.w[j] : 1) * (a && ANOMALIES[a].seuil || 1);
 }
 // Constellations complètes (pour le bonus de données)
 const SKY_BRANCHES = () => [...TREE, { pal: 3, id: 'K', name: 'Lois clés', nodes: KEYS }];
@@ -1277,7 +1284,7 @@ function nodeState(m, n) {
 }
 const freshMeta = () => ({ catalog: [], bank: 0, comets: 0, cometIn: 180, pal: 0, ownedList: ['dust'], core: 'dust', record: 0, sings: 0, novas: 0, discovered: [], tree: [], eclats: 0, eclatsTotal: 0, challengesDone: [], chTargets: {}, won: false, totalTime: 0, realTime: 0, best: 0, lastLines: [],
   galaxy: 1, data: 0, dataTotal: 0, research: {}, relics: {}, equip: [], probes: [], pclock: 0, gch: {}, gActive: null, plans: {}, pilot: true, lightOrder: [], lastOrder: [], autoCollapse: false, palAge: 0, galTime: 0 });
-if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equipped, setPower, setMult, setStab, drawAnomalies, palierGift, ANOMALIES, ANOMALY_FROM, anom, anomIs, anomEl, drawAnomaly, gammaK, windK, anomSpeed, ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
+if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_FAMS, equipped, setPower, setMult, setStab, drawAnomalies, palierGift, ANOMALIES, ANOMALY_FROM, anom, anomIs, anomEl, drawAnomaly, gammaK, windK, anomSpeed, ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
   acquired, ACQ_NODES, MORPHS, morph, ACQUIS, hasAcq, RESEARCH, res, researchCost, EXPEDITIONS, expTime, probes, RARITIES, RELICS, RELIC_IDS, relicSlots, bestRarity, relicLv, cometTail, GCHAL, GCH_FROM, gch, gchMalus, mass, seuil, branchDone, skiesDone, dataMult, dataRaw, dataGain, novaMult, WIND_K, windRate, NOVA_AGE, FIRST_COLLAPSE_BONUS, EXPLOITS, exploitMult, EXPLOIT_BONUS };
 
 </script>
@@ -1566,11 +1573,31 @@ if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equip
       when: () => canSing(), done: () => meta.pal > 0 },
     { id: 'fusion', title: 'La fusion', text: 'Au palier 1, tu peux fusionner des éléments autour du noyau. Deux éléments ensemble déclenchent une réaction : à toi de trouver les meilleures.', glow: () => $('t-el'),
       when: () => meta.pal >= 1, done: () => run.fused.length > 0 || meta.pal >= 2 },
+    // Acte 1, fin : le vent
+    { id: 'wind', title: 'Le Vent stellaire', text: 'Au-delà du seuil de Nova, ta run rapporte maintenant des éclats en continu : un quart du meilleur rythme de Nova de la run. La loi Alizés le porte à 40 %. Une Nova reste utile pour repartir sur une run plus forte.', glow: () => $('t-law'),
+      when: () => windPerMin() > 0, done: () => (meta.windTotal || 0) > 200 || (meta.galaxy || 1) > 1 },
+    { id: 'sat', title: 'Les satellites', text: 'Tu as plus de 5 emplacements de fusion. Au-delà du 5e, ce sont des satellites : l\'élément garde son effet et sa réaction avec le noyau, mais ne réagit pas avec les autres éléments fusionnés.', glow: () => $('t-el'),
+      when: () => maxFused(meta) > SAT_FROM, done: () => run.fused.length > SAT_FROM },
+    // Acte 2
+    { id: 'research', title: 'La recherche', text: 'Les données de l\'effondrement se dépensent en recherche, dans l\'onglet Galaxie. Chaque recherche reste acquise pour toutes les galaxies suivantes.', glow: () => $('t-gal'),
+      when: () => (meta.galaxy || 1) >= 2 && Object.keys(RESEARCH).some(id => res(meta, id) < RESEARCH[id].max && meta.data >= researchCost(meta, id)), done: () => Object.keys(RESEARCH).some(id => res(meta, id) > 0) },
+    { id: 'probes', title: 'Les sondes', text: 'Envoie une sonde depuis l\'onglet Galaxie : elle voyage en temps réel, même jeu fermé, et rapporte des reliques.', glow: () => $('t-gal'),
+      when: () => probes(meta) > 0 && probeFree() >= 0, done: () => (meta.probes || []).some(Boolean) || RELIC_IDS.some(id => bestRarity(meta, id) >= 0) },
+    { id: 'relics', title: 'Les reliques', text: 'Équipe une relique dans l\'onglet Galaxie, vue Reliques. Deux reliques de la même famille forment un ensemble avec un bonus en plus, et le Miroir complète n\'importe quel ensemble.', glow: () => $('t-gal'),
+      when: () => RELIC_IDS.some(id => bestRarity(meta, id) >= 0), done: () => (meta.equip || []).length > 0 },
+    { id: 'anomaly', title: 'Les anomalies', text: 'Chaque galaxie a maintenant une anomalie, tirée à l\'effondrement : elle change les règles et le build à viser. Elle est rappelée en orange sur cet écran et dans l\'onglet Galaxie.', glow: () => $('palAnom'),
+      when: () => !!anom(meta), done: () => (meta.galaxy || 1) >= ANOMALY_FROM + 1 },
+    { id: 'boussole', title: 'La Boussole', text: 'Ta Boussole te laisse choisir l\'anomalie de cette galaxie. Tant que tu n\'as pas choisi, aucune ne s\'applique : le choix se fait dans l\'onglet Galaxie.', glow: () => $('t-gal'),
+      when: () => !!meta.anomChoice, done: () => !!meta.anomChoiceSeen && !meta.anomChoice },
+    { id: 'builds', title: 'Les builds par palier', text: 'Le Pilote automatique rejoue ton noyau et tes fusions à chaque palier. Dans l\'onglet Éléments, « Builds par palier » te laisse composer le build de chaque palier à l\'avance.', glow: () => $('t-el'),
+      when: () => hasAcq(meta, 'pilot'), done: () => Object.values(meta.plans || {}).some(p => p && p.manual) || (meta.galaxy || 1) >= ANOMALY_FROM + 2 },
+    { id: 'gch', title: 'Les défis galactiques', text: 'Une galaxie entière sous contrainte, pour une récompense permanente. Ils se lancent dans l\'onglet Défis, vue Défis galactiques.', glow: () => $('t-ch'),
+      when: () => (meta.galaxy || 1) >= GCH_FROM && !anom(meta) || ((meta.galaxy || 1) >= GCH_FROM && (meta.tuto.done || []).includes('anomaly')), done: () => !!meta.gActive || Object.keys(GCHAL).some(id => gch(meta, id) > 0) || (meta.galaxy || 1) >= GCH_FROM + 3 },
   ];
   let tutoShown = null;
   function tutoTick() {
     const T = meta.tuto || (meta.tuto = { done: [] });
-    if (T.off || (meta.galaxy || 1) > 1) { tutoHide(); return; }
+    if (T.off) { tutoHide(); return; }
     for (const t of TUTO) if (!T.done.includes(t.id) && safe(t.done)) { T.done.push(t.id); if (tutoShown === t.id) tutoHide(); }
     if (tutoShown) return;
     const t = TUTO.find(x => !T.done.includes(x.id) && safe(x.when)); if (t) tutoShow(t);
@@ -1589,6 +1616,17 @@ if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equip
   }
   // ---------- Notes de version (menu) : la plus récente en premier ----------
   const PATCHNOTES = [
+    ['0.18.3', '23 octobre', 'Tutoriel complété', [
+      'Le tutoriel couvre maintenant les nouveautés, au moment où elles arrivent : Vent stellaire et Alizés, satellites, recherche, sondes, reliques et ensembles, anomalies, Boussole, builds par palier, défis galactiques.',
+      'Les parties déjà avancées verront ces bulles une fois, à la prochaine occasion. « Désactiver » dans le menu les coupe toutes.']],
+    ['0.18.2', '23 octobre', 'Emplacements satellites', [
+      'Le plafond de 5 éléments fusionnés est levé. Au-delà du 5e, les emplacements deviennent des satellites : l\'élément garde son effet et sa réaction avec le noyau, mais ne réagit pas avec les autres éléments fusionnés.',
+      'Un satellite rapporte environ ×4 à ×8 de production, au lieu de ×10 millions avant la correction.',
+      'Étoile nue et Fusion de galaxies redonnent un emplacement de fusion de plus.']],
+    ['0.18.1', '23 octobre', 'Production plafonnée', [
+      'Cinq éléments fusionnés au plus. Chaque emplacement au-delà ajoutait environ 10 millions de fois la production (une réaction par paire d\'éléments fusionnés), ce qui cassait le jeu.',
+      'Étoile nue : sa récompense donne le cinquième emplacement dès le palier 5.',
+      'Fusion de galaxies : un emplacement de plus jusqu\'au palier 5 et vitesse ×1,5, au lieu d\'un sixième emplacement.']],
     ['0.18.0', '23 octobre', 'Trois défis galactiques', [
       'Sans acquis : pilote, rallumage et capteur coupés, la constellation Automatisation se rachète. Récompense : chaque étoile du catalogue offre 2 éclats.',
       'Course : la galaxie doit s\'effondrer en moins de 15 min de jeu. Récompense : vitesse ×1,5.',
@@ -1649,7 +1687,7 @@ if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equip
   }
   function chooseAnomaly(id) {
     if (!meta.anomChoice || !meta.anomChoice.includes(id)) return;
-    meta.anomaly = id; meta.anomChoice = null; logEv('anomalie', { id, boussole: true });
+    meta.anomaly = id; meta.anomChoice = null; meta.anomChoiceSeen = true; logEv('anomalie', { id, boussole: true });
     const gift = ANOMALIES[id].gift; anomGift(gift, meta.lastColData || 0);
     fx.pulse('#ffb36b', 1.2);
     toast(`Anomalie choisie : <b>${ANOMALIES[id].name}</b> · ${gift === 'data' ? `+${datW(meta.lastColData || 0)} offertes` : gift === 'eclats' ? `+${eclW(ANOMALIES[id].amount)} offerts` : ANOMALIES[id].desc}`, '#ffb36b', 'anom');
@@ -2082,11 +2120,12 @@ if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equip
       const gauge = h('div', { class: 'gauge' }, h('div', { class: 'row' }, h('span', {}, 'Stabilité utilisée'), h('b', {}, `${used} / ${max}`)), h('div', { class: 'bar' }, h('i', { style: `width:${Math.min(100, max ? used / max * 100 : 100)}%` })));
       const orb = (x, cls, label) => h('div', { class: 'slot ' + cls }, h('div', { class: 'orb', style: x ? `--c:${EL_COLOR[x]}` : '' }, x ? ELEMENTS[x].short : ''), h('small', {}, label));
       const slots = h('div', { class: 'slots' }, orb(run.core, 'core', 'Noyau'));
-      for (let i = 0; i < maxFused(meta); i++) { slots.append(h('span', { class: 'plus' }, '+')); const x = run.fused[i]; slots.append(x ? orb(x, '', 'Fusionné') : orb(null, 'free', 'Libre')); }
+      for (let i = 0; i < maxFused(meta); i++) { slots.append(h('span', { class: 'plus' }, '+')); const x = run.fused[i], sat = i >= SAT_FROM; slots.append(x ? orb(x, sat ? 'sat' : '', sat ? 'Satellite' : 'Fusionné') : orb(null, 'free' + (sat ? ' sat' : ''), sat ? 'Satellite' : 'Libre')); }
+      const satNote = maxFused(meta) > SAT_FROM ? h('p', { class: 'small' }, `Satellite : un élément au-delà du ${SAT_FROM}e garde son effet et sa réaction avec le noyau, mais ne réagit pas avec les autres éléments fusionnés.`) : null;
       const anyFuse = ORDER.some(x => canFuse(x));
       const hint = !anyFuse && !run.fused.length && run.challenge !== 'pure' ? h('p', { class: 'small', style: 'color:var(--bad)' }, 'Aucun élément ne tient dans ta stabilité avec ce noyau. Essaie un noyau qui coûte moins de stabilité, ou allume des lois de la constellation Stabilité.') : null;
       const ik = innerK(meta, run);
-      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyau et fusions'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} emplacements`)), gauge, slots, ...(hint ? [hint] : []),
+      gc.append(h('div', { class: 'head' }, h('h2', {}, 'Noyau et fusions'), h('span', { class: 'small' }, `${run.fused.length} / ${maxFused(meta)} emplacements`)), gauge, slots, ...(satNote ? [satNote] : []), ...(hint ? [hint] : []),
         ...[fissionBtn(), pilotCard()].filter(Boolean),
         h('p', { class: 'small' }, run.challenge === 'pure' ? 'Défi Pur : aucune fusion possible.' : `${run.fused.includes('graviton') ? 'Graviton fusionné : le noyau ne coûte plus de stabilité. ' : run.core === 'graviton' ? 'Graviton au noyau : chaque élément fusionné coûte 1 de stabilité en moins. ' : 'Le noyau coûte aussi de la stabilité. '}${ik ? `Quark : les éléments fusionnés réagissent entre eux (${Math.round(ik * 100)} %). ` : ''}Le noyau se change tant que rien n'est fusionné ; une fusion dure jusqu'à la prochaine Nova.`));
     }
