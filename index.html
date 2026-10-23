@@ -344,6 +344,13 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; min-hei
 
 /* Messages */
 .anom-line { color: #ffb36b; }
+.anom-pick { display: grid; gap: 6px; }
+.anom-pick .btn { display: grid; justify-items: start; text-align: left; gap: 2px; min-height: 44px; border-color: color-mix(in srgb, #ffb36b 45%, var(--line)); }
+.anom-pick .btn small { color: var(--muted); font-size: 11.5px; font-weight: 400; }
+.rfam { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0 6px; margin-left: 6px; white-space: nowrap; }
+.sets { display: grid; gap: 4px; font-size: 12.5px; }
+.sets .on { color: var(--good); }
+.sets .off { color: var(--muted); }
 .anom-line b { color: #ffb36b; }
 .tuto { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--dock-h) + var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); z-index: 31; width: min(440px, calc(100% - 32px));
   background: var(--panel-2); border: 1px solid var(--cyan); border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 34px rgba(0,0,0,.55); display: grid; gap: 8px; animation: tin .25s ease-out; }
@@ -373,20 +380,52 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
 @keyframes ready { 50% { box-shadow: 0 0 26px color-mix(in srgb, var(--fc, var(--cyan)) 55%, transparent); } }
 
 /* Galaxie */
+.log-nav { padding: 8px; position: sticky; top: calc(var(--top-h, 0px) + 4px); z-index: 4; }
+.rx-tools { display: grid; gap: 8px; }
+.rx-els { display: flex; flex-wrap: wrap; gap: 5px; }
+.rx-el { appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 3px 9px 3px 4px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); color: var(--fg); font: inherit; font-size: 12px; }
+.rx-el i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 9px; font-weight: 600; color: #05060c; background: var(--c, var(--muted)); }
+.rx-el small { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+.rx-el[aria-pressed="true"] { border-color: var(--c, var(--cyan)); background: color-mix(in srgb, var(--c, var(--cyan)) 16%, var(--panel-2)); }
+.rx-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+.rx .r .with { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
+.rx .r .with i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); display: inline-block; }
+.rx .r.inner { border-style: dashed; }
+.build-body { display: grid; gap: 12px; }
+.build-els { display: grid; gap: 6px; }
+.build-el { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.build-el .orb { width: 28px; height: 28px; font-size: 9.5px; }
+.build-el .nm { display: grid; min-width: 0; font-size: 13px; }
+.build-el .nm small { color: var(--muted); font-size: 11px; }
+.build-el .bb { display: flex; gap: 5px; }
+.build-el .bb .btn { min-height: 34px; padding: 3px 10px; font-size: 12px; }
+.build-el.is-core { border-color: var(--c); }
+.build-el.is-fused { border-color: color-mix(in srgb, var(--c) 55%, var(--line)); border-style: dashed; }
+.build-tag { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.build-tag.manual { color: var(--gold); }
+.notes { display: grid; gap: 6px; }
+.notes details { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 8px 10px; }
+.notes summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; font-size: 13px; list-style: none; }
+.notes summary::-webkit-details-marker { display: none; }
+.notes summary b { color: var(--cyan); font-family: var(--f-mono); font-weight: 500; }
+.notes summary span { color: var(--muted); font-size: 11.5px; }
+.notes summary em { font-style: normal; flex: 1; min-width: 0; }
+.notes ul { margin: 8px 0 2px; padding-left: 18px; display: grid; gap: 4px; font-size: 12.5px; line-height: 1.4; color: var(--fg); }
+.notes li small { color: var(--muted); }
 .gal-pick { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: 4px; }
 .gp { appearance: none; cursor: pointer; position: relative; min-width: 0; min-height: 46px; padding: 4px 2px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--fg); display: grid; justify-items: center; align-content: center; gap: 1px; }
 .gp b { font-size: 13px; font-weight: 600; }
 .gp small { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
 .gp[aria-pressed="true"] { border-color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, var(--panel-2)); }
 .gp.can::after { content: ""; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
-.gal-map { position: relative; width: 100%; aspect-ratio: 358 / 296; max-height: 470px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden;
+.gal-map { position: relative; width: 100%; aspect-ratio: 358 / 380; max-height: 600px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden;
   background: radial-gradient(ellipse 45% 45% at 50% 46%, color-mix(in srgb, var(--violet) 16%, transparent), transparent 75%), #03050b; }
 .gal-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .gal-map .ls.have i { background: #f4efff; box-shadow: 0 0 10px var(--violet), 0 0 22px color-mix(in srgb, var(--violet) 55%, transparent); }
 .gal-map .ls.max i { background: #ffffff; box-shadow: 0 0 12px #ffffff, 0 0 26px var(--violet); }
 .gal-map .ll { background: color-mix(in srgb, #03050b 70%, transparent); padding: 1px 5px; border-radius: 6px; max-width: 150px; }
 .gal-map .ll.t, .gal-map .ll.b { max-width: 150px; }
-@media (max-width: 480px) { .gal-map .ll, .gal-map .ll.t, .gal-map .ll.b { font-size: 10px; max-width: 78px; width: auto; padding: 1px 4px; } .gal-map .arm { font-size: 9.5px; } }
+@media (max-width: 480px) { .gal-map .ll, .gal-map .ll.t, .gal-map .ll.b { font-size: 10px; max-width: 78px; width: auto; padding: 1px 4px; } .gal-map .arm { display: none; } }
 .arm { position: absolute; z-index: 1; font-size: 10.5px; font-style: italic; color: var(--muted); pointer-events: none; white-space: nowrap; }
 .morphs { display: grid; gap: 2px; }
 .mo { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 10px; border: 1px solid transparent; }
@@ -555,19 +594,29 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
     <section class="panel" id="p-gal" role="tabpanel" aria-labelledby="t-gal" hidden></section>
 
     <section class="panel" id="p-log" role="tabpanel" aria-labelledby="t-log" hidden>
-      <div class="card"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
-        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre <span class="ecw">1 <i class="ec" aria-hidden="true"></i>éclat</span> au début de chaque palier. Une ligne complète fait coûter l'élément 1 de stabilité en moins.</p>
+      <div class="card log-nav"><div class="gal-pick" id="logPick" role="group" aria-label="Sections du catalogue" style="--n:5"></div></div>
+      <div class="card" data-lv="stars"><div class="head"><h2>Catalogue stellaire</h2><span class="small" id="catCount"></span></div>
+        <p class="small">Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre <span class="ecw">1 <i class="ec" aria-hidden="true"></i>éclat</span> à chaque fois que le ciel s'éteint. Une ligne complète fait coûter l'élément 1 de stabilité en moins.</p>
         <div class="cat" id="cat"></div></div>
-      <div class="card"><h2>Paliers</h2><div class="pals" id="pals"></div></div>
-      <div class="card"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div><div class="rx" id="rx"></div></div>
-      <div class="card"><div class="head"><h2>Exploits</h2><span class="small" id="expCount"></span></div>
+      <div class="card" data-lv="rx"><div class="head"><h2>Réactions</h2><span class="small" id="rxCount"></span></div>
+        <div class="rx-tools"><div class="rx-els" id="rxEls" role="group" aria-label="Filtrer par élément"></div>
+          <div class="rx-row"><div class="seg" id="rxState" role="group" aria-label="Afficher"></div><div class="seg" id="rxSort" role="group" aria-label="Trier"></div></div></div>
+        <p class="small" id="rxHint"></p><div class="rx" id="rx"></div></div>
+      <div class="card" data-lv="exp"><div class="head"><h2>Exploits</h2><span class="small" id="expCount"></span></div>
         <p class="small" id="expInfo"></p><div id="exps"></div></div>
-      <div class="card"><h2>Temps par palier</h2><div class="pal-stats" id="palStats"></div></div>
-      <div class="card"><h2>Partie</h2><div class="stats" id="stats"></div></div>
+      <div class="card" data-lv="pal"><h2>Paliers</h2><div class="pals" id="pals"></div></div>
+      <div class="card" data-lv="pal"><h2>Temps par palier</h2><div class="pal-stats" id="palStats"></div></div>
+      <div class="card" data-lv="stats"><h2>Partie</h2><div class="stats" id="stats"></div></div>
     </section>
   </section>
 </main>
 
+<div class="sheet" id="buildSheet" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="buildTitle">
+    <div class="head"><h2 id="buildTitle">Builds par palier</h2><button class="icon-btn" type="button" id="buildClose" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="buildBody" class="build-body"></div>
+  </div>
+</div>
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="head"><h2 id="sheetTitle">Réglages</h2><button class="icon-btn" type="button" id="sheetClose" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -613,6 +662,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
         <button class="btn" type="button" data-dev="anom">Anomalie suivante</button>
       </div>
     </div>
+    <div class="set"><span class="label">Notes de version</span><div class="notes" id="patchNotes"></div></div>
     <div class="set"><span class="label">Sauvegarde</span>
       <p class="small" id="saveInfo">Exporte ta partie pour la garder à l'abri ou la reprendre sur un autre appareil.</p>
       <div class="dev">
@@ -768,7 +818,8 @@ const TREE = [
     { id: 'A1', name: 'Auto-Flux', desc: 'Achète le Flux automatiquement', cost: 5, auto: 'flux' },
     { id: 'A2', name: 'Auto-Puissance', desc: 'Achète la Puissance automatiquement', cost: 10, auto: 'power' },
     { id: 'A3', name: 'Auto-améliorations', desc: 'Achète les améliorations de run automatiquement', cost: 20, auto: 'ups' },
-    { id: 'A4', name: 'Vent stellaire', desc: 'Au-delà du seuil de Nova, la run rapporte des éclats en continu, sans recommencer ; le vent faiblit à mesure que la run s\'allonge', cost: 40, auto: 'wind' },
+    { id: 'A4', name: 'Vent stellaire', desc: 'Au-delà du seuil de Nova, la run rapporte des éclats en continu, sans recommencer (un quart du meilleur rythme de Nova de la run)', cost: 40, auto: 'wind' },
+    { id: 'A6', name: 'Alizés', desc: 'Vent stellaire ×1,6 (40 % du meilleur rythme de Nova)', cost: 80, windX: 1.6 },
     { id: 'A5', name: 'Auto-singularité', desc: 'Déclenche la singularité dès que l\'objectif est atteint', cost: 80, auto: 'sing' } ] },
   { pal: 5, id: 'E', name: 'Exotique', nodes: [
     { id: 'E1', name: 'Matière exotique', desc: 'Effet des éléments exotiques fusionnés ×2', cost: 6, exo: 2 },
@@ -798,7 +849,9 @@ const ALL_NODES = [...TREE.flatMap(b => b.nodes.map(n => ({ ...n, branch: b.id, 
 const NODE = Object.fromEntries(ALL_NODES.map(n => [n.id, n]));
 // Étoiles acquises par la morphologie de la galaxie (Acte 2) : elles brillent d'office
 const ACQ_NODES = { A1: 2, A2: 2, A3: 2, A4: 2, A5: 3 };
-const acquired = (m, id) => ACQ_NODES[id] != null && (m.galaxy || 1) >= ACQ_NODES[id];
+const acquired = (m, id) => ACQ_NODES[id] != null && (m.galaxy || 1) >= ACQ_NODES[id] && m.gActive !== 'sansacq';
+// Dernier palier : 6, ou 4 pendant le défi Galaxie naine
+const lastPal = m => m && m.gActive === 'naine' ? 4 : LAST_PAL;
 const has = (m, id) => acquired(m, id) || (m.tree || []).includes(id);
 const nodesWith = (m, prop) => (m.tree || []).map(id => NODE[id]).filter(n => n && n[prop] != null);
 const prodOf = (m, prop) => nodesWith(m, prop).reduce((a, n) => a * n[prop], 1);
@@ -881,13 +934,18 @@ const observeAt = m => NOVA_MIN[palier(m)];
 const speedOf = pal => Math.pow(SPEED_BASE, pal);
 const palier = m => m.pal || 0;
 const owned = m => [...(m.ownedList || ['dust']).filter(x => !ELEMENTS[x].pal), ...EXOTIC.filter(x => palier(m) >= ELEMENTS[x].pal)];
-const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1) * (x.speedEarly && (r.age || 0) < x.speedEarly[1] ? x.speedEarly[0] : 1), 1);
-const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp')) * anomSpeed(m);
+// Âge « d'élan » : sert aux effets de début de run. La recherche Boucle causale le ralentit, et chaque comète capturée le remet à zéro.
+const LOOP_RX = Number(ENV.LRX || 0.5);
+const eAge = (m, r) => Math.max(0, (r.age || 0) - (r.loopAt || 0)) / (1 + res(m, 'loop'));
+const reactionSpeed = (m, r) => reactionsOf(m, r).reduce((a, x) => a * (x.speed || 1) * (x.speedEarly && eAge(m, r) < x.speedEarly[1] ? x.speedEarly[0] : 1), 1);
+const runSpeed = (m, r) => r.challenge === 'cold' ? 1 : speedOf(palier(m)) * prodOf(m, 'speed') * reactionSpeed(m, r) * (hasUp(r, 'comp') ? 1.25 : 1) * Math.pow(RESEARCH.warp.k, res(m, 'warp')) * anomSpeed(m) * setMult(m, 'temps') * (gch(m, 'course') ? 1.5 : 1);
 const anomSpeed = m => { const a = anom(m); return !a ? 1 : a === 'nursery' ? 1.5 : ANOMALIES[a].speed || 1; };
 const maxFused = m => m.gActive === 'nue' ? 0 : SLOTS[palier(m)] + sumOf(m, 'slot') + (gch(m, 'nue') ? 1 : 0) + (anomIs(m, 'merger') && SLOTS[palier(m)] > 0 ? 1 : 0);
 function stabMax(m, r) {
   let s = m.gActive === 'fragile' ? 4 : 4 + sumOf(m, 'stab') + (gch(m, 'fragile') ? 2 : 0);
   const dn = relicLv(m, 'binaire'); if (dn >= 0) s -= RELICS.binaire.v[dn];
+  const cr = relicLv(m, 'cristal'); if (cr >= 0) s += RELICS.cristal.v[cr];
+  s += setStab(m);
   if (r.challenge === 'unstable') s = Math.floor(s / 2);
   return Math.max(0, s);
 }
@@ -910,7 +968,7 @@ function innerK(m, r) {
   if (r.fused.some(x => key(r.core, x) === key('quark', 'plasma')) || (r.core === 'quark' && r.fused.includes('plasma')) || (r.fused.includes('quark') && r.fused.includes('plasma'))) k = 1;
   // Quark étrange (toujours) et Saveur fugace (au départ de la run) : réactions entre fusionnés à 100 %
   const pair = (a, b) => (r.core === a && r.fused.includes(b)) || (r.core === b && r.fused.includes(a)) || (r.fused.includes(a) && r.fused.includes(b));
-  if (pair('strange', 'quark') || (pair('tachyon', 'quark') && (r.age || 0) < 180)) k = 1;
+  if (pair('strange', 'quark') || (pair('tachyon', 'quark') && eAge(m, r) < 180)) k = 1;
   return k + sumOf(m, 'innerBonus');
 }
 function reactionsOf(m, r) {
@@ -931,7 +989,7 @@ function costPenalty(m, r) {
   let p = 1;
   if (r.core === 'anti') p *= 4; if (r.fused.includes('anti')) p *= 2;
   if (p === 1) return 1;
-  for (const x of reactionsOf(m, r)) { if (x.penZero) return 1; if (x.pen) p *= x.pen; if (x.penT) p /= 1 + 3 * sat(r.t, 1200); if (x.penEarly && (r.age || 0) < x.penEarly[1]) p *= x.penEarly[0]; }
+  for (const x of reactionsOf(m, r)) { if (x.penZero) return 1; if (x.pen) p *= x.pen; if (x.penT) p /= 1 + 3 * sat(r.t, 1200); if (x.penEarly && eAge(m, r) < x.penEarly[1]) p *= x.penEarly[0]; }
   p *= prodOf(m, 'pen');
   return Math.max(1, p);
 }
@@ -945,7 +1003,7 @@ const timeFactor = (m, r) => prodOf(m, 'time') * (r.core === 'chronon' ? 3 : r.f
 const specs = m => nodesWith(m, 'spec').map(n => n.spec);
 function breakdown(m, r) {
   const re = r.challenge === 'noecho' ? [] : reactionsOf(m, r);
-  const c = { t: r.t * timeFactor(m, r), n: r.fused.length, age: r.age || 0, half: re.some(x => x.elanX2) ? 240 : 120 };
+  const c = { t: r.t * timeFactor(m, r), n: r.fused.length, age: eAge(m, r), half: re.some(x => x.elanX2) ? 240 : 120 };
   const cDark = re.some(x => x.darkFull) ? { ...c, t: 1e9 } : c, cOf = x => x === 'dark' ? cDark : c;
   const parts = [];
   const fluxK = re.reduce((a, x) => a * (x.flux || 1) * (x.fluxEarly && c.age < x.fluxEarly[1] ? x.fluxEarly[0] : 1), 1);
@@ -961,7 +1019,7 @@ function breakdown(m, r) {
   const fusedV = x => { let v = FUSED[x](cOf(x)) * (hasUp(r, 'catal') ? 1.25 : 1); if (EXOTIC.includes(x)) v = 1 + (v - 1) * exoK; return v; };
   for (const x of r.fused) { const v = ab(x, x === 'strange' ? Math.max(1, ...r.fused.filter(y => y !== 'strange').map(fusedV)) : fusedV(x)); parts.push({ id: 'f-' + x, label: ELEMENTS[x].name + ' fusionné' + (x === 'strange' ? ' (copie)' : ''), v }); }
   const synK = 1 + sumOf(m, 'syn'), reactK = prodOf(m, 'react') * re.reduce((a, x) => a * (x.react || 1), 1) * (r.core === 'strange' ? 2 : 1), harmK = hasUp(r, 'harm') ? 1.5 : 1, exoR = prodOf(m, 'exoReact');
-  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: v < 1 ? v : 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1) * (ae && x.k.split('+').includes(ae) ? ANOM_EL_K : 1) * (anomIs(m, 'jet') ? 1.1 : 1), reaction: true }); } }
+  for (const x of re) { const v = x.f(c); if (v !== 1) { const isExo = x.k.split('+').some(e => EXOTIC.includes(e)); parts.push({ id: 'r-' + x.k + (x.inner ? '-i' : ''), label: x.name + (x.inner ? ' (entre fusionnés)' : ''), v: v < 1 ? v : 1 + (v - 1) * synK * reactK * harmK * (isExo ? exoR : 1) * (x.inner || 1) * (ae && x.k.split('+').includes(ae) ? ANOM_EL_K : 1) * (anomIs(m, 'jet') ? 1.1 : 1) * (x.k.split('+').includes('tachyon') ? 1 + LOOP_RX * res(m, 'loop') : 1), reaction: true }); } }
   const sp = specs(m), n = r.fused.length;
   const usePur = sp.includes('purity'), useCat = sp.includes('catalysis');
   if (usePur && n <= 1) parts.push({ id: 'purity', label: 'Pureté', v: has(m, 'K1') ? 6 : 3 });
@@ -995,18 +1053,24 @@ const ACQUIS = [
   { g: 6, id: 'deep',    name: 'Espace profond', desc: 'Les sondes peuvent partir vers le Noyau galactique' },
   { g: 7, id: 'autocol', name: 'Effondrement automatique', desc: 'En option : la galaxie s\'effondre dès que le rythme de données par minute baisse' },
 ];
-const hasAcq = (m, id) => (m.galaxy || 1) >= ACQUIS.find(a => a.id === id).g;
+const hasAcq = (m, id) => m.gActive !== 'sansacq' && (m.galaxy || 1) >= (id === 'relight' && res(m, 'early') ? 2 : ACQUIS.find(a => a.id === id).g);
 // Recherche : la carte de la Voie lactée (x, y en % de la carte, côté de l'étiquette)
 const RESEARCH = {
-  yield:  { arm: 'Bulbe',        name: 'Rendement',              desc: 'Données ×1,5 par niveau',                                  base: 60, mul: 4,   max: Infinity, k: 1.5,  at: [50, 50, 'b'] },
-  echo:   { arm: 'Persée',       name: 'Écho galactique',        desc: 'Production ×10 par niveau',                                base: 15, mul: 3,   max: Infinity, k: 10,   at: [48.9, 67, 'b'] },
-  ray:    { arm: 'Persée',       name: 'Rayonnement',            desc: 'Éclats gagnés par Nova ×1,5 par niveau',                   base: 15, mul: 1.8, max: 5, k: 1.5,  at: [24.2, 32.7, 'b'] },
-  warp:   { arm: 'Sagittaire',   name: 'Distorsion',             desc: 'Vitesse ×1,5 par niveau',                                  base: 12, mul: 1.8, max: 6, k: 1.5,  at: [24.7, 70.4, 'b'] },
-  leap:   { arm: 'Orion',        name: 'Saut stellaire',         desc: 'La galaxie commence un palier plus loin, avec le ciel des paliers sautés allumé', base: 45, mul: 1.8, max: 4, k: 1, at: [78.2, 42.5, 'b'] },
-  firm:   { arm: 'Orion',        name: 'Firmament',              desc: 'Chaque palier commence avec 5 éclats de plus par niveau',  base: 12, mul: 1.8, max: 5, k: 5,    at: [85.2, 60.5, 'b'] },
-  hangar: { arm: 'Écu-Centaure', name: 'Hangar',                 desc: 'Une sonde de plus',                                        base: 40, mul: 3,   max: 2, k: 1,    at: [45.9, 35.8, 't'], probes: true },
-  scope:  { arm: 'Écu-Centaure', name: 'Télescope',              desc: 'Expéditions 25 % plus courtes',                            base: 20, mul: 2,   max: 3, k: 0.75, at: [61.7, 32, 'b'], probes: true },
-  slot:   { arm: 'Écu-Centaure', name: 'Emplacement de relique', desc: 'Un emplacement de relique de plus',                        base: 90, mul: 3,   max: 2, k: 1,    at: [74.1, 71, 'b'], probes: true },
+  yield:  { arm: 'Bulbe',        name: 'Rendement',              desc: 'Données ×1,5 par niveau',                                  base: 60, mul: 4,   max: Infinity, k: 1.5,  at: [50, 38.4, 'b'] },
+  echo:   { arm: 'Persée',       name: 'Écho galactique',        desc: 'Production ×10 par niveau',                                base: 15, mul: 3,   max: Infinity, k: 10,   at: [48.9, 51.7, 'b'] },
+  ray:    { arm: 'Persée',       name: 'Rayonnement',            desc: 'Éclats gagnés par Nova ×1,5 par niveau',                   base: 15, mul: 1.8, max: 5, k: 1.5,  at: [24.2, 24.9, 'b'] },
+  warp:   { arm: 'Sagittaire',   name: 'Distorsion',             desc: 'Vitesse ×1,5 par niveau',                                  base: 12, mul: 1.8, max: 6, k: 1.5,  at: [24.7, 54.3, 'b'] },
+  leap:   { arm: 'Orion',        name: 'Saut stellaire',         desc: 'La galaxie commence un palier plus loin, avec le ciel des paliers sautés allumé', base: 45, mul: 1.8, max: 4, k: 1, at: [78.2, 32.6, 'b'] },
+  firm:   { arm: 'Orion',        name: 'Firmament',              desc: 'Chaque palier commence avec 5 éclats de plus par niveau',  base: 12, mul: 1.8, max: 5, k: 5,    at: [85.2, 46.6, 'b'] },
+  hangar: { arm: 'Écu-Centaure', name: 'Hangar',                 desc: 'Une sonde de plus',                                        base: 40, mul: 3,   max: 2, k: 1,    at: [45.9, 27.4, 't'], probes: true },
+  scope:  { arm: 'Écu-Centaure', name: 'Télescope',              desc: 'Expéditions 25 % plus courtes',                            base: 20, mul: 2,   max: 3, k: 0.75, at: [61.7, 24.4, 'b'], probes: true },
+  slot:   { arm: 'Écu-Centaure', name: 'Emplacement de relique', desc: 'Un emplacement de relique de plus',                        base: 90, mul: 3,   max: 2, k: 1,    at: [74.1, 54.8, 'b'], probes: true },
+  hold: { arm: 'Règle', name: 'Soute', desc: 'Chaque sonde rapporte une relique de plus', base: 60, mul: 3, max: 2, k: 1, at: [79.5, 72.2, 'r'], probes: true },
+  forge: { arm: 'Règle', name: 'Forge stellaire', desc: 'Assembler demande 2 reliques au lieu de 3', base: 80, mul: 1, max: 1, k: 1, at: [67.6, 79.3, 't'], probes: true },
+  reroll: { arm: 'Règle', name: 'Déviation', desc: 'Relance l\'anomalie de la galaxie, une fois de plus par niveau et par galaxie', base: 40, mul: 3, max: 2, k: 1, at: [53.9, 83.7, 'b'] },
+  chart: { arm: 'Règle', name: 'Cartographie', desc: 'Défis galactiques : le malus passe de ×1e5 à ×1e4 par niveau de défi, puis ×1e3', base: 50, mul: 3, max: 2, k: 1, at: [39.3, 85.1, 't'] },
+  loop: { arm: 'Règle', name: 'Boucle causale', desc: 'Les effets de début de run durent une fois de plus par niveau, le Tachyon et ses réactions +50 % par niveau ; chaque comète capturée relance l\'élan', base: 30, mul: 2.5, max: 3, k: 1, at: [25.3, 83.3, 'b'] },
+  early: { arm: 'Règle', name: 'Allumage précoce', desc: 'Rallumage dès la galaxie 2', base: 35, mul: 1, max: 1, k: 1, at: [12.9, 78.2, 't'] },
 };
 const res = (m, id) => (m.research || {})[id] || 0;
 const researchCost = (m, id) => Math.round(RESEARCH[id].base * Math.pow(RESEARCH[id].mul, res(m, id)));
@@ -1021,19 +1085,40 @@ const expTime = (m, d) => EXPEDITIONS[d].time * Math.pow(RESEARCH.scope.k, res(m
 const probes = m => (m.galaxy || 1) >= 2 ? 1 + res(m, 'hangar') : 0;
 const RARITIES = ['Commune', 'Rare', 'Épique', 'Légendaire'];
 const RELICS = {
-  comete:    { name: 'Comète apprivoisée', v: [5, 7, 10, 15], w: [1.5, 2, 2.5, 3], desc: l => `Comètes ${['1,5', '2', '2,5', '3'][l]} fois plus fréquentes, queue de comète ×${[5, 7, 10, 15][l]} ; mais toujours une queue, plus de salve ni de fragment de temps` },
-  empreinte: { name: 'Empreinte', v: [2, 3, 4, 6], desc: l => `Les ${[2, 3, 4, 6][l]} premières améliorations de run offertes à chaque run` },
-  prisme:    { name: 'Prisme', v: [2, 3, 4, 5], w: [10, 6, 4, 2], desc: l => `Chaque étoile du catalogue offre ${[2, 3, 4, 5][l]} éclats ; mais seuil de Nova ×${[10, 6, 4, 2][l]}` },
-  braise:    { name: 'Braise', v: [0.1, 0.2, 0.35, 0.5], w: [0.25, 0.2, 0.15, 0.1], desc: l => `Après une Nova, la run repart avec ${[10, 20, 35, 50][l]} % de ses niveaux de Flux ; mais la Nova rapporte ${[25, 20, 15, 10][l]} % d'éclats en moins` },
-  astrolabe: { name: 'Astrolabe', v: [1, 2, 3, 4], w: [0.6, 0.5, 0.4, 0.3], desc: l => `Les ${[1, 2, 3, 4][l]} premières étoiles de chaque constellation s'allument gratuitement ; mais les suivantes coûtent ${[60, 50, 40, 30][l]} % de plus` },
-  binaire:   { name: 'Double noyau', deep: true, v: [3, 2, 1, 0], desc: l => `Le premier élément fusionné donne aussi son effet de noyau${[3, 2, 1, 0][l] ? ` ; mais stabilité −${[3, 2, 1, 0][l]}` : ''}` },
-  fission:   { name: 'Fission', deep: true, v: [1, 2, 3, 5], desc: l => `Défusionner le dernier élément ${[1, 2, 3, 5][l]} fois par run` },
-  jet:       { name: 'Jet relativiste', deep: true, v: [1.5, 1.75, 2, 2.5], w: [1e4, 1e3, 1e2, 1e1], desc: l => `Données de l'effondrement ×${['1,5', '1,75', '2', '2,5'][l]} ; mais seuil d'effondrement ×${['1e4', '1e3', '1e2', '10'][l]}` },
+  comete:    { fam: 'temps', name: 'Comète apprivoisée', v: [5, 7, 10, 15], w: [1.5, 2, 2.5, 3], desc: l => `Comètes ${['1,5', '2', '2,5', '3'][l]} fois plus fréquentes, queue de comète ×${[5, 7, 10, 15][l]} ; mais toujours une queue, plus de salve ni de fragment de temps` },
+  empreinte: { fam: 'ciel', name: 'Empreinte', v: [2, 3, 4, 6], desc: l => `Les ${[2, 3, 4, 6][l]} premières améliorations de run offertes à chaque run` },
+  prisme:    { fam: 'ciel', name: 'Prisme', v: [2, 3, 4, 5], w: [10, 6, 4, 2], desc: l => `Chaque étoile du catalogue offre ${[2, 3, 4, 5][l]} éclats ; mais seuil de Nova ×${[10, 6, 4, 2][l]}` },
+  braise:    { fam: 'temps', name: 'Braise', v: [0.1, 0.2, 0.35, 0.5], w: [0.25, 0.2, 0.15, 0.1], desc: l => `Après une Nova, la run repart avec ${[10, 20, 35, 50][l]} % de ses niveaux de Flux ; mais la Nova rapporte ${[25, 20, 15, 10][l]} % d'éclats en moins` },
+  astrolabe: { fam: 'ciel', name: 'Astrolabe', v: [1, 2, 3, 4], w: [0.6, 0.5, 0.4, 0.3], desc: l => `Les ${[1, 2, 3, 4][l]} premières étoiles de chaque constellation s'allument gratuitement ; mais les suivantes coûtent ${[60, 50, 40, 30][l]} % de plus` },
+  binaire:   { fam: 'matiere', name: 'Double noyau', deep: true, v: [3, 2, 1, 0], desc: l => `Le premier élément fusionné donne aussi son effet de noyau${[3, 2, 1, 0][l] ? ` ; mais stabilité −${[3, 2, 1, 0][l]}` : ''}` },
+  fission:   { fam: 'matiere', name: 'Fission', deep: true, v: [1, 2, 3, 5], desc: l => `Défusionner le dernier élément ${[1, 2, 3, 5][l]} fois par run` },
+  jet:       { fam: 'galaxie', name: 'Jet relativiste', deep: true, v: [1.5, 1.75, 2, 2.5], w: [1e4, 1e3, 1e2, 1e1], desc: l => `Données de l'effondrement ×${['1,5', '1,75', '2', '2,5'][l]} ; mais seuil d'effondrement ×${['1e4', '1e3', '1e2', '10'][l]}` },
+  // v0.16.0 : quatre reliques de plus
+  boussole:  { fam: 'galaxie', name: 'Boussole', v: [2, 3, 4, 5], desc: l => `À chaque effondrement, choisis l'anomalie de la galaxie suivante parmi ${[2, 3, 4, 5][l]}` },
+  sablier:   { fam: 'temps', name: 'Sablier', v: [1.5, 2, 3, 4], desc: l => `L'absence est prise en compte plus longtemps : ${['1 h 30', '2 h', '3 h', '4 h'][l]} au lieu de 1 h (le reste part toujours en réserve)` },
+  cristal:   { fam: 'matiere', name: 'Cristal', v: [1, 2, 2, 3], desc: l => `Stabilité +${[1, 2, 2, 3][l]}` },
+  miroir:    { fam: 'joker', name: 'Miroir', deep: true, v: [0, 0.25, 0.5, 1], desc: l => `Compte comme une relique de chaque famille pour les ensembles${l ? ` ; bonus d'ensemble renforcés de ${[0, 25, 50, 100][l]} %` : ''}` },
 };
 const RELIC_IDS = Object.keys(RELICS);
+// Ensembles : deux reliques équipées de la même famille (le Miroir complète n'importe laquelle)
+const RELIC_FAMS = {
+  ciel:    { name: 'Céleste', bonus: 'Éclats de Nova et du vent ×1,5', k: 1.5 },
+  temps:   { name: 'Temps',   bonus: 'Vitesse ×1,25', k: 1.25 },
+  matiere: { name: 'Matière', bonus: 'Stabilité +1', k: 1 },
+  galaxie: { name: 'Galaxie', bonus: 'Données ×1,25', k: 1.25 },
+};
 const relicSlots = m => (m.galaxy || 1) >= 2 ? 1 + res(m, 'slot') : 0;
 const bestRarity = (m, id) => { const inv = (m.relics || {})[id]; if (!inv) return -1; for (let i = 3; i >= 0; i--) if (inv[i] > 0) return i; return -1; };
 const relicLv = (m, id) => (m.equip || []).slice(0, relicSlots(m)).includes(id) ? bestRarity(m, id) : -1;
+const equipped = m => (m.equip || []).slice(0, relicSlots(m)).filter(id => RELICS[id] && bestRarity(m, id) >= 0);
+// force d'un ensemble (0 = inactif, sinon le facteur de renfort du Miroir : 1 à 2)
+function setPower(m, fam) {
+  const eq = equipped(m), n = eq.filter(id => RELICS[id].fam === fam).length, mir = eq.includes('miroir');
+  if (n + (mir ? 1 : 0) < 2 || n < 1) return 0;
+  return mir ? 1 + RELICS.miroir.v[bestRarity(m, 'miroir')] : 1;
+}
+const setMult = (m, fam) => { const p = setPower(m, fam); return p ? 1 + (RELIC_FAMS[fam].k - 1) * p : 1; };
+const setStab = m => { const p = setPower(m, 'matiere'); return p ? Math.round(p) : 0; };
 const cometTail = m => { const cm = relicLv(m, 'comete'); return cm >= 0 ? RELICS.comete.v[cm] : 3; };
 // Défis galactiques : une galaxie entière sous contrainte, réussie à l'effondrement
 const GCHAL = {
@@ -1042,6 +1127,9 @@ const GCHAL = {
   ciel:     { name: 'Ciel noir', desc: 'Aucune constellation, sauf les étoiles acquises', reward: 'Éclats gagnés par Nova ×2' },
   fragile:  { name: 'Fragile', desc: 'La stabilité reste à 4 : constellations et lois clés n\'y ajoutent rien', reward: 'Stabilité +2' },
   mur:      { name: 'Mur', desc: 'Objectifs et seuil d\'effondrement ×1e10', reward: 'Données ×2' },
+  sansacq:  { name: 'Sans acquis', desc: 'Aucun acquis : pilote, rallumage, capteur de comètes coupés, et la constellation Automatisation se rachète comme dans l\'Acte 1', reward: 'Chaque étoile du catalogue offre 2 éclats au lieu de 1' },
+  course:   { name: 'Course', desc: 'La galaxie doit s\'effondrer en moins de 15 min de jeu, sinon le défi échoue', reward: 'Vitesse ×1,5' },
+  naine:    { name: 'Galaxie naine', desc: 'Le dernier palier est le palier 4 ; seuil d\'effondrement ÷1e38', reward: 'Données ×1,5' },
 };
 const GCH_FROM = 3;
 // ---------- Anomalies galactiques (v15.0) ----------
@@ -1054,9 +1142,11 @@ const ANOMALIES = {
   gamma:   { name: 'Sursaut gamma',             desc: 'La première Nova de chaque palier rapporte ×10' },
   lens:    { name: 'Lentille gravitationnelle', desc: 'Graviton et ses réactions ×1,5', el: 'graviton' },
   dwarf:   { name: 'Naine satellite',           desc: 'Seuil d\'effondrement ÷10, données ×0,7', seuil: 0.1, data: 0.7 },
-  gwind:   { name: 'Vent galactique',           desc: 'Vent stellaire au rythme plein (×2)' },
+  gwind:   { name: 'Vent galactique',           desc: 'Vent stellaire ×2' },
+  archive: { name: 'Archive galactique',        desc: 'Les données de ton dernier effondrement offertes une seconde fois, dès l\'arrivée', gift: 'data' },
+  remnant: { name: 'Reliquat de supernova',     desc: '+250 éclats dès l\'arrivée', gift: 'eclats', amount: 250 },
   merger:  { name: 'Fusion de galaxies',        desc: 'Un emplacement de fusion de plus, seuil d\'effondrement ×' + (ENV.MS || '1e18') }, 
-  jet:     { name: 'Jet relativiste',           desc: 'Toutes les réactions ×1,1' },
+  jet:     { name: 'Noyau actif',               desc: 'Toutes les réactions ×1,1' },
   strange: { name: 'Bulle étrange',             desc: 'Matière étrange et ses réactions ×1,5', el: 'strange' },
   fossil:  { name: 'Galaxie fossile',           desc: 'Étoiles du ciel à moitié prix, données ×0,8', data: 0.8 },
   nursery: { name: 'Pouponnière d\'étoiles',    desc: 'Vitesse ×1,5' },
@@ -1071,10 +1161,15 @@ function drawAnomaly(m, rnd = Math.random) {
   const ids = Object.keys(ANOMALIES).filter(id => id !== m.anomaly);
   return ids[Math.floor(rnd() * ids.length)];
 }
+function drawAnomalies(m, n, rnd = Math.random) {
+  const ids = Object.keys(ANOMALIES).filter(id => id !== m.anomaly), out = [];
+  while (out.length < Math.min(n, ids.length)) { const i = Math.floor(rnd() * ids.length); out.push(ids.splice(i, 1)[0]); }
+  return out;
+}
 const gammaK = m => anomIs(m, 'gamma') && !(m.novasPal || 0) ? 10 : 1;
-const windK = m => anomIs(m, 'gwind') ? 1 : WIND_K;
+const windK = m => WIND_K * prodOf(m, 'windX') * (anomIs(m, 'gwind') ? 2 : 1);
 const gch = (m, id) => (m.gch || {})[id] || 0;
-function gchMalus(m) { if (!m.gActive) return 1; return Math.pow(10, 5 * gch(m, m.gActive)) * (m.gActive === 'mur' ? 1e10 : 1); }
+function gchMalus(m) { if (!m.gActive) return 1; return Math.pow(10, (5 - res(m, 'chart')) * gch(m, m.gActive)) * (m.gActive === 'mur' ? 1e10 : 1); }
 // Seuil d'effondrement : 1e72 pour la première galaxie, puis 1e74 × (masse ÷ 10)^4 ; la masse = toutes les données gagnées
 const mass = m => m.dataTotal || 0;
 const SEUIL0 = Number(ENV.S0 || 1e83);   // v14.2 : recalé sur la production de l'Acte 1 réglée (trou noir à 1e85)
@@ -1082,7 +1177,7 @@ const FIRST_COLLAPSE_BONUS = 100;      // données offertes en fin d'Acte 1 (san
 function seuil(m) {
   const j = relicLv(m, 'jet'), base = (m.galaxy || 1) > 1 ? SEUIL0 * Math.pow(Math.max(1, mass(m) / 10), 4) : OBJS[LAST_PAL];
   const a = anom(m);
-  return base * gchMalus(m) * (a === 'merger' ? Number(ENV.MS || 1e18) : 1) * (j >= 0 ? RELICS.jet.w[j] : 1) * (a && ANOMALIES[a].seuil || 1);
+  return base * gchMalus(m) * (m.gActive === 'naine' ? 1e-38 : 1) * (a === 'merger' ? Number(ENV.MS || 1e18) : 1) * (j >= 0 ? RELICS.jet.w[j] : 1) * (a && ANOMALIES[a].seuil || 1);
 }
 // Constellations complètes (pour le bonus de données)
 const SKY_BRANCHES = () => [...TREE, { pal: 3, id: 'K', name: 'Lois clés', nodes: KEYS }];
@@ -1090,12 +1185,12 @@ const branchDone = (m, b) => b.nodes.every(n => (n.repeat ? nodeCount(m, n.id) >
 const skiesDone = m => SKY_BRANCHES().filter(b => branchDone(m, b)).length;
 // Données : 10 × (ordres de grandeur au-dessus du seuil + 1) × multiplicateurs
 function dataMult(m) {
-  let k = Math.pow(RESEARCH.yield.k, res(m, 'yield')) * (gch(m, 'mur') ? 2 : 1);
+  let k = Math.pow(RESEARCH.yield.k, res(m, 'yield')) * (gch(m, 'mur') ? 2 : 1) * (gch(m, 'naine') ? 1.5 : 1);
   let extra = 0; for (const id in GCHAL) extra += Math.max(0, gch(m, id) - 1); k *= 1 + 0.25 * extra;
   if (m.gActive) k *= 1 + gch(m, m.gActive) + 1;
   const j = relicLv(m, 'jet'); if (j >= 0) k *= RELICS.jet.v[j];
   const a = anom(m);
-  return k * (1 + 0.1 * skiesDone(m)) * exploitMult(m) * (a && ANOMALIES[a].data || 1);
+  return k * (1 + 0.1 * skiesDone(m)) * exploitMult(m) * (a && ANOMALIES[a].data || 1) * setMult(m, 'galaxie');
 }
 const dataRaw = (m, produced) => { const s = seuil(m); return produced < s ? 0 : 10 * (Math.log10(produced / s) + 1) * dataMult(m); };
 const dataGain = (m, produced) => Math.floor(dataRaw(m, produced));
@@ -1148,16 +1243,17 @@ const EXPLOITS = [
 // ---------- Nova et éclats ----------
 const novaMin = m => { const pr = relicLv(m, 'prisme'); return NOVA_MIN[palier(m)] * (pr >= 0 ? RELICS.prisme.w[pr] : 1); };
 const NOVA_K = Number(ENV.NK || 1);
-const novaMult = m => { const br = relicLv(m, 'braise'); return exploitMult(m) * prodOf(m, 'eclats') * Math.pow(RESEARCH.ray.k, res(m, 'ray')) * (gch(m, 'ciel') ? 2 : 1) * (br >= 0 ? 1 - RELICS.braise.w[br] : 1); };
+const novaMult = m => { const br = relicLv(m, 'braise'); return exploitMult(m) * prodOf(m, 'eclats') * Math.pow(RESEARCH.ray.k, res(m, 'ray')) * (gch(m, 'ciel') ? 2 : 1) * (br >= 0 ? 1 - RELICS.braise.w[br] : 1) * setMult(m, 'ciel'); };
 const novaRaw = (m, produced) => produced < novaMin(m) ? 0 : NOVA_K * Math.pow(Math.log10(produced / novaMin(m)) + 1, 2) * novaMult(m);
 const novaGain = (m, produced) => Math.floor(novaRaw(m, produced));
-// Vent stellaire : au-delà du seuil de Nova, éclats par seconde = WIND_K × le rythme de Nova du moment (v15.0.3, avant : le meilleur de la run)
+// Vent stellaire : au-delà du seuil de Nova, éclats par seconde = WIND_K × le meilleur rythme de Nova de la run
+// v15.1 : WIND_K passe de 0,5 à 0,25 ; la loi Alizés (constellation Automatisation) le porte à 0,4
 // (rythme = ce que rapporterait la Nova ÷ (âge de la run + 30 s pour la relancer))
-const WIND_K = 0.5;
+const WIND_K = Number(ENV.WK0 || 0.25);
 const windRate = (m, r) => { const g = novaRaw(m, r.produced); return g >= 1 ? g / ((r.age || 0) + 30) : 0; };
 // v15.0.3 : avec Mémoire stellaire le ciel reste allumé, le cadeau du catalogue ne se redonne pas à chaque palier (seul Firmament reste)
 const palierGift = m => treePermanent(m) ? RESEARCH.firm.k * res(m, 'firm') : catalogEclats(m);
-const catalogEclats = m => { const pr = relicLv(m, 'prisme'); return (m.catalog || []).length * (pr >= 0 ? RELICS.prisme.v[pr] : 1) + RESEARCH.firm.k * res(m, 'firm'); };
+const catalogEclats = m => { const pr = relicLv(m, 'prisme'); return (m.catalog || []).length * (pr >= 0 ? RELICS.prisme.v[pr] : 1) * (gch(m, 'sansacq') ? 2 : 1) + RESEARCH.firm.k * res(m, 'firm'); };
 // État d'un nœud : have / can / poor / locked
 const nodeCount = (m, id) => (m.tree || []).filter(x => x === id).length;
 function nodeCost(m, n) {
@@ -1181,7 +1277,7 @@ function nodeState(m, n) {
 }
 const freshMeta = () => ({ catalog: [], bank: 0, comets: 0, cometIn: 180, pal: 0, ownedList: ['dust'], core: 'dust', record: 0, sings: 0, novas: 0, discovered: [], tree: [], eclats: 0, eclatsTotal: 0, challengesDone: [], chTargets: {}, won: false, totalTime: 0, realTime: 0, best: 0, lastLines: [],
   galaxy: 1, data: 0, dataTotal: 0, research: {}, relics: {}, equip: [], probes: [], pclock: 0, gch: {}, gActive: null, plans: {}, pilot: true, lightOrder: [], lastOrder: [], autoCollapse: false, palAge: 0, galTime: 0 });
-if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANOMALY_FROM, anom, anomIs, anomEl, drawAnomaly, gammaK, windK, anomSpeed, ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
+if (typeof module !== 'undefined') module.exports = { lastPal, RELIC_FAMS, equipped, setPower, setMult, setStab, drawAnomalies, palierGift, ANOMALIES, ANOMALY_FROM, anom, anomIs, anomEl, drawAnomaly, gammaK, windK, anomSpeed, ENV, sat, ORDER, EXOTIC, ELEMENTS, CORE, FUSED, EL_FX, RUN1_UNLOCK, key, REACTIONS, UPG, TREE, KEYS, ALL_NODES, NODE, has, prodOf, sumOf, treePermanent, MEMORY_CH, CHALLENGES, SOBER_POWER, PALIERS, LAST_PAL, OBJS, NOVA_MIN, SLOTS, fluxMilestones, nextFluxMilestone, POWER_MS_STEP, POWER_MS_MULT, powerMilestones, powerMsMult, RUN_UPS, hasUp, STAR_TYPES, starKey, starName, lineDone, objective, runFloor, upCost, observeAt, speedOf, palier, owned, runSpeed, maxFused, stabMax, elInstab, instab, innerK, reactionsOf, newRun, costPenalty, cost, timeFactor, specs, breakdown, prod, step, novaMin, novaGain, novaRaw, challengeTarget, catalogEclats, NOVA_EXP, nodeCost, nodeCount, nodeState, freshMeta,
   acquired, ACQ_NODES, MORPHS, morph, ACQUIS, hasAcq, RESEARCH, res, researchCost, EXPEDITIONS, expTime, probes, RARITIES, RELICS, RELIC_IDS, relicSlots, bestRarity, relicLv, cometTail, GCHAL, GCH_FROM, gch, gchMalus, mass, seuil, branchDone, skiesDone, dataMult, dataRaw, dataGain, novaMult, WIND_K, windRate, NOVA_AGE, FIRST_COLLAPSE_BONUS, EXPLOITS, exploitMult, EXPLOIT_BONUS };
 
 </script>
@@ -1272,7 +1368,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
 
   // ---------- Règles ----------
   const P = () => prod(meta, run);
-  const isFinal = () => meta.pal >= LAST_PAL;
+  const isFinal = () => meta.pal >= lastPal(meta);
   const canSing = () => !run.challenge && !isFinal() && run.produced >= objective(meta.pal, meta);
   const canCollapse = () => !run.challenge && isFinal() && run.produced >= seuil(meta);
   const colGain = () => canCollapse() ? dataGain(meta, run.produced) : 0;
@@ -1394,7 +1490,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     if (!auto && !singArmed) { singArmed = true; refresh(false); singTimer = setTimeout(() => { singArmed = false; refresh(true); }, 3500); return; }
     clearTimeout(singTimer); singArmed = false;
     meta.record = Math.max(meta.record, run.produced); meta.best = Math.max(meta.best, P()); meta.sings++;
-    meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
+    if (!(meta.plans[meta.pal] && meta.plans[meta.pal].manual) && !run.challenge) meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
     logEv('sing', { prod: lg(run.produced), age: Math.round(run.age || 0), palTime: Math.round(meta.palAge || 0), ecl: Math.floor(meta.eclats), sky: meta.tree.length, vent: meta.windTotal || 0, auto: !!auto });
     recordPal(); checkExploits({ type: 'sing', pal: meta.pal, novas: meta.novasPal || 0, fused: run.fused.length, core: run.core });
     meta.pal++; meta.palAge = 0; meta.novasPal = 0; sound('singularite', { auto: !!auto }); sound('palier', { auto: true });
@@ -1491,6 +1587,111 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     tutoShown = null; $('tuto').hidden = true; document.body.classList.remove('has-tuto');
     document.querySelectorAll('.tuto-glow').forEach(x => x.classList.remove('tuto-glow'));
   }
+  // ---------- Notes de version (menu) : la plus récente en premier ----------
+  const PATCHNOTES = [
+    ['0.18.0', '23 octobre', 'Trois défis galactiques', [
+      'Sans acquis : pilote, rallumage et capteur coupés, la constellation Automatisation se rachète. Récompense : chaque étoile du catalogue offre 2 éclats.',
+      'Course : la galaxie doit s\'effondrer en moins de 15 min de jeu. Récompense : vitesse ×1,5.',
+      'Galaxie naine : le dernier palier est le palier 4, seuil d\'effondrement ÷1e38. Récompense : données ×1,5.']],
+    ['0.17.0', '23 octobre', 'Le bras de la Règle', [
+      'Cinquième bras sur la carte de la recherche, avec six recherches : Soute (une relique de plus par sonde), Forge stellaire (assembler 2 reliques au lieu de 3), Déviation (relancer l\'anomalie), Cartographie (défis galactiques moins durs), Boucle causale, Allumage précoce (Rallumage dès la galaxie 2).',
+      'Boucle causale : les effets de début de run durent plus longtemps, le Tachyon et ses réactions sont renforcés, et chaque comète capturée relance l\'élan. Au niveau 3, un build Tachyon rivalise avec les meilleurs.',
+      'La carte de la recherche est un peu plus haute pour faire de la place au nouveau bras.']],
+    ['0.16.0', '23 octobre', 'Reliques et ensembles', [
+      'Quatre reliques : Boussole (choisis l\'anomalie de la galaxie suivante parmi 2 à 5), Sablier (l\'absence compte jusqu\'à 4 h au lieu de 1 h), Cristal (stabilité +1 à +3), Miroir (espace profond, complète n\'importe quel ensemble).',
+      'Ensembles : deux reliques équipées de la même famille donnent un bonus. Céleste : éclats ×1,5 ; Temps : vitesse ×1,25 ; Matière : stabilité +1 ; Galaxie : données ×1,25.',
+      'L\'anomalie Jet relativiste devient Noyau actif (même nom qu\'une relique).',
+      'Les versions sont numérotées v0.xx.x.']],
+    ['0.15.5', '23 octobre', 'Notes de version', [
+      'Les notes de version apparaissent ici, dans le menu, à chaque mise à jour.']],
+    ['0.15.4', '23 octobre', 'Builds, catalogue, vent', [
+      'Builds par palier : dans l\'onglet Éléments, la carte du Pilote ouvre une fenêtre pour composer le noyau et les fusions de chaque palier. Un build composé à la main n\'est plus remplacé à la singularité.',
+      'Catalogue en cinq sous-menus : Étoiles, Réactions, Exploits, Paliers, Partie.',
+      'Réactions : filtre par élément (toutes ses fusions, « avec X »), découvertes ou inconnues, tri par élément ou par nom.',
+      'Vent stellaire : de nouveau stable (meilleur rythme de la run), mais 25 % de ce rythme au lieu de 50 %. Nouvelle loi Alizés (Automatisation, 80 éclats) : 40 %.',
+      'Deux anomalies à cadeau : Archive galactique (les données du dernier effondrement offertes une seconde fois) et Reliquat de supernova (+250 éclats).']],
+    ['0.15.3', '23 octobre', 'Retours des testeurs', [
+      'Comètes : pendant un rattrapage ou la dépense de la réserve, un Fragment de temps devient une Salve d\'énergie (la réserve ne se remplit plus en se vidant).',
+      'Avec Mémoire stellaire, le cadeau du catalogue n\'arrive plus qu\'au début de chaque galaxie (Firmament reste à chaque palier) : les éclats montaient trop vite dans l\'Acte 2.',
+      'L\'anomalie Pluie de comètes devient Essaim de comètes (même nom qu\'une loi du ciel).']],
+    ['0.15.2', '23 octobre', 'Nouvelle carte de la galaxie', [
+      'Carte de la recherche redessinée : spirale barrée vue de biais, deux grands bras et deux éperons.',
+      'Étiquettes plus petites sur téléphone pour ne plus se chevaucher.']],
+    ['0.15.1', '23 octobre', 'Corrections', [
+      'Onglet Éléments : « null » ou « nullnull » ne s\'affiche plus.',
+      'Polyvalence : changer de noyau tient compte des éléments déjà fusionnés.',
+      'Garde-fou : si la stabilité ou les emplacements baissent en cours de run, les dernières fusions sont retirées.',
+      'Le temps passé avec l\'appli en arrière-plan est rattrapé comme une absence.']],
+    ['0.15.0', '22 octobre', 'Anomalies galactiques', [
+      'Dès la galaxie 3, chaque effondrement tire une anomalie qui change les règles de la galaxie.',
+      'Cibles recalées : Désordre (objectif du palier 4), Noyau imposé (environ 1e70).']],
+    ['0.14.3', '22 octobre', 'Tutoriel', [
+      'Sept bulles d\'aide pendant les premières minutes, à revoir ou désactiver dans le menu.',
+      'Points d\'accroche pour brancher des sons plus tard.']],
+  ];
+  function buildNotes() {
+    $('patchNotes').replaceChildren(...PATCHNOTES.map(([v, date, title, items], i) => h('details', i === 0 ? { open: true } : {},
+      h('summary', {}, h('b', {}, 'v' + v), h('em', {}, title), h('span', {}, date)),
+      h('ul', {}, ...items.map(t => h('li', {}, t))))));
+  }
+  // ---------- Anomalies : cadeau et choix (Boussole) ----------
+  function anomGift(gift, d) {
+    if (gift === 'data') meta.data += d;
+    if (gift === 'eclats') meta.eclats += ANOMALIES[meta.anomaly].amount;
+  }
+  function rerollAnomaly() {
+    if (!anom(meta) || (meta.rerolls || 0) >= res(meta, 'reroll')) return;
+    meta.rerolls = (meta.rerolls || 0) + 1; meta.anomaly = drawAnomaly(meta); logEv('anomalie', { id: meta.anomaly, deviation: true });
+    const gift = ANOMALIES[meta.anomaly].gift; anomGift(gift, meta.lastColData || 0);
+    fx.pulse('#ffb36b', 1.2);
+    toast(`Déviation : nouvelle anomalie, <b>${ANOMALIES[meta.anomaly].name}</b> · ${gift === 'data' ? `+${datW(meta.lastColData || 0)} offertes` : gift === 'eclats' ? `+${eclW(ANOMALIES[meta.anomaly].amount)} offerts` : ANOMALIES[meta.anomaly].desc}`, '#ffb36b', 'anom');
+    structure(); refresh(true); save();
+  }
+  function chooseAnomaly(id) {
+    if (!meta.anomChoice || !meta.anomChoice.includes(id)) return;
+    meta.anomaly = id; meta.anomChoice = null; logEv('anomalie', { id, boussole: true });
+    const gift = ANOMALIES[id].gift; anomGift(gift, meta.lastColData || 0);
+    fx.pulse('#ffb36b', 1.2);
+    toast(`Anomalie choisie : <b>${ANOMALIES[id].name}</b> · ${gift === 'data' ? `+${datW(meta.lastColData || 0)} offertes` : gift === 'eclats' ? `+${eclW(ANOMALIES[id].amount)} offerts` : ANOMALIES[id].desc}`, '#ffb36b', 'anom');
+    structure(); refresh(true); save();
+  }
+  // ---------- Catalogue : sous-menus ----------
+  const LOG_VIEWS = [['stars', 'Étoiles'], ['rx', 'Réactions'], ['exp', 'Exploits'], ['pal', 'Paliers'], ['stats', 'Partie']];
+  function buildLogNav() {
+    if (!LOG_VIEWS.some(v => v[0] === ui.logView)) ui.logView = store.get(VERSION + '-logv') || 'stars';
+    if (!LOG_VIEWS.some(v => v[0] === ui.logView)) ui.logView = 'stars';
+    const subs = { stars: `${meta.catalog.length}/${ORDER.length * 4}`, rx: `${meta.discovered.length}/${Object.keys(REACTIONS).length}`, exp: `${(meta.exploits || []).length}/${EXPLOITS.length}`, pal: `${meta.pal}/${LAST_PAL}`, stats: '' };
+    $('logPick').replaceChildren(...LOG_VIEWS.map(([id, name]) => h('button', { class: 'gp', type: 'button', 'aria-pressed': String(ui.logView === id), onclick: () => { ui.logView = id; store.set(VERSION + '-logv', id); buildLogNav(); } }, h('b', {}, name), h('small', {}, subs[id]))));
+    document.querySelectorAll('#p-log [data-lv]').forEach(c => { c.hidden = c.dataset.lv !== ui.logView; });
+  }
+  // Réactions : filtre par élément, découvertes ou non, tri
+  function buildReactions() {
+    const ks = Object.keys(REACTIONS), known = k => meta.discovered.includes(k);
+    const els = ORDER.filter(x => owned(meta).includes(x) || ks.some(k => known(k) && k.split('+').includes(x)));
+    if (ui.rxEl && !els.includes(ui.rxEl)) ui.rxEl = null;
+    ui.rxState = ui.rxState || 'all'; ui.rxSort = ui.rxSort || 'el';
+    const of = x => ks.filter(k => k.split('+').includes(x));
+    $('rxEls').replaceChildren(
+      h('button', { class: 'rx-el', type: 'button', 'aria-pressed': String(!ui.rxEl), onclick: () => { ui.rxEl = null; buildReactions(); } }, h('i', { style: '--c:var(--fg)' }, '∗'), 'Tous', h('small', {}, `${meta.discovered.length}/${ks.length}`)),
+      ...els.map(x => h('button', { class: 'rx-el', type: 'button', style: `--c:${EL_COLOR[x]}`, 'aria-pressed': String(ui.rxEl === x), onclick: () => { ui.rxEl = ui.rxEl === x ? null : x; buildReactions(); } },
+        h('i', {}, ELEMENTS[x].short), ELEMENTS[x].name, h('small', {}, `${of(x).filter(known).length}/${of(x).length}`))));
+    const seg = (id, key, opts) => $(id).replaceChildren(...opts.map(([v, label]) => h('button', { type: 'button', 'aria-pressed': String(ui[key] === v), onclick: () => { ui[key] = v; buildReactions(); } }, label)));
+    seg('rxState', 'rxState', [['all', 'Toutes'], ['known', 'Découvertes'], ['unk', 'Inconnues']]);
+    seg('rxSort', 'rxSort', [['el', 'Par élément'], ['name', 'Par nom']]);
+    let list = ui.rxEl ? of(ui.rxEl) : ks;
+    if (ui.rxState === 'known') list = list.filter(known); else if (ui.rxState === 'unk') list = list.filter(k => !known(k));
+    const partner = k => { const [a, b] = k.split('+'); return ui.rxEl ? (a === ui.rxEl ? b : a) : null; };
+    if (ui.rxSort === 'name') list = [...list].sort((a, b) => (known(a) ? REACTIONS[a].name : '~').localeCompare(known(b) ? REACTIONS[b].name : '~', 'fr'));
+    else list = [...list].sort((a, b) => { const pa = ui.rxEl ? ORDER.indexOf(partner(a)) : ORDER.indexOf(a.split('+')[0]) * 20 + ORDER.indexOf(a.split('+')[1]), pb = ui.rxEl ? ORDER.indexOf(partner(b)) : ORDER.indexOf(b.split('+')[0]) * 20 + ORDER.indexOf(b.split('+')[1]); return pa - pb; });
+    const rx = $('rx');
+    rx.replaceChildren(...list.map(k => { const [a, b] = k.split('+'), kn = known(k), pt = partner(k);
+      return h('div', { class: 'r' + (kn ? '' : ' unk') }, h('b', {}, kn ? REACTIONS[k].name : '???'),
+        pt ? h('span', { class: 'with', style: `--c:${EL_COLOR[pt]}` }, h('i'), `avec ${ELEMENTS[pt].name}`) : h('span', { class: 'pair' }, `${ELEMENTS[a].name} + ${ELEMENTS[b].name}`),
+        kn ? h('span', {}, reactText(k)) : h('span', { class: 'small' }, 'Fusionne ces deux éléments pour la découvrir')); }));
+    if (!list.length) rx.append(h('p', { class: 'small' }, 'Aucune réaction ne correspond à ce filtre.'));
+    $('rxHint').textContent = ui.rxEl ? `Réactions de ${ELEMENTS[ui.rxEl].name} avec chaque autre élément, au noyau comme fusionné.` : 'Choisis un élément pour voir toutes ses fusions.';
+    $('rxCount').textContent = `${meta.discovered.length} / ${ks.length} découvertes`;
+  }
   // ---------- Exploits ----------
   function checkExploits(ev) {
     const got = meta.exploits || (meta.exploits = []); let any = false;
@@ -1549,20 +1750,27 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     clearTimeout(colTimer); colArmed = false;
     const g0 = meta.galaxy, d = dataGain(meta, run.produced), skies = skiesDone(meta), gDone = meta.gActive;
     meta.record = Math.max(meta.record, run.produced); meta.best = Math.max(meta.best, P()); meta.sings++;
-    meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
+    if (!(meta.plans[meta.pal] && meta.plans[meta.pal].manual) && !run.challenge) meta.plans[meta.pal] = { core: run.core, fused: [...run.fused] };
     if (gDone) { meta.gch[gDone] = gch(meta, gDone) + 1; meta.gActive = null; }
     logEv('col', { d, prod: lg(run.produced), seuil: lg(seuil(meta)), galTime: Math.round(meta.galTime || 0), gch: gDone || null, auto: !!auto });
     recordPal(); checkExploits({ type: 'col', galTime: meta.galTime || 0 });
     meta.gBest = Math.min(meta.gBest || Infinity, meta.galTime || Infinity); meta.gLast = meta.galTime || 0;
     sound('effondrement', { auto: !!auto, value: d });
     meta.data += d + (g0 === 1 ? FIRST_COLLAPSE_BONUS : 0); meta.dataTotal += d; meta.galaxy++; meta.won = true; meta.novasPal = 0;
-    if (meta.galaxy >= ANOMALY_FROM) { meta.anomaly = drawAnomaly(meta); logEv('anomalie', { id: meta.anomaly }); }
+    meta.lastColData = d; meta.anomChoice = null; meta.rerolls = 0;
+    const bsl = relicLv(meta, 'boussole');
+    if (meta.galaxy >= ANOMALY_FROM && bsl >= 0) { meta.anomChoice = drawAnomalies(meta, RELICS.boussole.v[bsl]); meta.anomaly = null; }
+    else if (meta.galaxy >= ANOMALY_FROM) { meta.anomaly = drawAnomaly(meta); logEv('anomalie', { id: meta.anomaly }); }
     if (meta.lightOrder.length) meta.lastOrder = [...meta.lightOrder];
     resetGalaxy();
+    // anomalies à cadeau : versées à l'arrivée (les données offertes ne comptent pas dans la masse)
+    const gift = anom(meta) && ANOMALIES[meta.anomaly].gift;
+    anomGift(gift, d);
     fx.singularity('Effondrement galactique'); fx.warp(3);
     const acq = ACQUIS.find(a => a.g === meta.galaxy);
     toast(`Galaxie ${meta.galaxy} · <b>${morph(meta)}</b> · +${datW(d)}${skies ? ` (dont +${skies * 10} % pour ${skies} constellation${skies > 1 ? 's' : ''} complète${skies > 1 ? 's' : ''})` : ''}${gDone ? ` · défi <b>${GCHAL[gDone].name}</b> réussi` : ''}${acq ? ` · acquis : <b>${acq.name}</b>` : ''}`, '#9b6bff');
-    if (anom(meta)) setTimeout(() => toast(`Anomalie : <b>${ANOMALIES[meta.anomaly].name}</b> · ${ANOMALIES[meta.anomaly].desc}`, '#ffb36b', 'anom'), 900);
+    if (meta.anomChoice) setTimeout(() => toast(`Boussole : choisis l'anomalie de cette galaxie parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`, '#ffb36b', 'anom'), 900);
+    if (anom(meta)) setTimeout(() => toast(`Anomalie : <b>${ANOMALIES[meta.anomaly].name}</b> · ${gift === 'data' ? `+${datW(d)} offertes` : gift === 'eclats' ? `+${eclW(ANOMALIES[meta.anomaly].amount)} offerts` : ANOMALIES[meta.anomaly].desc}`, '#ffb36b', 'anom'), 900);
     markTab('gal'); if (meta.galaxy === GCH_FROM) markTab('ch');
     if (g0 === 1) showFirstCollapse(d + FIRST_COLLAPSE_BONUS);
     structure(); refresh(true); save();
@@ -1643,6 +1851,12 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     toast(`Défi galactique lancé : <b>${GCHAL[id].name}</b>, niveau ${gch(meta, id) + 1} · ${GCHAL[id].desc}. Il est réussi à l'effondrement.`, '#9b6bff');
     structure(); refresh(true); save();
   }
+  function checkCourse() {
+    if (meta.gActive !== 'course' || (meta.galTime || 0) < 900) return;
+    meta.gActive = null; resetGalaxy();
+    toast('Défi galactique <b>Course</b> échoué : 15 min dépassées. La galaxie recommence sans contrainte.', '#9b6bff');
+    structure(); refresh(true); save();
+  }
   function abandonGch() {
     if (!meta.gActive || !armGch('abandon')) return;
     const id = meta.gActive; meta.gActive = null; resetGalaxy();
@@ -1654,7 +1868,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     for (const [id, G] of Object.entries(GCHAL)) {
       const lv = gch(meta, id), active = meta.gActive === id, next = lv + 1;
       const st = active ? ['run', `En cours · niveau ${next}`] : lv ? ['done', `Réussi · niveau ${next} ouvert`] : ['', 'Niveau 1'];
-      const malus = (id === 'mur' ? 1e10 : 1) * Math.pow(10, 5 * lv);
+      const malus = (id === 'mur' ? 1e10 : 1) * Math.pow(10, (5 - res(meta, 'chart')) * lv);
       const btn = active ? h('button', { class: 'btn' + (gchArmed === 'abandon' ? ' armed' : ''), type: 'button', onclick: abandonGch }, gchArmed === 'abandon' ? 'Confirmer : la galaxie recommence sans contrainte' : 'Abandonner')
         : h('button', { class: 'btn' + (gchArmed === id ? ' armed' : ''), type: 'button', disabled: !!meta.gActive, onclick: () => startGch(id) }, gchArmed === id ? `Confirmer : la galaxie recommence au palier ${start}` : `Lancer · niveau ${next}`);
       list.append(h('div', { class: 'chal' }, h('div', { class: 'top-r' }, h('b', {}, G.name), h('span', { class: 'st ' + st[0] }, st[1])),
@@ -1674,7 +1888,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     S: { pts: { S1: [18, 40, 'r'], S2: [42, 16, 'r'], S3: [72, 30, 'r'], S4: [64, 70, 'b'], S5: [30, 72, 'b'] }, fig: [['S5', 'S1']] },
     R: { pts: { R1: [12, 50, 'b'], R2: [36, 24, 't'], R3: [36, 76, 'b'], R4: [62, 50, 'r'], R5: [86, 24, 't'] }, edges: [['R1', 'R2'], ['R1', 'R3'], ['R2', 'R4'], ['R3', 'R4'], ['R4', 'R5']], pair: ['R2', 'R3'] },
     T: { pts: { T1: [16, 22, 't'], T2: [84, 22, 't'], T3: [50, 48, 'r'], T4: [16, 76, 'b'], T5: [84, 76, 'b'] }, fig: [['T5', 'T3'], ['T3', 'T1']] },
-    A: { pts: { A1: [12, 70, 'b'], A2: [26, 32, 'r'], A3: [50, 22, 't'], A4: [74, 32, 'r'], A5: [88, 70, 'b'] }, fig: [['A5', 'A1']] },
+    A: { pts: { A1: [12, 70, 'b'], A2: [26, 32, 'r'], A3: [50, 22, 't'], A4: [74, 32, 'r'], A6: [62, 66, 'b'], A5: [88, 70, 'b'] }, fig: [['A5', 'A1']] },
     E: { pts: { E1: [16, 26, 'r'], E2: [42, 42, 'r'], E3: [24, 70, 'b'], E4: [62, 72, 'r'], E5: [84, 30, 't'] }, fig: [['E5', 'E2']] },
     X: { pts: { X1: [50, 14, 'r'], X2: [80, 46, 'b'], X3: [50, 80, 'r'], X4: [20, 46, 'b'] }, fig: [['X4', 'X1']] },
     K: { pts: { K6: [16, 12, 'b'], K8: [50, 12, 'b'], K3: [84, 12, 'b'], K7: [16, 44, 'b'], K9: [50, 44, 'b'], K2: [84, 44, 'b'], K1: [16, 76, 'b'], K4: [50, 76, 'b'], K5: [84, 76, 'b'] }, edges: [['K6', 'K8'], ['K8', 'K3'], ['K3', 'K2'], ['K2', 'K9'], ['K9', 'K7'], ['K7', 'K1'], ['K1', 'K4'], ['K4', 'K5']], fig: [['K6', 'K9'], ['K9', 'K5']] },
@@ -1739,8 +1953,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
   function windTick(dt) {
     if (!has(meta, 'A4') || run.challenge) return;
     const rate = windRate(meta, run); if (!rate) return;
-    // v15.0.3 : le vent suit le rythme du moment (il faiblit quand la run s'allonge, une Nova le relance), plus le meilleur rythme de la run
-    run.windBest = rate;
+    if (rate > (run.windBest || 0)) run.windBest = rate;
     run.windAcc = (run.windAcc || 0) + windK(meta) * run.windBest * dt;
     const w = Math.floor(run.windAcc); if (w < 1) return;
     run.windAcc -= w; meta.eclats += w; meta.eclatsTotal = (meta.eclatsTotal || 0) + w; meta.eclatsPal = (meta.eclatsPal || 0) + w; meta.windTotal = (meta.windTotal || 0) + w;
@@ -1781,6 +1994,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
   function captureComet(auto) {
     if (meta.comets <= 0) return;
     meta.comets--;
+    if (res(meta, 'loop')) run.loopAt = run.age || 0;
     const roll = Math.random(), say = auto ? () => {} : msg => toast(msg, '#9fe8ff', 'comet');
     if (auto) { quietLog.comets++; meta.cometsAuto = (meta.cometsAuto || 0) + 1; }
     else { const now = performance.now(); ui.cometHits = (ui.cometHits || []).filter(t => now - t < 10000); ui.cometHits.push(now); checkExploits({ type: 'comet', burst: ui.cometHits.length }); }
@@ -2005,13 +2219,11 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
       if (lineBonus) line.append(lineBonus);
       cat.append(line);
     }
-    $('catCount').replaceChildren(...rich(`${meta.catalog.length} / ${ORDER.length * 4} · +${eclW(meta.catalog.length)} à chaque palier`));
+    $('catCount').replaceChildren(...rich(`${meta.catalog.length} / ${ORDER.length * 4} · +${eclW(meta.catalog.length)} quand le ciel s'éteint`));
     const pals = $('pals'); pals.replaceChildren();
     for (const p of PALIERS) pals.append(h('div', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '' }, h('span', {}, String(p.n)), h('span', {}, h('b', {}, p.name), h('br'), h('small', {}, `${p.unlock} · vitesse ×${speedOf(p.n)}`))));
-    const rx = $('rx'); rx.replaceChildren();
-    const ks = Object.keys(REACTIONS);
-    for (const k of ks) { const [a, b] = k.split('+'), known = meta.discovered.includes(k); rx.append(h('div', { class: 'r' + (known ? '' : ' unk') }, h('b', {}, known ? REACTIONS[k].name : '???'), h('span', { class: 'pair' }, `${ELEMENTS[a].name} + ${ELEMENTS[b].name}`), known ? h('span', {}, reactText(k)) : null)); }
-    $('rxCount').textContent = `${meta.discovered.length} / ${ks.length} découvertes`;
+    buildReactions();
+    buildLogNav();
     buildExploits(); buildPalStats();
     $('t-ch').classList.toggle('locked', meta.pal < 3 && meta.galaxy === 1);
     $('t-gal').classList.toggle('locked', meta.galaxy === 1);
@@ -2020,9 +2232,10 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
     const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
     $('palNow').replaceChildren(h('b', {}, `Palier ${meta.pal} · ${cur.name}`), ` · vitesse ×${fmt(speed())}`);
-    const an = anom(meta), pa = $('palAnom'); pa.hidden = !an;
+    const an = anom(meta), pa = $('palAnom'); pa.hidden = !an && !meta.anomChoice;
+    if (meta.anomChoice) pa.replaceChildren(h('b', {}, 'Boussole'), ` : anomalie à choisir parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`);
     if (an) pa.replaceChildren(h('b', {}, `Anomalie · ${ANOMALIES[an].name}`), ` : ${ANOMALIES[an].desc}${an === 'gamma' ? (meta.novasPal ? ' (déjà utilisée à ce palier)' : ' (prête)') : ''}`);
-    $('palNext').textContent = nxt ? `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}` : meta.galaxy === 1 ? 'Dernier palier de l\'Acte 1 : atteins le seuil d\'effondrement, ton trou noir avalera la galaxie.' : 'Dernier palier : dépasse le seuil d\'effondrement pour faire naître la galaxie suivante.';
+    $('palNext').textContent = nxt && !isFinal() ? `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}` : meta.galaxy === 1 ? 'Dernier palier de l\'Acte 1 : atteins le seuil d\'effondrement, ton trou noir avalera la galaxie.' : 'Dernier palier : dépasse le seuil d\'effondrement pour faire naître la galaxie suivante.';
   }
 
   // ---------- Onglet Galaxie ----------
@@ -2037,10 +2250,54 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     '<path d="M20 20L8 4M20 20l12 16" stroke="#c9bfff" stroke-width="1.6" stroke-linecap="round"/><circle cx="20" cy="20" r="5" fill="#c9bfff" fill-opacity="0.35"/><circle cx="20" cy="20" r="2.5" fill="#fff"/>',
   ];
   // v15.0.1 : spirale barrée vue de biais, deux grands bras et deux éperons (l'ancienne carte à quatre bras crochus évoquait un symbole haineux)
-  const ARMS = [{"d": "M213.4 167.4 L215.3 170.1 L216.8 173.2 L217.9 176.5 L218.5 180.1 L218.7 183.8 L218.3 187.8 L217.4 191.9 L215.9 196.1 L213.7 200.3 L211.0 204.5 L207.6 208.7 L203.6 212.7 L199.0 216.5 L193.8 220.0 L188.1 223.3 L181.9 226.1 L175.1 228.4 L168.0 230.2 L160.5 231.5 L152.8 232.1 L144.9 232.0 L137.0 231.1 L129.0 229.5 L121.2 227.1 L113.7 223.8 L106.5 219.7 L99.9 214.7 L93.8 208.9 L88.5 202.3 L84.1 194.9 L80.6 186.7 L78.3 177.9 L77.2 168.5 L77.4 158.6 L79.0 148.2 L82.0 137.6 L86.6 126.8 L92.8 115.9 L100.5 105.2 L109.9 94.7", "w": 1}, {"d": "M144.6 188.6 L142.7 185.9 L141.2 182.8 L140.1 179.5 L139.5 175.9 L139.3 172.2 L139.7 168.2 L140.6 164.1 L142.1 159.9 L144.3 155.7 L147.0 151.5 L150.4 147.3 L154.4 143.3 L159.0 139.5 L164.2 136.0 L169.9 132.7 L176.1 129.9 L182.9 127.6 L190.0 125.8 L197.5 124.5 L205.2 123.9 L213.1 124.0 L221.0 124.9 L229.0 126.5 L236.8 128.9 L244.3 132.2 L251.5 136.3 L258.1 141.3 L264.2 147.1 L269.5 153.7 L273.9 161.1 L277.4 169.3 L279.7 178.1 L280.8 187.5 L280.6 197.4 L279.0 207.8 L276.0 218.4 L271.4 229.2 L265.2 240.1 L257.5 250.8 L248.1 261.3", "w": 1}, {"d": "M179.5 227.2 L177.3 228.4 L175.0 229.7 L172.7 230.9 L170.2 232.1 L167.7 233.2 L165.1 234.3 L162.4 235.3 L159.6 236.3 L156.7 237.2 L153.8 238.1 L150.7 238.9 L147.6 239.6 L144.4 240.3 L141.1 240.8 L137.7 241.3 L134.3 241.7 L130.7 242.1 L127.2 242.3 L123.5 242.4 L119.8 242.4 L116.0 242.3 L112.2 242.1 L108.3 241.8 L104.4 241.4 L100.4 240.8 L96.4 240.1 L92.4 239.3 L88.4 238.3 L84.3 237.2 L80.2 235.9 L76.1 234.5 L72.0 232.9 L67.9 231.1 L63.8 229.2 L59.8 227.2 L55.8 224.9 L51.8 222.5 L47.8 219.9 L43.9 217.1 L40.1 214.1", "w": 0.6}, {"d": "M257.7 140.0 L259.3 140.8 L261.0 141.7 L262.7 142.6 L264.3 143.6 L266.0 144.6 L267.6 145.7 L269.2 146.8 L270.8 147.9 L272.4 149.1 L273.9 150.3 L275.5 151.6 L277.0 152.9 L278.5 154.3 L280.0 155.7 L281.4 157.2 L282.9 158.7 L284.3 160.2 L285.6 161.8 L287.0 163.5 L288.3 165.2 L289.5 166.9 L290.8 168.7 L291.9 170.6 L293.1 172.5 L294.2 174.4 L295.3 176.4 L296.3 178.4 L297.3 180.5 L298.2 182.7 L299.1 184.8 L300.0 187.1 L300.7 189.3 L301.5 191.7 L302.2 194.0 L302.8 196.4 L303.3 198.9 L303.8 201.4 L304.3 204.0 L304.6 206.6 L304.9 209.2", "w": 0.45}];
-  const BAR = 'M144.6 188.6 L213.4 167.4';
-  const ARM_LABELS = [['Bras de Persée', 26, 6, 'left'], ['Bras du Sagittaire', 2, 91, 'left'], ['Bras d\'Orion', 2, 33, 'right'], ['Bras de l\'Écu-Centaure', 2, 92, 'right']];
+  const ARMS = [{"d": "M213.4 135.4 L215.3 138.1 L216.8 141.2 L217.9 144.5 L218.5 148.1 L218.7 151.8 L218.3 155.8 L217.4 159.9 L215.9 164.1 L213.7 168.3 L211.0 172.5 L207.6 176.7 L203.6 180.7 L199.0 184.5 L193.8 188.0 L188.1 191.3 L181.9 194.1 L175.1 196.4 L168.0 198.2 L160.5 199.5 L152.8 200.1 L144.9 200.0 L137.0 199.1 L129.0 197.5 L121.2 195.1 L113.7 191.8 L106.5 187.7 L99.9 182.7 L93.8 176.9 L88.5 170.3 L84.1 162.9 L80.6 154.7 L78.3 145.9 L77.2 136.5 L77.4 126.6 L79.0 116.2 L82.0 105.6 L86.6 94.8 L92.8 83.9 L100.5 73.2 L109.9 62.7", "w": 1}, {"d": "M144.6 156.6 L142.7 153.9 L141.2 150.8 L140.1 147.5 L139.5 143.9 L139.3 140.2 L139.7 136.2 L140.6 132.1 L142.1 127.9 L144.3 123.7 L147.0 119.5 L150.4 115.3 L154.4 111.3 L159.0 107.5 L164.2 104.0 L169.9 100.7 L176.1 97.9 L182.9 95.6 L190.0 93.8 L197.5 92.5 L205.2 91.9 L213.1 92.0 L221.0 92.9 L229.0 94.5 L236.8 96.9 L244.3 100.2 L251.5 104.3 L258.1 109.3 L264.2 115.1 L269.5 121.7 L273.9 129.1 L277.4 137.3 L279.7 146.1 L280.8 155.5 L280.6 165.4 L279.0 175.8 L276.0 186.4 L271.4 197.2 L265.2 208.1 L257.5 218.8 L248.1 229.3", "w": 1}, {"d": "M179.5 195.2 L177.3 196.4 L175.0 197.7 L172.7 198.9 L170.2 200.1 L167.7 201.2 L165.1 202.3 L162.4 203.3 L159.6 204.3 L156.7 205.2 L153.8 206.1 L150.7 206.9 L147.6 207.6 L144.4 208.3 L141.1 208.8 L137.7 209.3 L134.3 209.7 L130.7 210.1 L127.2 210.3 L123.5 210.4 L119.8 210.4 L116.0 210.3 L112.2 210.1 L108.3 209.8 L104.4 209.4 L100.4 208.8 L96.4 208.1 L92.4 207.3 L88.4 206.3 L84.3 205.2 L80.2 203.9 L76.1 202.5 L72.0 200.9 L67.9 199.1 L63.8 197.2 L59.8 195.2 L55.8 192.9 L51.8 190.5 L47.8 187.9 L43.9 185.1 L40.1 182.1", "w": 0.6}, {"d": "M257.7 108.0 L259.3 108.8 L261.0 109.7 L262.7 110.6 L264.3 111.6 L266.0 112.6 L267.6 113.7 L269.2 114.8 L270.8 115.9 L272.4 117.1 L273.9 118.3 L275.5 119.6 L277.0 120.9 L278.5 122.3 L280.0 123.7 L281.4 125.2 L282.9 126.7 L284.3 128.2 L285.6 129.8 L287.0 131.5 L288.3 133.2 L289.5 134.9 L290.8 136.7 L291.9 138.6 L293.1 140.5 L294.2 142.4 L295.3 144.4 L296.3 146.4 L297.3 148.5 L298.2 150.7 L299.1 152.8 L300.0 155.1 L300.7 157.3 L301.5 159.7 L302.2 162.0 L302.8 164.4 L303.3 166.9 L303.8 169.4 L304.3 172.0 L304.6 174.6 L304.9 177.2", "w": 0.45}, {"d": "M284.7 274.5 L279.9 278.3 L274.9 281.9 L269.8 285.5 L264.5 288.9 L259.1 292.2 L253.6 295.4 L247.9 298.4 L242.1 301.2 L236.3 303.9 L230.3 306.4 L224.2 308.8 L218.1 311.0 L211.9 313.1 L205.6 314.9 L199.2 316.6 L192.8 318.1 L186.4 319.4 L179.9 320.6 L173.4 321.5 L166.9 322.3 L160.3 322.9 L153.8 323.3 L147.3 323.4 L140.8 323.4 L134.3 323.2 L127.9 322.8 L121.5 322.2 L115.1 321.5 L108.8 320.5 L102.6 319.3 L96.5 317.9 L90.4 316.4 L84.4 314.6 L78.6 312.7 L72.8 310.5 L67.2 308.2 L61.7 305.7 L56.3 303.0 L51.1 300.1 L46.0 297.1", "w": 0.55}];
+  const BAR = 'M144.6 156.6 L213.4 135.4';
+  const ARM_LABELS = [['Bras de Persée', 26, 5, 'left'], ['Bras du Sagittaire', 2, 60, 'left'], ['Bras d\'Orion', 2, 28, 'right'], ['Bras de l\'Écu-Centaure', 2, 62, 'right'], ['Bras de la Règle', 2, 94, 'left']];
   const galViews = () => [['rech', 'Recherche'], ['probes', 'Sondes'], ['relics', 'Reliques'], ['acq', 'Acquis']];
+  // ---------- Builds par palier : un noyau et des fusions pour chaque palier, rejoués par le pilote ----------
+  const bMeta = p => ({ ...meta, pal: p });
+  const bAvail = (x, p) => ELEMENTS[x].pal ? ELEMENTS[x].pal <= p : (meta.ownedList || []).includes(x);
+  function bInfo(p) {
+    const pl = meta.plans[p] || null, m = bMeta(p), slots = maxFused(m), max = stabMax(m, run);
+    const used = pl ? instab(m, run, pl.fused, pl.core) : 0;
+    return { pl, m, slots, max, used };
+  }
+  function setPlan(p, core, fused) { meta.plans[p] = { core, fused, manual: true }; save(); renderBuilds(); structure(); }
+  function renderBuilds() {
+    if ($('buildSheet').hidden) return;
+    if (ui.bp == null || ui.bp > LAST_PAL) ui.bp = meta.pal;
+    const p = ui.bp, { pl, m, slots, max, used } = bInfo(p);
+    const pick = h('div', { class: 'gal-pick', role: 'group', 'aria-label': 'Palier', style: `--n:${LAST_PAL + 1}` },
+      ...PALIERS.map(P => { const q = meta.plans[P.n]; return h('button', { class: 'gp', type: 'button', 'aria-pressed': String(p === P.n), onclick: () => { ui.bp = P.n; renderBuilds(); } }, h('b', {}, String(P.n)), h('small', {}, q ? ELEMENTS[q.core].short + (q.fused.length ? '+' + q.fused.length : '') : '—')); }));
+    const orb = (x, cls, label) => h('div', { class: 'slot ' + cls }, h('div', { class: 'orb', style: x ? `--c:${EL_COLOR[x]}` : '' }, x ? ELEMENTS[x].short : ''), h('small', {}, label));
+    const slotsRow = h('div', { class: 'slots' }, orb(pl && pl.core, pl ? 'core' : 'core free', 'Noyau'));
+    for (let i = 0; i < slots; i++) { const x = pl && pl.fused[i]; slotsRow.append(h('span', { class: 'plus' }, '+'), x ? orb(x, '', 'Fusionné') : orb(null, 'free', 'Libre')); }
+    const head = h('div', { class: 'head' }, h('b', {}, `Palier ${p} · ${PALIERS[p].name}`),
+      h('span', { class: 'build-tag' + (pl && pl.manual ? ' manual' : '') }, !pl ? 'aucun plan' : pl.manual ? 'composé à la main' : 'enregistré à la singularité'));
+    const gauge = h('p', { class: 'small' }, `Stabilité ${used} / ${max} · ${slots} emplacement${slots > 1 ? 's' : ''} de fusion`, p < 1 ? ' (la fusion arrive au palier 1)' : '', '. La stabilité est calculée avec ton ciel actuel.');
+    const list = h('div', { class: 'build-els' });
+    for (const x of ORDER) {
+      if (!bAvail(x, p)) continue;
+      const isCore = pl && pl.core === x, isFused = pl && pl.fused.includes(x);
+      const core = pl ? pl.core : 'dust', fused = pl ? pl.fused : [];
+      const asCore = [x, fused.filter(y => y !== x)], canCoreB = !isCore && instab(m, run, asCore[1], x) <= max;
+      const canAdd = !isCore && !isFused && p >= 1 && fused.length < slots && instab(m, run, [...fused, x], core) <= max;
+      const why = isCore ? 'Au noyau' : isFused ? 'Fusionné' : p < 1 ? '' : fused.length >= slots ? 'emplacements pleins' : instab(m, run, [...fused, x], core) > max ? `stabilité ${instab(m, run, [...fused, x], core)} / ${max}` : `coûte ${elInstab(m, x)} de stabilité`;
+      list.append(h('div', { class: 'build-el' + (isCore ? ' is-core' : isFused ? ' is-fused' : ''), style: `--c:${EL_COLOR[x]}` },
+        h('div', { class: 'orb' }, ELEMENTS[x].short), h('div', { class: 'nm' }, h('b', {}, ELEMENTS[x].name), h('small', {}, why)),
+        h('div', { class: 'bb' },
+          h('button', { class: 'btn' + (isCore ? ' ok' : ''), type: 'button', disabled: !canCoreB, onclick: () => setPlan(p, x, asCore[1]) }, 'Noyau'),
+          p >= 1 ? (isFused ? h('button', { class: 'btn', type: 'button', onclick: () => setPlan(p, core, fused.filter(y => y !== x)) }, 'Retirer')
+            : h('button', { class: 'btn', type: 'button', disabled: !canAdd, onclick: () => setPlan(p, core, [...fused, x]) }, 'Fusionner')) : null)));
+    }
+    const acts = h('div', { class: 'dev' },
+      h('button', { class: 'btn', type: 'button', onclick: () => setPlan(p, run.core, run.challenge ? [] : [...run.fused].slice(0, slots)) }, 'Reprendre la run en cours'),
+      h('button', { class: 'btn', type: 'button', disabled: !pl, onclick: () => { delete meta.plans[p]; save(); renderBuilds(); structure(); } }, 'Effacer ce plan'));
+    $('buildBody').replaceChildren(
+      h('p', { class: 'small' }, 'Compose un noyau et ses fusions pour chaque palier. Le pilote automatique les rejoue au début de chaque run. Un build composé ici n\'est plus remplacé par la singularité ; efface-le pour revenir à l\'enregistrement automatique.'),
+      pick, head, slotsRow, gauge, list, acts);
+  }
+  const openBuilds = open => { $('buildSheet').hidden = !open; if (open) { ui.bp = meta.pal; renderBuilds(); $('buildClose').focus(); } };
   function pilotCard() {
     if (!hasAcq(meta, 'pilot')) return null;
     const pl = meta.plans[meta.pal];
@@ -2050,7 +2307,8 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
         h('div', { class: 'seg', role: 'group', 'aria-label': 'Pilote automatique' },
           h('button', { type: 'button', 'aria-pressed': String(meta.pilot), onclick: () => { meta.pilot = true; structure(); save(); } }, 'Activé'),
           h('button', { type: 'button', 'aria-pressed': String(!meta.pilot), onclick: () => { meta.pilot = false; structure(); save(); } }, 'Manuel'))),
-      h('p', { class: 'small' }, h('b', {}, `Plan du palier ${meta.pal} : `), desc, '. Chaque singularité enregistre le noyau et les fusions de la run, et le pilote les rejoue ensuite ; en manuel, essaie autre chose et ton nouveau build remplacera l\'ancien.'));
+      h('p', { class: 'small' }, h('b', {}, `Plan du palier ${meta.pal} : `), desc, pl && pl.manual ? ' (composé à la main).' : '. Chaque singularité enregistre le noyau et les fusions de la run, sauf pour un build composé à la main.'),
+      h('button', { class: 'btn', type: 'button', onclick: () => openBuilds(true) }, 'Builds par palier'));
   }
   function buildGalaxy() {
     const pg = $('p-gal'); pg.replaceChildren();
@@ -2062,8 +2320,11 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     const head = h('div', { class: 'card' },
       h('div', { class: 'head' }, h('h2', {}, `Galaxie ${meta.galaxy} · ${morph(meta)}`), h('span', { class: 'small' }, 'masse ', h('b', { class: 'mono' }, fmt(mass(meta))), ' · seuil ', h('b', { class: 'mono' }, fmt(seuil(meta))))),
       h('p', { class: 'small' }, nxt ? `Prochain effondrement : ${MORPHS[Math.min(MORPHS.length, meta.galaxy + 1) - 1]}, acquis ${nxt.name}.` : 'Tous les acquis sont là : la boucle continue, chaque galaxie plus massive que la précédente.'),
-      anom(meta) ? h('p', { class: 'small anom-line' }, h('b', {}, `Anomalie : ${ANOMALIES[meta.anomaly].name}. `), ANOMALIES[meta.anomaly].desc + '. Une nouvelle anomalie est tirée à chaque effondrement.') : meta.galaxy + 1 >= ANOMALY_FROM ? h('p', { class: 'small' }, 'Dès la prochaine galaxie, chaque effondrement tire une anomalie qui change les règles de la galaxie.') : null,
-      meta.gActive ? h('p', { class: 'small', style: 'color:#b89bff' }, h('b', {}, `Défi galactique en cours : ${GCHAL[meta.gActive].name}, niveau ${gch(meta, meta.gActive) + 1}. `), GCHAL[meta.gActive].desc + '.') : null);
+      meta.anomChoice ? h('div', { class: 'anom-pick' }, h('p', { class: 'small anom-line' }, h('b', {}, 'Boussole : '), 'choisis l\'anomalie de cette galaxie. Tant que tu n\'as pas choisi, aucune ne s\'applique.'),
+        ...meta.anomChoice.map(id => h('button', { class: 'btn', type: 'button', onclick: () => chooseAnomaly(id) }, h('b', {}, ANOMALIES[id].name), h('small', {}, ANOMALIES[id].desc)))) :
+      anom(meta) ? h('div', { class: 'anom-pick' }, h('p', { class: 'small anom-line' }, h('b', {}, `Anomalie : ${ANOMALIES[meta.anomaly].name}. `), ANOMALIES[meta.anomaly].desc + '. Une nouvelle anomalie est tirée à chaque effondrement.'),
+        res(meta, 'reroll') ? h('button', { class: 'btn', type: 'button', disabled: (meta.rerolls || 0) >= res(meta, 'reroll'), onclick: rerollAnomaly }, h('b', {}, 'Dévier l\'anomalie'), h('small', {}, `${res(meta, 'reroll') - (meta.rerolls || 0)} déviation${res(meta, 'reroll') - (meta.rerolls || 0) > 1 ? 's' : ''} restante${res(meta, 'reroll') - (meta.rerolls || 0) > 1 ? 's' : ''} dans cette galaxie`)) : null) : meta.galaxy + 1 >= ANOMALY_FROM ? h('p', { class: 'small' }, 'Dès la prochaine galaxie, chaque effondrement tire une anomalie qui change les règles de la galaxie.') : null,
+      meta.gActive ? h('p', { class: 'small', style: 'color:#b89bff' }, h('b', {}, `Défi galactique en cours : ${GCHAL[meta.gActive].name}, niveau ${gch(meta, meta.gActive) + 1}. `), meta.gActive === 'course' ? `Temps écoulé ${fmtT(meta.galTime || 0)} sur 15:00. ` : '', GCHAL[meta.gActive].desc + '.') : null);
     if (hasAcq(meta, 'autocol')) head.append(h('div', { class: 'seg', role: 'group', 'aria-label': 'Effondrement automatique' },
       h('button', { type: 'button', 'aria-pressed': String(meta.autoCollapse), onclick: () => { meta.autoCollapse = true; structure(); save(); } }, 'Effondrement automatique'),
       h('button', { type: 'button', 'aria-pressed': String(!meta.autoCollapse), onclick: () => { meta.autoCollapse = false; structure(); save(); } }, 'Manuel')));
@@ -2081,8 +2342,8 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
   }
   function researchCard() {
     const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 30 358 296'); svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = '<defs><radialGradient id="bulbe" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e6dcff" stop-opacity="0.5"/><stop offset="0.45" stop-color="#9b6bff" stop-opacity="0.16"/><stop offset="1" stop-color="#9b6bff" stop-opacity="0"/></radialGradient></defs><ellipse cx="179" cy="178" rx="74" ry="52" transform="rotate(-17 179 178)" fill="url(#bulbe)"/><path d="' + BAR + '" stroke="#e6dcff" stroke-opacity="0.22" stroke-width="12" stroke-linecap="round"/>'
+    svg.setAttribute('viewBox', '0 0 358 380'); svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<defs><radialGradient id="bulbe" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e6dcff" stop-opacity="0.5"/><stop offset="0.45" stop-color="#9b6bff" stop-opacity="0.16"/><stop offset="1" stop-color="#9b6bff" stop-opacity="0"/></radialGradient></defs><ellipse cx="179" cy="146" rx="74" ry="52" transform="rotate(-17 179 146)" fill="url(#bulbe)"/><path d="' + BAR + '" stroke="#e6dcff" stroke-opacity="0.22" stroke-width="12" stroke-linecap="round"/>'
       + ARMS.map(({ d, w }) => `<path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="${(24 * w).toFixed(1)}" stroke-opacity="${(0.06 + 0.04 * w).toFixed(3)}"/><path d="${d}" fill="none" stroke="#9b6bff" stroke-linecap="round" stroke-width="${(0.6 + 0.8 * w).toFixed(2)}" stroke-opacity="${(0.3 + 0.3 * w).toFixed(2)}" vector-effect="non-scaling-stroke"/>`).join('');
     const map = h('div', { class: 'gal-map' }, svg);
     for (const [txt, x, y, side] of ARM_LABELS) map.append(h('span', { class: 'arm', style: `${side}:${x}%;top:${y}%`, 'aria-hidden': 'true' }, txt));
@@ -2151,7 +2412,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     const pr = probeAt(i); if (!pr || meta.pclock < pr.end) return;
     meta.probes[i] = null;
     const got = [];
-    for (let k = 0; k < EXPEDITIONS[pr.dest].n; k++) {
+    for (let k = 0; k < EXPEDITIONS[pr.dest].n + res(meta, 'hold'); k++) {
       const [id, r] = rollRelic(pr.dest), first = bestRarity(meta, id) < 0;
       (meta.relics[id] = meta.relics[id] || [0, 0, 0, 0])[r]++;
       got.push(`<b>${RELICS[id].name}</b> ${RARITIES[r].toLowerCase()}${first ? ' (nouvelle)' : ''}`);
@@ -2162,10 +2423,10 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     structure(); save();
   }
   function assemble(id, r) {
-    const inv = meta.relics[id]; if (!inv || r >= 3 || inv[r] < 3) return;
-    inv[r] -= 3; inv[r + 1]++;
+    const need = asmNeed(), inv = meta.relics[id]; if (!inv || r >= 3 || inv[r] < need) return;
+    inv[r] -= need; inv[r + 1]++;
     fx.pulse('#ffffff', 1.2);
-    toast(`Assemblé : 1 <b>${RELICS[id].name}</b> ${RARITIES[r + 1].toLowerCase()}, à partir de 3 ${RAR_PL[r]}`, '#c9cfdf');
+    toast(`Assemblé : 1 <b>${RELICS[id].name}</b> ${RARITIES[r + 1].toLowerCase()}, à partir de ${need} ${RAR_PL[r]}`, '#c9cfdf');
     structure(); refresh(true); save();
   }
   function toggleRelic(id) {
@@ -2188,7 +2449,8 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     const b = probeBack(), o = probeOut(), sl = relicSlots(meta);
     return { probes: b ? `${b} de retour` : o ? `${o} en route` : 'au repos', relics: `${meta.equip.slice(0, sl).length} sur ${sl}` };
   };
-  const galCan = id => id === 'probes' ? probeBack() > 0 || probeFree() >= 0 : id === 'relics' ? RELIC_IDS.some(r => (meta.relics[r] || []).slice(0, 3).some(c => c >= 3)) : false;
+  const galCan = id => id === 'probes' ? probeBack() > 0 || probeFree() >= 0 : id === 'relics' ? RELIC_IDS.some(r => (meta.relics[r] || []).slice(0, 3).some(c => c >= asmNeed())) : false;
+  const asmNeed = () => res(meta, 'forge') ? 2 : 3;
   function galExtra(pg) { pg.append(...(ui.gview === 'probes' ? probesCards() : relicsCards())); }
   function probesCards() {
     const n = probes(meta), list = h('div', { class: 'probes' });
@@ -2229,17 +2491,20 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
       else { const r = bestRarity(meta, id); sl.append(h('div', { class: 'rslot rar' + r }, h('div', { class: 'row' }, h('b', {}, `${RELICS[id].name} · ${RARITIES[r].toLowerCase()}`, pips(r)), h('button', { class: 'btn', type: 'button', disabled: locked, onclick: () => toggleRelic(id) }, 'Retirer')), h('span', { class: 'small' }, RELICS[id].desc(r)))); }
     }
     eqCard.append(sl);
+    const famOf = id => RELICS[id].fam === 'joker' ? 'joker' : RELIC_FAMS[RELICS[id].fam].name;
+    eqCard.append(h('div', { class: 'sets' }, h('span', { class: 'label' }, 'Ensembles · deux reliques équipées de la même famille'),
+      ...Object.entries(RELIC_FAMS).map(([f, F]) => { const pw = setPower(meta, f); return h('span', { class: pw ? 'on' : 'off' }, `${pw ? '✓' : '·'} ${F.name} : ${F.bonus}${pw > 1 ? ` (renforcé de ${Math.round((pw - 1) * 100)} % par le Miroir)` : ''}`); })));
     const found = RELIC_IDS.filter(id => bestRarity(meta, id) >= 0), miss = RELIC_IDS.filter(id => bestRarity(meta, id) < 0);
     const col = h('div', { class: 'card' }, h('div', { class: 'head' }, h('h2', {}, 'Collection'), h('span', { class: 'small' }, `${found.length} sur ${RELIC_IDS.length} trouvées`)));
     if (!found.length) col.append(h('p', { class: 'small' }, 'Aucune relique pour l\'instant : envoie une sonde, elle en rapportera.'));
     const list = h('div', { class: 'relics' });
     for (const id of found) {
-      const inv = meta.relics[id], r = bestRarity(meta, id), on = eq.includes(id), asm = [0, 1, 2].find(k => inv[k] >= 3);
+      const inv = meta.relics[id], r = bestRarity(meta, id), on = eq.includes(id), asm = [0, 1, 2].find(k => inv[k] >= asmNeed());
       list.append(h('div', { class: 'relic rar' + r + (on ? ' on' : '') },
-        h('div', { class: 'row' }, h('b', {}, `${RELICS[id].name} · ${RARITIES[r].toLowerCase()}`, pips(r)), h('span', { class: 'cnt' }, inv.map((c, k) => c ? `${RAR_L[k]} ${c}` : null).filter(Boolean).join(' · '))),
+        h('div', { class: 'row' }, h('b', {}, `${RELICS[id].name} · ${RARITIES[r].toLowerCase()}`, pips(r), h('span', { class: 'rfam' }, RELICS[id].fam === 'joker' ? 'toutes familles' : RELIC_FAMS[RELICS[id].fam].name)), h('span', { class: 'cnt' }, inv.map((c, k) => c ? `${RAR_L[k]} ${c}` : null).filter(Boolean).join(' · '))),
         h('span', { class: 'small' }, RELICS[id].desc(r)),
         h('div', { class: 'btns' },
-          asm !== undefined ? h('button', { class: 'btn ok', type: 'button', onclick: () => assemble(id, asm) }, `Assembler 3 ${RAR_PL[asm]} → 1 ${RARITIES[asm + 1].toLowerCase()}`) : null,
+          asm !== undefined ? h('button', { class: 'btn ok', type: 'button', onclick: () => assemble(id, asm) }, `Assembler ${asmNeed()} ${RAR_PL[asm]} → 1 ${RARITIES[asm + 1].toLowerCase()}`) : null,
           h('button', { class: 'btn', type: 'button', disabled: locked || (!on && eq.length >= slots), onclick: () => toggleRelic(id) }, on ? 'Retirer' : eq.length >= slots ? 'Emplacements pleins' : 'Équiper'))));
     }
     col.append(list);
@@ -2326,7 +2591,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
       if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = `Prochain élément : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} d'énergie produite. `; }
       if (meta.gActive) note += `Défi galactique ${GCHAL[meta.gActive].name} : réussi à l'effondrement. `;
       const wpm = windPerMin();
-      if (wpm > 0) note += `Vent stellaire : +${wpm >= 10 ? fmt(wpm) : nf1.format(wpm)} éclats/min, la run continue ; il faiblit à mesure que la run s'allonge, une Nova le relance. `;
+      if (wpm > 0) note += `Vent stellaire : +${wpm >= 10 ? fmt(wpm) : nf1.format(wpm)} éclats/min, la run continue. `;
       if (isFinal() && run.produced >= obj) { const L = Math.log10(run.produced / obj); note += `Seuil dépassé de ${nf1.format(L)} ordre${L >= 2 ? 's' : ''} de grandeur : chaque ordre de plus rapporte des données. `; }
       else if (!wpm && !eta) note += g >= 1 ? 'Nova : la run recommence et rapporte des éclats. Plus tu attends, plus elle rapporte.' : has(meta, 'A4') && !run.challenge ? `Le vent stellaire se lève au seuil de Nova, ${fmt(nm)} d'énergie produite dans la run.` : `La Nova s'allume au seuil de ${fmt(nm)} d'énergie produite dans la run.`;
       $('objNote').replaceChildren(...rich(note));
@@ -2377,7 +2642,11 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
   // Réglages
   const openSheet = open => { $('sheet').hidden = !open; $('menuBtn').setAttribute('aria-expanded', String(open)); if (open) { refresh(true); $('sheetClose').focus(); } };
   $('menuBtn').addEventListener('click', () => { saveInfo(); openSheet(true); });
+  buildNotes();
   $('sheetClose').addEventListener('click', () => openSheet(false));
+  $('buildClose').addEventListener('click', () => openBuilds(false));
+  $('buildSheet').addEventListener('click', e => { if (e.target === $('buildSheet')) openBuilds(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('buildSheet').hidden) openBuilds(false); });
   $('sheet').addEventListener('click', e => { if (e.target === $('sheet')) openSheet(false); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('sheet').hidden) openSheet(false); });
   const setTopH = () => document.documentElement.style.setProperty('--top-h', $('top').offsetHeight + 'px');
@@ -2793,7 +3062,8 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
     // les sondes voyagent en temps réel, même jeu fermé (sans plafond)
     ui.lastBack = probeBack(); meta.pclock = (meta.pclock || 0) + awayAll;
     setTimeout(() => checkExploits({ type: 'away', sec: awayAll }), 1500);
-    const away = Math.min(OFFLINE_CAP, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - OFFLINE_CAP));
+    const sb = relicLv(meta, 'sablier'), cap = OFFLINE_CAP * (sb >= 0 ? RELICS.sablier.v[sb] : 1);
+    const away = Math.min(cap, awayAll), banked = Math.min(BANK_CAP - meta.bank, Math.max(0, awayAll - cap));
     const before = run.produced, pal0 = meta.pal, g0 = meta.galaxy, c0 = quietLog.comets; let left = away;
     quiet++;
     while (left > 0) { const s = Math.min(60, left); advance(s, 20); left -= s; }
@@ -2817,7 +3087,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
       for (const [k, ch] of Object.entries(CHALLENGES)) if (!meta.chTargets[k] && (meta.galaxy > 1 || meta.pal >= ch.tier)) meta.chTargets[k] = challengeTarget(k);
       if (has(meta, 'R2') && has(meta, 'R3')) { const drop = meta.tree.indexOf('R2') < meta.tree.indexOf('R3') ? 'R3' : 'R2'; meta.tree = meta.tree.filter(x => x !== drop); meta.eclats = (meta.eclats || 0) + NODE[drop].cost; }
       // v15.0 : les galaxies déjà en cours reçoivent leur anomalie
-      if (meta.galaxy >= ANOMALY_FROM && !anom(meta)) meta.anomaly = drawAnomaly(meta);
+      if (meta.galaxy >= ANOMALY_FROM && !anom(meta)) { do meta.anomaly = drawAnomaly(meta); while (ANOMALIES[meta.anomaly].gift); }
       // v13 : l'Acte 2 arrive pour ceux qui avaient fini l'Acte 1
       if (meta.won && meta.galaxy === 1 && !live) setTimeout(() => toast('<b>L\'Acte 2 est arrivé</b> · au palier 6, dépasse le seuil d\'effondrement : ton trou noir avalera la galaxie', '#9b6bff'), 1200);
       const awayAll = !live && d.savedAt ? Math.max(0, (Date.now() - d.savedAt) / 1000) : 0;
@@ -2835,7 +3105,7 @@ if (typeof module !== 'undefined') module.exports = { palierGift, ANOMALIES, ANO
       if (gap > 5) { lastT = performance.now(); catchUp(gap); return; }
       const now = performance.now(), realStep = Math.min(1, (now - lastT) / 1000), dt = realStep * testSpeed; lastT = now;
       meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick(); etaTick();
-      if (n % 10 === 0) { checkExploits(null); tutoTick(); fitStability(); }
+      if (n % 10 === 0) { checkExploits(null); tutoTick(); fitStability(); checkCourse(); }
       const back = probeBack();
       if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toast(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
       ui.lastBack = back;
