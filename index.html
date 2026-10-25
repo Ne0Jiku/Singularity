@@ -107,10 +107,12 @@ button { font: inherit; color: inherit; }
 .stage { display: grid; gap: 10px; justify-items: center; min-width: 0; }
 .canvas-box { width: min(100%, calc(100svh - var(--top-h) - var(--dock-h) - var(--nav-h) - 150px), 640px); min-width: 240px; aspect-ratio: 1; max-width: 100%; position: relative; }
 .stage { min-height: calc(100svh - var(--top-h) - var(--dock-h) - var(--nav-h) - 40px); align-content: center; }
+.stage-info { display: grid; gap: 10px; width: 100%; }
 .panel { position: fixed; z-index: 14; left: 0; right: 0; top: calc(var(--top-h) + env(safe-area-inset-top, 0px)); bottom: calc(var(--dock-h) + var(--nav-h) + env(safe-area-inset-bottom, 0px));
-  overflow-y: auto; overscroll-behavior: contain; align-content: start; background: color-mix(in srgb, var(--bg) 97%, transparent);
+  overflow-y: auto; overscroll-behavior: contain; align-content: start; background: var(--bg);
   padding-block: 14px 24px; padding-left: max(16px, calc((100vw - 860px) / 2), env(safe-area-inset-left, 0px)); padding-right: max(16px, calc((100vw - 860px) / 2), env(safe-area-inset-right, 0px)); }
 .panel[hidden] { display: none !important; }
+body.panel-open .stage > :not(.dock) { visibility: hidden; }
 canvas#gen { width: 100%; height: 100%; display: block; }
 .note { font-size: 13.5px; color: var(--muted); text-align: center; margin: 0; max-width: 46ch; }
 .comet-btn { position: absolute; right: 0; top: 0; appearance: none; cursor: pointer; border: 1px solid color-mix(in srgb, #9fe8ff 70%, transparent); background: color-mix(in srgb, #0b1a2a 85%, transparent); color: #d9f6ff; border-radius: 999px; padding: 8px 12px; font-size: 13.5px; box-shadow: 0 0 18px rgba(159, 232, 255, 0.35); animation: ready 1.8s ease-in-out infinite; --fc: #9fe8ff; }
@@ -517,6 +519,17 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
 /* ---------- Grand écran : deux colonnes, dock et onglets dans la page ---------- */
 @media (min-width: 900px) {
   :root { --dock-h: 72px; --nav-h: 64px; }
+  .layout { max-width: 1240px; padding-block: 12px calc(var(--dock-h) + var(--nav-h) + 12px); }
+  .stage { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: ". star info" ". note info"; column-gap: 28px; align-items: center;
+    min-height: calc(100svh - var(--top-h) - var(--dock-h) - var(--nav-h) - 60px); }
+  .canvas-box { grid-area: star; width: min(calc(100svh - var(--top-h) - var(--dock-h) - var(--nav-h) - 100px), 46vw, 680px); }
+  .stage > .note { grid-area: note; }
+  .stage-info { grid-area: info; align-self: center; max-width: 380px; justify-self: start; }
+  .panel { padding-left: max(24px, calc((100vw - 1160px) / 2)); padding-right: max(24px, calc((100vw - 1160px) / 2)); }
+  .els { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+  .el { align-content: start; }
+  .toasts { left: max(16px, env(safe-area-inset-left, 0px)); right: auto; transform: none; bottom: calc(var(--dock-h) + var(--nav-h) + 16px); width: min(360px, calc((100vw - 760px) / 2 - 24px)); min-width: 280px; }
+  body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + 16px); }
   .dock { padding-left: max(16px, calc((100vw - 760px) / 2)); padding-right: max(16px, calc((100vw - 760px) / 2)); }
   .act { min-height: 54px; }
   .tabs { padding-left: max(8px, calc((100vw - 900px) / 2)); padding-right: max(8px, calc((100vw - 900px) / 2)); }
@@ -580,6 +593,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
       <button class="act sing" type="button" id="singBtn">Singularité</button>
       <button class="act quit" type="button" id="abandonBtn" hidden>Abandonner le défi</button>
     </div>
+    <div class="stage-info">
     <div class="box bank" id="bankBox" hidden>
       <div class="row"><span>Réserve de temps</span><span id="bankValue"></span></div>
       <p class="small">Le temps d'absence au-delà d'une heure s'accumule ici. Dépense-le quand tu veux : le jeu avance d'un coup.</p>
@@ -594,6 +608,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
       <p class="small" id="palNow"></p>
       <p class="small" id="palNext"></p>
       <p class="small anom-line" id="palAnom" hidden></p>
+    </div>
     </div>
   </section>
 
@@ -668,6 +683,14 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
     <div class="set" id="soundSet" hidden><span class="label">Sons</span>
       <div class="vol"><span>Effets</span><input type="range" min="0" max="100" step="5" id="volFx" aria-label="Volume des effets"><span class="mono" id="volFxV"></span></div>
       <div class="vol"><span>Ambiance</span><input type="range" min="0" max="100" step="5" id="volAmb" aria-label="Volume de l'ambiance"><span class="mono" id="volAmbV"></span></div>
+    </div>
+    <div class="set"><span class="label">Notifications</span>
+      <div class="seg" role="group" aria-label="Notifications" id="notifSet">
+        <button type="button" data-v="all">Toutes</button>
+        <button type="button" data-v="imp">Essentielles</button>
+        <button type="button" data-v="none">Aucune</button>
+      </div>
+      <p class="small">Essentielles : paliers, galaxies, défis, sondes de retour et mises à jour. Tout reste noté dans le journal de partie.</p>
     </div>
     <div class="set"><span class="label">Notation des nombres</span>
       <div class="seg" role="group" aria-label="Notation des nombres" id="notation">
@@ -1411,6 +1434,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   let run = newRun(meta);
   // Outils de développement (banc de test, raccourcis) : présents dans l'aperçu de test, retirés de la version publique
   const DEV_TOOLS = false;
+  let notifMode = 'all';
   let testSpeed = 1;
   const speed = () => runSpeed(meta, run);
   function save() { if (typeof importing !== 'undefined' && importing) return; store.set(VERSION, JSON.stringify({ meta, run, savedAt: Date.now() })); }
@@ -1553,7 +1577,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     run = newRun(meta);
     const pal = PALIERS[meta.pal];
     fx.singularity(`Palier ${meta.pal}`);
-    toast(`Palier ${meta.pal} · <b>${pal.name}</b> · ${pal.unlock}. Vitesse <b>×${fmt(speed())}</b>${perm ? '' : ` · le ciel s'éteint${catalogEclats(meta) ? `, tu repars avec ${eclW(catalogEclats(meta))} offert${catalogEclats(meta) > 1 ? 's' : ''} par le catalogue` : ''}`}`, '#9b6bff', 'pal');
+    toastImp(`Palier ${meta.pal} · <b>${pal.name}</b> · ${pal.unlock}. Vitesse <b>×${fmt(speed())}</b>${perm ? '' : ` · le ciel s'éteint${catalogEclats(meta) ? `, tu repars avec ${eclW(catalogEclats(meta))} offert${catalogEclats(meta) > 1 ? 's' : ''} par le catalogue` : ''}`}`, '#9b6bff', 'pal');
     markTab('law'); if (ORDER.some(x => ELEMENTS[x].pal === meta.pal) || meta.pal === 1) markTab('el');
     if (meta.pal === 5) markTab('ch');
     structure(); refresh(true); save();
@@ -1663,6 +1687,14 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   }
   // ---------- Notes de version (menu) : la plus récente en premier ----------
   const PATCHNOTES = [
+    ['0.20.2', '25 octobre', 'Panneaux plus nets', [
+      'Les panneaux ouverts sont opaques : le texte de l\'écran de l\'étoile ne transparaît plus derrière.',
+      'Sur deux colonnes, les cartes d\'une même rangée ont la même hauteur : plus de trous entre les rangées.']],
+    ['0.20.1', '25 octobre', 'Confort sur ordinateur', [
+      'Sur ordinateur, l\'écran de l\'étoile tient sans défiler : l\'étoile au milieu, le palier et la réserve de temps à droite.',
+      'Les notifications s\'affichent en bas à gauche sur ordinateur, plus devant l\'étoile.',
+      'Nouveau réglage Notifications : toutes, essentielles (paliers, galaxies, défis, sondes, mises à jour) ou aucune.',
+      'Sur grand écran, les listes d\'éléments et de défis passent sur deux colonnes.']],
     ['0.20.0', '25 octobre', 'Nouvel écran et ciels composés', [
       'L\'étoile occupe maintenant le centre de l\'écran. Chaque onglet s\'ouvre en plein écran par-dessus ; l\'onglet Étoile, ou un second appui sur l\'onglet ouvert, ramène à l\'étoile. Nova et Singularité restent toujours à portée de pouce.',
       'Textes plus grands partout, notamment dans le ciel.',
@@ -1892,8 +1924,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     anomGift(gift, d);
     fx.singularity('Effondrement galactique'); fx.warp(3);
     const acq = ACQUIS.find(a => a.g === meta.galaxy);
-    toast(`Galaxie ${meta.galaxy} · <b>${morph(meta)}</b> · +${datW(d)}${skies ? ` (dont +${skies * 10} % pour ${skies} constellation${skies > 1 ? 's' : ''} complète${skies > 1 ? 's' : ''})` : ''}${gDone ? ` · défi <b>${GCHAL[gDone].name}</b> réussi` : ''}${acq ? ` · acquis : <b>${acq.name}</b>` : ''}`, '#9b6bff');
-    if (meta.anomChoice) setTimeout(() => toast(`Boussole : choisis l'anomalie de cette galaxie parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`, '#ffb36b', 'anom'), 900);
+    toastImp(`Galaxie ${meta.galaxy} · <b>${morph(meta)}</b> · +${datW(d)}${skies ? ` (dont +${skies * 10} % pour ${skies} constellation${skies > 1 ? 's' : ''} complète${skies > 1 ? 's' : ''})` : ''}${gDone ? ` · défi <b>${GCHAL[gDone].name}</b> réussi` : ''}${acq ? ` · acquis : <b>${acq.name}</b>` : ''}`, '#9b6bff');
+    if (meta.anomChoice) setTimeout(() => toastImp(`Boussole : choisis l'anomalie de cette galaxie parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`, '#ffb36b', 'anom'), 900);
     if (anom(meta)) setTimeout(() => toast(`Anomalie : <b>${ANOMALIES[meta.anomaly].name}</b> · ${gift === 'data' ? `+${datW(d)} offertes` : gift === 'eclats' ? `+${eclW(ANOMALIES[meta.anomaly].amount)} offerts` : ANOMALIES[meta.anomaly].desc}`, '#ffb36b', 'anom'), 900);
     markTab('gal'); if (meta.galaxy === GCH_FROM) markTab('ch');
     if (g0 === 1) showFirstCollapse(d + FIRST_COLLAPSE_BONUS);
@@ -1929,7 +1961,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     if (!run.fused.length) return;
     let cut = 0;
     while (run.fused.length && (run.fused.length > maxFused(meta) || instab(meta, run) > stabMax(meta, run))) { run.fused.pop(); cut++; }
-    if (cut) { toast(`Stabilité dépassée : ${cut} fusion${cut > 1 ? 's retirées' : ' retirée'}`, '#f2c46b', 'stab'); ui.dirty = true; }
+    if (cut) { toastImp(`Stabilité dépassée : ${cut} fusion${cut > 1 ? 's retirées' : ' retirée'}`, '#f2c46b', 'stab'); ui.dirty = true; }
   }
   // Pilote automatique : rejoue le noyau et les fusions enregistrés pour ce palier
   function pilotTick() {
@@ -1980,7 +2012,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   function checkCourse() {
     if (meta.gActive !== 'course' || (meta.galTime || 0) < 900) return;
     meta.gActive = null; resetGalaxy();
-    toast('Défi galactique <b>Course</b> échoué : 15 min dépassées. La galaxie recommence sans contrainte.', '#9b6bff');
+    toastImp('Défi galactique <b>Course</b> échoué : 15 min dépassées. La galaxie recommence sans contrainte.', '#9b6bff');
     structure(); refresh(true); save();
   }
   function abandonGch() {
@@ -2058,7 +2090,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   function checkChallenge() {
     const k = run.challenge; if (!k) return;
     if (CHALLENGES[k].limit && run.produced < meta.chTargets[k] && (run.age || 0) >= CHALLENGES[k].limit) {
-      toast(`Défi ${CHALLENGES[k].name} : temps écoulé à ${fmt(run.produced)} sur ${fmt(meta.chTargets[k])}. Nouvelle run.`, '#f2c46b'); run = newRun(meta); structure(); refresh(true); save(); return;
+      toastImp(`Défi ${CHALLENGES[k].name} : temps écoulé à ${fmt(run.produced)} sur ${fmt(meta.chTargets[k])}. Nouvelle run.`, '#f2c46b'); run = newRun(meta); structure(); refresh(true); save(); return;
     }
     if (k === 'chaos') {
       const due = Math.floor((run.age || 0) / 120); if (due > (run.chaosN || 0)) {
@@ -2070,7 +2102,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       const wasPerm = treePermanent(meta);
       meta.challengesDone.push(k); logEv('defi', { k, age: Math.round(run.age || 0) }); sound('defi');
       fx.singularity('Défi réussi');
-      toast(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, à allumer dans le ciel (constellation Lois clés)`, '#6ee7a8');
+      toastImp(`Défi réussi : <b>${CHALLENGES[k].name}</b> · ${CHALLENGES[k].reward}, à allumer dans le ciel (constellation Lois clés)`, '#6ee7a8');
       if (!wasPerm && treePermanent(meta)) setTimeout(() => toast('<b>Mémoire stellaire</b> · tes constellations restent allumées d\'un palier à l\'autre', '#f2c46b'), 600);
       run = newRun(meta);
       markTab('law'); structure(); refresh(true); save();
@@ -2772,6 +2804,10 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   const openSheet = open => { $('sheet').hidden = !open; $('menuBtn').setAttribute('aria-expanded', String(open)); if (open) { refresh(true); $('sheetClose').focus(); } };
   $('menuBtn').addEventListener('click', () => { saveInfo(); openSheet(true); });
   buildNotes();
+  notifMode = store.get('singularity-notif') || 'all';
+  const notifUi = () => $('notifSet').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === notifMode)));
+  $('notifSet').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; notifMode = b.dataset.v; store.set('singularity-notif', notifMode); notifUi(); if (notifMode === 'none') $('toasts').replaceChildren(); });
+  notifUi();
   // ---------- Application (PWA) : installation et mises à jour ----------
   let installEvt = null;
   const standalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
@@ -2784,7 +2820,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installUi(); });
   window.addEventListener('appinstalled', () => { installEvt = null; installUi(); toast('SINGULARITY est installé', '#8a93ae', 'dev'); });
   $('installBtn').addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; installUi(); });
-  window.addEventListener('singularity:update', () => toast('<b>Nouvelle version prête</b> · ferme et rouvre le jeu pour l\'installer (ta partie est sauvegardée)', '#52e4f0', 'update'));
+  window.addEventListener('singularity:update', () => toastImp('<b>Nouvelle version prête</b> · ferme et rouvre le jeu pour l\'installer (ta partie est sauvegardée)', '#52e4f0', 'update'));
   installUi();
   $('sheetClose').addEventListener('click', () => openSheet(false));
   $('buildClose').addEventListener('click', () => openBuilds(false));
@@ -2797,8 +2833,12 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   // quiet > 0 : rattrapage en cours (absence, réserve de temps) ; les événements sont résumés à la fin
   let quiet = 0;
   const quietLog = { comets: 0 };
-  function toast(html, color, key) {
+  // Notifications : toutes, essentielles seulement (paliers, galaxies, défis, sondes, mises à jour), ou aucune
+  const toastImp = (html, color, key) => toast(html, color, key, true);
+  function toast(html, color, key, imp) {
     if (quiet) return;
+    if (notifMode === 'none' && key !== 'update') return;
+    if (notifMode === 'imp' && !imp) return;
     const box = $('toasts'), old = key ? [...box.children].find(x => x.dataset.key === key) : null;
     const t = old || h('div', { class: 'toast' });
     if (key) t.dataset.key = key;
@@ -3250,7 +3290,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       meta.realTime = (meta.realTime || 0) + realStep; meta.pclock = (meta.pclock || 0) + dt; snapTick(); etaTick();
       if (n % 10 === 0) { checkExploits(null); tutoTick(); fitStability(); checkCourse(); }
       const back = probeBack();
-      if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toast(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
+      if (back > (ui.lastBack || 0)) { const d = (meta.probes || []).filter(x => x && meta.pclock >= x.end).map(x => EXP_FROM[x.dest]); toastImp(`${back > 1 ? `${back} sondes de retour` : `Sonde de retour ${d[0]}`} · reliques à récupérer dans l'onglet Galaxie`, '#9b6bff'); markTab('gal'); structure(); }
       ui.lastBack = back;
       if (testSpeed > 240) { let left = dt; while (left > 0) { const s = Math.min(10, left); advance(s, 20); left -= s; } } else advance(dt, testSpeed > 60 ? 5 : 1);
       refresh(++n % 10 === 0);
