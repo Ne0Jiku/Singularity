@@ -8,8 +8,8 @@
   "orientation": "any",
   "background_color": "#05070e",
   "theme_color": "#05070e",
-  "lang": "fr",
-  "description": "Un jeu incrémental cosmique : fais grandir une étoile jusqu'au trou noir, puis avale des galaxies.",
+  "lang": "en",
+  "description": "A cosmic incremental game: grow a star into a black hole, then swallow galaxies.",
   "categories": [
     "games"
   ],
