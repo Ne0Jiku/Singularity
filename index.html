@@ -15,17 +15,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Singularity">
 
-<meta name="theme-color" content="#05070e">
-<meta name="description" content="SINGULARITY: a cosmic incremental game. Grow a star into a black hole, then swallow galaxies.">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-32.png" sizes="32x32">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Singularity">
-
 <style>
 @font-face { font-family: 'Michroma'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/michroma-latin-ext-400-normal.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
 @font-face { font-family: 'Michroma'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/michroma-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
@@ -77,6 +66,9 @@ button { font: inherit; color: inherit; }
 .small { font-size: 13.5px; color: var(--muted); margin: 0; }
 .small b { color: var(--fg); font-weight: 500; }
 #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+/* galaxie de fond : sa propre couche, redessinée 5 fois par seconde seulement (elle tourne très lentement) */
+#galbg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+body.panel-open #galbg { visibility: hidden; }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
 /* ---------- Barre du haut ---------- */
@@ -459,6 +451,16 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
 .build-tag.manual { color: var(--gold); }
 .notes { display: grid; gap: 6px; }
 .notes details { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 8px 10px; }
+.credits { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 10px 12px; font-size: 14px; }
+.credits .cr-title { margin: 0; display: flex; justify-content: space-between; align-items: baseline; }
+.credits .cr-title b { font-family: var(--f-display, inherit); letter-spacing: .12em; }
+.credits .cr-title span { color: var(--muted); font-family: var(--f-mono); font-size: 12.5px; }
+.credits dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
+.credits dt { color: var(--muted); }
+.credits dd { margin: 0; line-height: 1.45; }
+.credits dd small { color: var(--muted); }
+.credits p { margin: 0; }
+@media (max-width: 480px) { .credits dl { grid-template-columns: 1fr; gap: 2px; } .credits dd { margin-bottom: 6px; } }
 .notes-pick { width: 100%; font: inherit; font-size: 14px; color: var(--fg); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
 .notes-pick:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .notes-body { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 10px 12px; }
@@ -576,6 +578,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
 
 </head>
 <body>
+<canvas id="galbg" aria-hidden="true"></canvas>
 <canvas id="bg" aria-hidden="true"></canvas>
 <header class="top" id="top">
   <div class="top-in">
@@ -716,6 +719,13 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
       </div>
       <p class="small">Essentielles : paliers, galaxies, défis, sondes de retour et mises à jour. Tout reste noté dans le journal de partie.</p>
     </div>
+    <div class="set"><span class="label">Effets visuels</span>
+      <div class="seg" role="group" aria-label="Effets visuels" id="fxSet">
+        <button type="button" data-v="full">Complets</button>
+        <button type="button" data-v="lite">Légers</button>
+      </div>
+      <p class="small">Légers : fond figé et animation de l'étoile à 30 images par seconde, pour les appareils modestes.</p>
+    </div>
     <div class="set"><span class="label">Notation des nombres</span>
       <div class="seg" role="group" aria-label="Notation des nombres" id="notation">
         <button type="button" data-n="sci" aria-pressed="true">1,23e9</button>
@@ -727,6 +737,7 @@ body.has-tuto .toasts { bottom: calc(var(--dock-h) + var(--nav-h) + var(--tuto-h
       <div class="dev"><button class="btn ok" type="button" id="installBtn" hidden>Installer SINGULARITY</button></div>
     </div>
     <div class="set"><span class="label">Notes de version</span><div class="notes" id="patchNotes"></div></div>
+    <div class="set"><span class="label">Crédits</span><div class="credits" id="credits"></div></div>
     <div class="set"><span class="label">Sauvegarde</span>
       <p class="small" id="saveInfo">Exporte ta partie pour la garder à l'abri ou la reprendre sur un autre appareil.</p>
       <div class="dev">
@@ -791,7 +802,7 @@ const EL_FX = {
   anti:     { core: (EN ? "production ×6, but cost penalty ×4" : 'production ×6, mais pénalité de coût ×4'), fused: (EN ? "production ×3, but cost penalty ×2" : 'production ×3, mais pénalité de coût ×2') },
   neutro:   { core: (EN ? "production +50% per fused element" : 'production +50 % par élément fusionné'), fused: (EN ? "production ×1.6" : 'production ×1,6') },
   chronon:  { core: (EN ? "production ×1.5 · time-based effects progress ×3 faster" : 'production ×1,5 · les effets liés au temps progressent ×3 plus vite'), fused: (EN ? "production ×1.2 · time-based effects progress ×2 faster" : 'production ×1,2 · les effets liés au temps progressent ×2 plus vite') },
-  graviton: { core: (EN ? "production ×1.5 · each fused element costs 1 less stability" : 'production ×1,5 · chaque élément fusionné coûte 1 de stabilité en moins'), fused: (EN ? "production ×1.2 · the core no longer costs stability" : 'production ×1,2 · le noyau ne coûte plus de stabilité') },
+  graviton: { core: (EN ? "production ×1.5 · each fused element costs 1 less stability (minimum 1, a free element stays free)" : 'production ×1,5 · chaque élément fusionné coûte 1 de stabilité en moins (minimum 1, un élément gratuit le reste)'), fused: (EN ? "production ×1.2 · the core no longer costs stability" : 'production ×1,2 · le noyau ne coûte plus de stabilité') },
   quark:    { core: (EN ? "production ×1.5 · fused elements also react with each other" : 'production ×1,5 · les éléments fusionnés réagissent aussi entre eux'), fused: (EN ? "production ×1.2 · fused elements react with each other at 50%" : 'production ×1,2 · les éléments fusionnés réagissent entre eux à 50 %') },
   tachyon:  { core: (EN ? "production ×8 at the start of the run, halved every 2 min, down to ×1.5" : 'production ×8 au départ de la run, divisée par 2 toutes les 2 min, jusqu\'à ×1,5'), fused: (EN ? "production ×3 at the start of the run, halved every 2 min, down to ×1.2" : 'production ×3 au départ de la run, divisée par 2 toutes les 2 min, jusqu\'à ×1,2') },
   strange:  { core: (EN ? "all reaction effects ×2" : 'effet de toutes les réactions ×2'), fused: (EN ? "copies the fusion effect of the best other fused element" : 'copie l\'effet de fusion du meilleur autre élément fusionné') },
@@ -1028,7 +1039,8 @@ function instab(m, r, fused = r.fused, core = r.core) {
   const rr = { ...r, fused, core };
   const gravCore = core === 'graviton', gravFused = fused.includes('graviton');
   let s = gravFused ? 0 : elInstab(m, core, rr);
-  for (const x of fused) { s += Math.max(gravCore ? 1 : 0, elInstab(m, x, rr) - (gravCore ? 1 : 0)); const re = REACTIONS[key(core, x)]; if (re && re.stab) s -= re.stab; }
+  // Graviton au noyau : un élément fusionné coûte 1 de moins, sans descendre sous 1… mais un élément déjà gratuit le reste (v0.23.1)
+  for (const x of fused) { const v = elInstab(m, x, rr); s += gravCore ? Math.min(v, Math.max(1, v - 1)) : v; const re = REACTIONS[key(core, x)]; if (re && re.stab) s -= re.stab; }
   return Math.max(0, s);
 }
 // Force des réactions entre éléments fusionnés (0 = aucune)
@@ -1358,7 +1370,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
 <script>
   // Textes fixes de la page : traduits au chargement quand le jeu est en anglais
   if (EN) {
-    const HTML_EN = {"Palier 0": "Tier 0", "0 éclat": "0 shards", "0 donnée": "0 data", "Objectif du palier": "Tier goal", "Singularité": "Singularity", "Abandonner le défi": "Abandon the challenge", "Réserve de temps": "Time reserve", "Le temps d'absence au-delà d'une heure s'accumule ici. Dépense-le quand tu veux : le jeu avance d'un coup.": "Time away beyond one hour builds up here. Spend it whenever you like: the game moves forward in one go.", "Tout": "All", "Étoile": "Star", "Éléments": "Elements", "Ciel": "Sky", "Défis": "Challenges", "Catalogue": "Catalog", "Galaxie": "Galaxy", "Niveaux": "Levels", "Remis à zéro à chaque Nova": "Reset at each Nova", "Améliorations de run": "Run upgrades", "Détail de la production": "Production breakdown", "Catalogue stellaire": "Star catalog", "Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre": "Each core gives a star type depending on the number of fused elements. A star is cataloged when your run passes the Nova threshold. Each star gives", "éclat": "shard", "à chaque fois que le ciel s'éteint. Une ligne complète fait coûter l'élément 1 de stabilité en moins.": "every time the sky goes dark. A complete row makes the element cost 1 less stability.", "Réactions": "Reactions", "Exploits": "Feats", "Paliers": "Tiers", "Temps par palier": "Time per tier", "Partie": "Game", "Builds par palier": "Builds per tier", "Réglages": "Settings", "Singularités": "Singularities", "Durée de la run": "Run time", "Tutoriel": "Tutorial", "Revoir le tutoriel": "Replay the tutorial", "Désactiver": "Disable", "Sons": "Sounds", "Effets": "Effects", "Ambiance": "Ambience", "Toutes": "All", "Essentielles": "Essential", "Aucune": "None", "Essentielles : paliers, galaxies, défis, sondes de retour et mises à jour. Tout reste noté dans le journal de partie.": "Essential: tiers, galaxies, challenges, returning probes and updates. Everything stays recorded in the game log.", "Notation des nombres": "Number notation", "1,23 Md": "1.23 B", "Raccourcis de développement": "Development shortcuts", "Palier suivant": "Next tier", "éclats": "shards", "Défis de l'Acte 1 réussis": "Act 1 challenges completed", "Fin de l'Acte 1": "End of Act 1", "Aller à l'Acte 2": "Go to Act 2", "Galaxie suivante": "Next galaxy", "données": "data", "Sondes de retour": "Probes back", "+3 reliques de chaque": "+3 relics of each", "Anomalie suivante": "Next anomaly", "Application": "App", "Installer SINGULARITY": "Install SINGULARITY", "Notes de version": "Patch notes", "Sauvegarde": "Save", "Exporte ta partie pour la garder à l'abri ou la reprendre sur un autre appareil.": "Export your game to keep it safe or continue on another device.", "Exporter": "Export", "Importer": "Import", "Charger cette sauvegarde": "Load this save", "Depuis un fichier": "From a file", "Journal de partie": "Game log", "Chaque Nova, singularité, effondrement, étoile et recherche est noté avec le temps de jeu, plus un instantané de la run toutes les 5 min. Copie-le et colle-le dans la conversation pour l'équilibrage.": "Every Nova, singularity, collapse, star and research is recorded with the play time, plus a snapshot of the run every 5 min. Copy it and send it to the developer to help with balancing.", "Copier le journal": "Copy the log", "Tout effacer": "Erase everything", "EFFONDREMENT": "COLLAPSE", "Continuer": "Continue", "Éclats : gagnés par Nova, ils allument les lois de tes constellations": "Shards: earned by Nova, they light the laws of your constellations", "Données : gagnées à l'effondrement galactique, elles paient la recherche": "Data: earned at galactic collapse, they pay for research", "Réglages et partie": "Settings and game", "L'étoile, son noyau et ses éléments fusionnés": "The star, its core and its fused elements", "Sections du jeu": "Game sections", "Sections du catalogue": "Catalog sections", "Filtrer par élément": "Filter by element", "Afficher": "Show", "Trier": "Sort", "Fermer": "Close", "Volume des effets": "Effects volume", "Volume de l'ambiance": "Ambience volume", "Accélération de test": "Test speed-up", "Sauvegarde en texte": "Save as text", "1,23e9": "1.23e9"};
+    const HTML_EN = {"Crédits": "Credits", "Effets visuels": "Visual effects", "Complets": "Full", "Légers": "Light", "Légers : fond figé et animation de l'étoile à 30 images par seconde, pour les appareils modestes.": "Light: still background and the star animated at 30 frames per second, for modest devices.", "Palier 0": "Tier 0", "0 éclat": "0 shards", "0 donnée": "0 data", "Objectif du palier": "Tier goal", "Singularité": "Singularity", "Abandonner le défi": "Abandon the challenge", "Réserve de temps": "Time reserve", "Le temps d'absence au-delà d'une heure s'accumule ici. Dépense-le quand tu veux : le jeu avance d'un coup.": "Time away beyond one hour builds up here. Spend it whenever you like: the game moves forward in one go.", "Tout": "All", "Étoile": "Star", "Éléments": "Elements", "Ciel": "Sky", "Défis": "Challenges", "Catalogue": "Catalog", "Galaxie": "Galaxy", "Niveaux": "Levels", "Remis à zéro à chaque Nova": "Reset at each Nova", "Améliorations de run": "Run upgrades", "Détail de la production": "Production breakdown", "Catalogue stellaire": "Star catalog", "Chaque noyau donne un type d'étoile selon le nombre d'éléments fusionnés. Une étoile est cataloguée quand ta run franchit le seuil de Nova. Chaque étoile offre": "Each core gives a star type depending on the number of fused elements. A star is cataloged when your run passes the Nova threshold. Each star gives", "éclat": "shard", "à chaque fois que le ciel s'éteint. Une ligne complète fait coûter l'élément 1 de stabilité en moins.": "every time the sky goes dark. A complete row makes the element cost 1 less stability.", "Réactions": "Reactions", "Exploits": "Feats", "Paliers": "Tiers", "Temps par palier": "Time per tier", "Partie": "Game", "Builds par palier": "Builds per tier", "Réglages": "Settings", "Singularités": "Singularities", "Durée de la run": "Run time", "Tutoriel": "Tutorial", "Revoir le tutoriel": "Replay the tutorial", "Désactiver": "Disable", "Sons": "Sounds", "Effets": "Effects", "Ambiance": "Ambience", "Toutes": "All", "Essentielles": "Essential", "Aucune": "None", "Essentielles : paliers, galaxies, défis, sondes de retour et mises à jour. Tout reste noté dans le journal de partie.": "Essential: tiers, galaxies, challenges, returning probes and updates. Everything stays recorded in the game log.", "Notation des nombres": "Number notation", "1,23 Md": "1.23 B", "Raccourcis de développement": "Development shortcuts", "Palier suivant": "Next tier", "éclats": "shards", "Défis de l'Acte 1 réussis": "Act 1 challenges completed", "Fin de l'Acte 1": "End of Act 1", "Aller à l'Acte 2": "Go to Act 2", "Galaxie suivante": "Next galaxy", "données": "data", "Sondes de retour": "Probes back", "+3 reliques de chaque": "+3 relics of each", "Anomalie suivante": "Next anomaly", "Application": "App", "Installer SINGULARITY": "Install SINGULARITY", "Notes de version": "Patch notes", "Sauvegarde": "Save", "Exporte ta partie pour la garder à l'abri ou la reprendre sur un autre appareil.": "Export your game to keep it safe or continue on another device.", "Exporter": "Export", "Importer": "Import", "Charger cette sauvegarde": "Load this save", "Depuis un fichier": "From a file", "Journal de partie": "Game log", "Chaque Nova, singularité, effondrement, étoile et recherche est noté avec le temps de jeu, plus un instantané de la run toutes les 5 min. Copie-le et colle-le dans la conversation pour l'équilibrage.": "Every Nova, singularity, collapse, star and research is recorded with the play time, plus a snapshot of the run every 5 min. Copy it and send it to the developer to help with balancing.", "Copier le journal": "Copy the log", "Tout effacer": "Erase everything", "EFFONDREMENT": "COLLAPSE", "Continuer": "Continue", "Éclats : gagnés par Nova, ils allument les lois de tes constellations": "Shards: earned by Nova, they light the laws of your constellations", "Données : gagnées à l'effondrement galactique, elles paient la recherche": "Data: earned at galactic collapse, they pay for research", "Réglages et partie": "Settings and game", "L'étoile, son noyau et ses éléments fusionnés": "The star, its core and its fused elements", "Sections du jeu": "Game sections", "Sections du catalogue": "Catalog sections", "Filtrer par élément": "Filter by element", "Afficher": "Show", "Trier": "Sort", "Fermer": "Close", "Volume des effets": "Effects volume", "Volume de l'ambiance": "Ambience volume", "Accélération de test": "Test speed-up", "Sauvegarde en texte": "Save as text", "1,23e9": "1.23e9"};
     document.documentElement.lang = 'en';
     const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n; (n = tw.nextNode());) { const t = n.nodeValue.trim(); if (t && HTML_EN[t] != null) n.nodeValue = n.nodeValue.replace(t, HTML_EN[t]); }
@@ -1699,6 +1711,19 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   const FR_MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
   const enDate = d => { const [n, mo] = d.split(' '), k = FR_MONTHS.indexOf(mo); return k < 0 ? d : new Date(2026, k, +n).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }); };
   const PATCHNOTES = [
+    ['0.23.1', '29 octobre', (EN ? "Graviton fix" : 'Correction du Graviton'), [
+      (EN ? "With Graviton at the core, an element that costs no stability (a complete catalog row) no longer costs 1 again." : 'Avec le Graviton au noyau, un élément qui ne coûte plus de stabilité (ligne du catalogue complète) ne recoûte plus 1.'),
+      (EN ? "Graviton's description now says that its reduction never goes below 1, except for an element that is already free." : 'La description du Graviton précise que sa réduction ne descend jamais sous 1, sauf pour un élément déjà gratuit.'),
+    ]],
+    ['0.23.0', '29 octobre', (EN ? "Smoother game" : 'Jeu plus fluide'), [
+      (EN ? "The screen is rebuilt far less often: only the open tab is updated, and a burst of Novas or singularities redraws it once instead of every time." : 'L\'écran se reconstruit beaucoup moins souvent : seul l\'onglet ouvert est mis à jour, et une rafale de Novas ou de singularités ne le redessine qu\'une fois.'),
+      (EN ? "The star and the background draw much less: lighter glows, star trails grouped, the background galaxy refreshed only a few times per second, nothing drawn behind an open tab." : 'L\'étoile et le fond se dessinent bien plus légèrement : halos simplifiés, traînées d\'étoiles regroupées, galaxie de fond rafraîchie quelques fois par seconde seulement, rien n\'est dessiné derrière un onglet ouvert.'),
+      (EN ? "New Visual effects setting: Light freezes the background and animates the star at 30 frames per second, for modest devices." : 'Nouveau réglage Effets visuels : « Légers » fige le fond et anime l\'étoile à 30 images par seconde, pour les appareils modestes.'),
+      (EN ? "Fix: the challenge reward line was still in French in the English version." : 'Correction : la ligne de récompense des défis restait en français dans la version anglaise.'),
+    ]],
+    ['0.22.0', '26 octobre', (EN ? "Credits" : 'Crédits'), [
+      (EN ? "Credits in Settings: who made the game and the fonts it uses." : 'Crédits dans les réglages : qui a fait le jeu et les polices qu\'il utilise.'),
+    ]],
     ['0.21.3', '26 octobre', (EN ? "Tidier settings" : 'Réglages plus compacts'), [
       (EN ? "Patch notes now fit in a drop-down menu: pick a version to read its changes." : 'Les notes de version tiennent dans un menu déroulant : choisis une version pour lire ses changements.'),
     ]],
@@ -1784,6 +1809,16 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       (EN ? "Seven help bubbles during the first minutes, to replay or disable in the menu." : 'Sept bulles d\'aide pendant les premières minutes, à revoir ou désactiver dans le menu.'),
       (EN ? "Hooks to plug sounds in later." : 'Points d\'accroche pour brancher des sons plus tard.')]],
   ];
+  // Crédits
+  function buildCredits() {
+    const ver = PATCHNOTES[0][0];
+    $('credits').replaceChildren(
+      h('p', { class: 'cr-title' }, h('b', {}, 'SINGULARITY'), h('span', {}, 'v' + ver)),
+      h('dl', {},
+        h('dt', {}, EN ? 'Game design & development' : 'Conception et développement'), h('dd', {}, 'Ne0Jiku'),
+        h('dt', {}, EN ? 'Fonts' : 'Polices'), h('dd', {}, 'Michroma — Vernon Adams', h('br'), 'IBM Plex Sans & IBM Plex Mono — IBM', h('br'), h('small', {}, EN ? 'SIL Open Font License 1.1' : 'Licence SIL Open Font 1.1'))),
+      h('p', { class: 'small' }, EN ? 'Thanks for playing!' : 'Merci de jouer !'));
+  }
   // Notes de version : un menu déroulant, une version affichée à la fois
   function buildNotes() {
     const label = ([v, date, title]) => `v${v} · ${title} · ${EN ? enDate(date) : date}`;
@@ -2240,7 +2275,27 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     { u: 'power', name: (EN ? "Power" : 'Puissance'), desc: (EN ? "Production ×2 per level" : 'Production ×2 par niveau'), lvl: () => (EN ? `lvl ${run.lv.power}` : `niv. ${run.lv.power}`), val: () => (EN ? `Next milestone: level ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP} · ×${(EN ? String(powerMsMult(meta)) : String(powerMsMult(meta)).replace('.', ','))}${run.challenge === 'sober' ? (EN ? ` · limit ${SOBER_POWER}` : ` · limite ${SOBER_POWER}`) : ''}` : `Prochain jalon : niveau ${(Math.floor(run.lv.power / POWER_MS_STEP) + 1) * POWER_MS_STEP} · ×${(EN ? String(powerMsMult(meta)) : String(powerMsMult(meta)).replace('.', ','))}${run.challenge === 'sober' ? (EN ? ` · limit ${SOBER_POWER}` : ` · limite ${SOBER_POWER}`) : ''}`) },
   ];
   const ui = { upg: {} };
-  function structure() {
+  // Les panneaux se reconstruisent à leur ouverture : seul celui qui est affiché est refait tout de suite
+  const PANEL_BUILD = { gen: buildGenPanel, el: buildElPanel, law: buildLawPanel, ch: buildChPanel, log: buildLogPanel, gal: () => buildGalaxy() };
+  const panelDirty = new Set();
+  let structPending = false;
+  // Plusieurs changements dans le même tour (Novas en rafale, pilote) ne reconstruisent l'écran qu'une fois
+  function structure() { if (structPending) return; structPending = true; queueMicrotask(() => { structPending = false; structureNow(); }); }
+  function structureNow() {
+    for (const id in PANEL_BUILD) { if (ui.tab === id) PANEL_BUILD[id](); else panelDirty.add(id); }
+    $('t-ch').classList.toggle('locked', meta.pal < 3 && meta.galaxy === 1);
+    $('t-gal').classList.toggle('locked', meta.galaxy === 1);
+    const tr = $('track'); tr.replaceChildren();
+    for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
+    const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
+    $('palNow').replaceChildren(h('b', {}, (EN ? `Tier ${meta.pal} · ${cur.name}` : `Palier ${meta.pal} · ${cur.name}`)), (EN ? ` · speed ×${fmt(speed())}` : ` · vitesse ×${fmt(speed())}`));
+    const an = anom(meta), pa = $('palAnom'); pa.hidden = !an && !meta.anomChoice;
+    if (meta.anomChoice) pa.replaceChildren(h('b', {}, (EN ? "Compass" : 'Boussole')), (EN ? `: anomaly to pick among ${meta.anomChoice.length}, in the Galaxy tab` : ` : anomalie à choisir parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`));
+    if (an) pa.replaceChildren(h('b', {}, (EN ? `Anomaly · ${ANOMALIES[an].name}` : `Anomalie · ${ANOMALIES[an].name}`)), `${EN ? ':' : ' :'} ${ANOMALIES[an].desc}${an === 'gamma' ? (meta.novasPal ? (EN ? " (already used at this tier)" : ' (déjà utilisée à ce palier)') : (EN ? " (ready)" : ' (prête)')) : ''}`);
+    $('palNext').textContent = nxt && !isFinal() ? (EN ? `Next tier: ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), speed ×${speedOf(nxt.n)}` : `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}`) : meta.galaxy === 1 ? (EN ? "Last tier of Act 1: reach the collapse threshold, your black hole will swallow the galaxy." : 'Dernier palier de l\'Acte 1 : atteins le seuil d\'effondrement, ton trou noir avalera la galaxie.') : (EN ? "Last tier: pass the collapse threshold to give birth to the next galaxy." : 'Dernier palier : dépasse le seuil d\'effondrement pour faire naître la galaxie suivante.');
+  }
+  function buildPanel(id) { if (panelDirty.has(id)) { panelDirty.delete(id); PANEL_BUILD[id](); } }
+  function buildGenPanel() {
     const rows = $('upgRows');
     if (!ui.built) {
       ui.built = true; rows.replaceChildren();
@@ -2263,6 +2318,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       ur.append(b); if (!have) ui.ups[up.id] = { b, small: cst, up };
     }
     $('upsHint').textContent = (EN ? `${run.ups.length} / ${RUN_UPS.length} · reset at each Nova` : `${run.ups.length} / ${RUN_UPS.length} · remises à zéro à chaque Nova`);
+  }
+  function buildElPanel() {
     // Éléments : noyau et fusions
     const gc = $('genCard'); gc.replaceChildren();
     if (meta.pal === 0) {
@@ -2305,6 +2362,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
           isCore ? h('span', { class: 'state' }, (EN ? "At the core" : 'Au noyau')) : isFused ? h('span', { class: 'state' }, (EN ? "Fused until the next Nova" : 'Fusionné jusqu\'à la prochaine Nova')) : null),
         actions.childNodes.length ? actions : null));
     }
+  }
+  function buildLawPanel() {
     // Ciel : une constellation par branche, chaque loi est une étoile qu'on allume avec des éclats
     const pl = $('p-law'); pl.replaceChildren();
     const perm = treePermanent(meta);
@@ -2378,6 +2437,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       h('div', { class: 'head' }, h('h2', {}, 'Constellations'), h('span', { class: 'small' }, h('b', { class: 'mono' }, eclW(meta.eclats)), (EN ? " to spend" : ' à dépenser'))),
       h('p', { class: 'small' }, perm ? (EN ? `Stellar memory: your constellations stay lit from one tier to the next. The catalog gives its ${eclW(ce)} at the start of each galaxy, when the sky goes dark.` : `Mémoire stellaire : tes constellations restent allumées d'un palier à l'autre. Le catalogue offre ses ${eclW(ce)} au début de chaque galaxie, quand le ciel s'éteint.`) : (EN ? `Each law is a star: light it with shards, earned by Nova. At each singularity, the sky goes dark${ce ? (EN ? ` and you start again with ${eclW(ce)} given by the catalog` : ` et tu repars avec ${eclW(ce)} offert${ce > 1 ? 's' : ''} par le catalogue`) : ''}.` : `Chaque loi est une étoile : allume-la avec des éclats, gagnés par Nova. À chaque singularité, le ciel s'éteint${ce ? (EN ? ` and you start again with ${eclW(ce)} given by the catalog` : ` et tu repars avec ${eclW(ce)} offert${ce > 1 ? 's' : ''} par le catalogue`) : ''}.`)),
       pick, skyHead, sky, detail), ...[skyBuildsCard()].filter(Boolean));
+  }
+  function buildChPanel() {
     // Défis
     const pc = $('p-ch'); pc.replaceChildren();
     const gOpen = meta.galaxy >= GCH_FROM;
@@ -2402,6 +2463,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       pc.append(h('div', { class: 'card' }, h('div', { class: 'head' }, h('h2', {}, (EN ? "Challenges" : 'Défis')), h('span', { class: 'small' }, (EN ? "Starting a challenge replaces the current run" : 'Lancer un défi remplace la run en cours'))),
         h('p', { class: 'small' }, (EN ? "Each challenge unlocks a key law in the sky (Key laws constellation). Pure, Unstable and Sobriety completed: Stellar memory, your constellations stay lit from one tier to the next." : 'Chaque défi débloque une loi clé dans le ciel (constellation Lois clés). Pur, Instable et Sobriété réussis : Mémoire stellaire, tes constellations restent allumées d\'un palier à l\'autre.')), list));
     }
+  }
+  function buildLogPanel() {
     // Catalogue
     const cat = $('cat'); cat.replaceChildren();
     for (const c of ORDER) {
@@ -2417,17 +2480,6 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     buildReactions();
     buildLogNav();
     buildExploits(); buildPalStats();
-    $('t-ch').classList.toggle('locked', meta.pal < 3 && meta.galaxy === 1);
-    $('t-gal').classList.toggle('locked', meta.galaxy === 1);
-    buildGalaxy();
-    const tr = $('track'); tr.replaceChildren();
-    for (const p of PALIERS) tr.append(h('span', { class: p.n < meta.pal ? 'done' : p.n === meta.pal ? 'cur' : '', title: p.name }));
-    const cur = PALIERS[meta.pal], nxt = PALIERS[meta.pal + 1];
-    $('palNow').replaceChildren(h('b', {}, (EN ? `Tier ${meta.pal} · ${cur.name}` : `Palier ${meta.pal} · ${cur.name}`)), (EN ? ` · speed ×${fmt(speed())}` : ` · vitesse ×${fmt(speed())}`));
-    const an = anom(meta), pa = $('palAnom'); pa.hidden = !an && !meta.anomChoice;
-    if (meta.anomChoice) pa.replaceChildren(h('b', {}, (EN ? "Compass" : 'Boussole')), (EN ? `: anomaly to pick among ${meta.anomChoice.length}, in the Galaxy tab` : ` : anomalie à choisir parmi ${meta.anomChoice.length}, dans l'onglet Galaxie`));
-    if (an) pa.replaceChildren(h('b', {}, (EN ? `Anomaly · ${ANOMALIES[an].name}` : `Anomalie · ${ANOMALIES[an].name}`)), `${EN ? ':' : ' :'} ${ANOMALIES[an].desc}${an === 'gamma' ? (meta.novasPal ? (EN ? " (already used at this tier)" : ' (déjà utilisée à ce palier)') : (EN ? " (ready)" : ' (prête)')) : ''}`);
-    $('palNext').textContent = nxt && !isFinal() ? (EN ? `Next tier: ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), speed ×${speedOf(nxt.n)}` : `Prochain palier : ${nxt.name} (${nxt.unlock[0].toLowerCase() + nxt.unlock.slice(1)}), vitesse ×${speedOf(nxt.n)}`) : meta.galaxy === 1 ? (EN ? "Last tier of Act 1: reach the collapse threshold, your black hole will swallow the galaxy." : 'Dernier palier de l\'Acte 1 : atteins le seuil d\'effondrement, ton trou noir avalera la galaxie.') : (EN ? "Last tier: pass the collapse threshold to give birth to the next galaxy." : 'Dernier palier : dépasse le seuil d\'effondrement pour faire naître la galaxie suivante.');
   }
 
   // ---------- Onglet Galaxie ----------
@@ -2713,29 +2765,32 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   const fillPct = (have, need) => (need > 0 && isFinite(need) ? Math.max(0, Math.min(100, have / need * 100)) : 0).toFixed(1) + '%';
   let lastExp = 0;
   const logp = v => Math.log10(Math.max(1, v));
+  // N'écrit dans la page que si le texte change : chaque écriture coûte une remise en page
+  const setTxt = (el, v) => { v = String(v); if (el.textContent !== v) el.textContent = v; };
+  const setKids = (el, key, ...kids) => { if (el.dataset.k !== key) { el.dataset.k = key; el.replaceChildren(...kids); } };
   function refresh(full) {
     const p = P();
-    const cb = $('cometBtn'); cb.hidden = meta.comets <= 0; if (meta.comets > 0) cb.textContent = (EN ? `Catch the comet${meta.comets > 1 ? ` (${meta.comets})` : ''}` : `Capturer la comète${meta.comets > 1 ? ` (${meta.comets})` : ''}`);
-    const bc = $('boostChip'); bc.hidden = !(run.boostLeft > 0); if (run.boostLeft > 0) bc.textContent = (EN ? `Comet ×${fmt(cometTail(meta))} · ${Math.ceil(run.boostLeft)} s` : `Comète ×${fmt(cometTail(meta))} · ${Math.ceil(run.boostLeft)} s`);
+    const cb = $('cometBtn'); cb.hidden = meta.comets <= 0; if (meta.comets > 0) setTxt(cb, (EN ? `Catch the comet${meta.comets > 1 ? ` (${meta.comets})` : ''}` : `Capturer la comète${meta.comets > 1 ? ` (${meta.comets})` : ''}`));
+    const bc = $('boostChip'); bc.hidden = !(run.boostLeft > 0); if (run.boostLeft > 0) setTxt(bc, (EN ? `Comet ×${fmt(cometTail(meta))} · ${Math.ceil(run.boostLeft)} s` : `Comète ×${fmt(cometTail(meta))} · ${Math.ceil(run.boostLeft)} s`));
     $('bankBox').hidden = meta.bank < 60 && !spending;
-    if (!spending) $('bankValue').textContent = fmtT(meta.bank);
+    if (!spending) setTxt($('bankValue'), fmtT(meta.bank));
     $('bankBtns').querySelectorAll('button').forEach(b => b.disabled = spending || meta.bank < 1);
-    $('energy').textContent = fmt(run.energy);
+    setTxt($('energy'), fmt(run.energy));
     const ex = Math.floor(Math.log10(Math.max(1, run.energy)));
     if (ex > lastExp) { const e = $('energy'); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
     lastExp = ex;
-    $('rate').textContent = fmt(p) + ' /s';
-    $('hPal').replaceChildren(h('span', {}, EN ? 'T' : 'P', h('span', { class: 'spw' }, (EN ? "ier " : 'alier ')), `${meta.pal} · ${PALIERS[meta.pal].name}`));
-    $('hEcl').textContent = eclW(meta.eclats);
-    $('hDatChip').hidden = meta.galaxy === 1 && !meta.data; $('hDat').textContent = datW(meta.data);
+    setTxt($('rate'), fmt(p) + ' /s');
+    setKids($('hPal'), meta.pal + PALIERS[meta.pal].name, h('span', {}, EN ? 'T' : 'P', h('span', { class: 'spw' }, (EN ? "ier " : 'alier ')), `${meta.pal} · ${PALIERS[meta.pal].name}`));
+    setTxt($('hEcl'), eclW(meta.eclats));
+    $('hDatChip').hidden = meta.galaxy === 1 && !meta.data; setTxt($('hDat'), datW(meta.data));
     if (!$('p-gal').hidden && ui.gview === 'probes') for (const el of document.querySelectorAll('[data-probe]')) {
       const pr = probeAt(+el.dataset.probe); if (!pr) continue; const left = pr.end - meta.pclock;
       el.textContent = (EN ? `back in ${fmtD(left)}` : `retour dans ${fmtD(left)}`); const bar = document.querySelector(`[data-probebar="${el.dataset.probe}"]`); if (bar) bar.style.width = Math.min(100, (1 - left / expTime(meta, pr.dest)) * 100).toFixed(1) + '%';
     }
-    $('hSpeed').replaceChildren(h('span', {}, h('span', { class: 'spw' }, (EN ? "speed " : 'vitesse ')), `×${fmt(speed())}${testSpeed > 1 ? ` (test ×${testSpeed})` : ''}`));
-    $('hSing').textContent = meta.sings;
-    $('hTime').textContent = fmtT(run.t / speed());
-    for (const k in ui.upg) {
+    { const sv = `×${fmt(speed())}${testSpeed > 1 ? ` (test ×${testSpeed})` : ''}`; setKids($('hSpeed'), sv, h('span', {}, h('span', { class: 'spw' }, (EN ? "speed " : 'vitesse ')), sv)); }
+    setTxt($('hSing'), meta.sings);
+    setTxt($('hTime'), fmtT(run.t / speed()));
+    if (ui.tab === 'gen' || full) for (const k in ui.upg) {
       const o = ui.upg[k], c = cost(meta, run, k);
       o.lvl.textContent = o.r.val(); o.lvlChip.textContent = o.r.lvl();
       if (!isFinite(c)) { o.cost.textContent = 'max'; setBtn(o.buyBtn, false); o.tenBtn.disabled = o.maxBtn.disabled = true; o.tenN.textContent = o.maxN.textContent = '—'; continue; }
@@ -2751,10 +2806,10 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       else { l = run.lv.power; lo = Math.floor(l / POWER_MS_STEP) * POWER_MS_STEP; hi = lo + POWER_MS_STEP; }
       o.bar.style.width = Math.max(0, Math.min(100, (l - lo) / (hi - lo) * 100)) + '%';
     }
-    for (const id in ui.ups) {
+    if (ui.tab === 'gen' || full) for (const id in ui.ups) {
       const o = ui.ups[id], c = upCost(meta, o.up), ok = run.energy >= c;
       const g = id === 'cap' ? (EN ? "Power ÷2" : 'Puissance ÷2') : id === 'comp' ? (EN ? "speed ×1.25" : 'vitesse ×1,25') : gainOf({ ...run, ups: [...run.ups, id] });
-      o.small.textContent = fmt(c) + (g ? ' · ' + g : '');
+      setTxt(o.small, fmt(c) + (g ? ' · ' + g : ''));
       o.b.disabled = !ok; o.b.classList.toggle('ok', ok); o.b.style.setProperty('--p', fillPct(run.energy, c));
     }
     if (run !== msRun) { msRun = run; msF = fluxMilestones(run.lv.flux); msP = powerMilestones(run.lv.power); }
@@ -2763,21 +2818,21 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     msF = nf; msP = np;
     // Objectif (barre du haut), Nova et singularité (dock)
     const box = $('objBox'), nb = $('novaBtn'), sb = $('singBtn'), top = $('top');
-    const setAct = (b, main, sub) => { if (b.dataset.main !== main) { b.dataset.main = main; b.replaceChildren(h('span', {}, main), h('small', { class: 'sub' })); } b.querySelector('.sub').replaceChildren(...rich(sub)); };
+    const setAct = (b, main, sub) => { if (b.dataset.main !== main) { b.dataset.main = main; b.replaceChildren(h('span', {}, main), h('small', { class: 'sub' })); } const so = b.querySelector('.sub'); if (so.dataset.t !== sub) { so.dataset.t = sub; so.replaceChildren(...rich(sub)); } };
     if (run.challenge) {
       const ch = CHALLENGES[run.challenge], tg = meta.chTargets[run.challenge];
       box.classList.add('challenge'); top.classList.add('challenge');
-      $('objLabel').textContent = (EN ? `Challenge ${ch.name}` : `Défi ${ch.name}`);
-      $('objValue').textContent = `${fmt(run.produced)} / ${fmt(tg)}`;
+      setTxt($('objLabel'), (EN ? `Challenge ${ch.name}` : `Défi ${ch.name}`));
+      setTxt($('objValue'), `${fmt(run.produced)} / ${fmt(tg)}`);
       $('objBar').style.width = Math.max(0, Math.min(1, logp(run.produced) / logp(tg))) * 100 + '%';
-      $('objNote').replaceChildren(...rich(`${ch.desc}. Récompense : ${ch.reward}.`));
+      $('objNote').replaceChildren(...rich(EN ? `${ch.desc}. Reward: ${ch.reward}.` : `${ch.desc}. Récompense : ${ch.reward}.`));
       sb.hidden = true; nb.hidden = true; $('abandonBtn').hidden = false;
     } else {
       box.classList.remove('challenge'); top.classList.remove('challenge');
       const obj = isFinal() ? seuil(meta) : objective(meta.pal, meta), lo = runFloor(meta.pal), nm = novaMin(meta), g = curGain();
       const prog = Math.max(0, Math.min(1, (logp(run.produced) - logp(lo)) / (logp(obj) - logp(lo))));
-      $('objLabel').textContent = isFinal() ? (EN ? "Collapse threshold" : 'Seuil d\'effondrement') : (EN ? `Goal → ${PALIERS[meta.pal + 1].name}` : `Objectif → ${PALIERS[meta.pal + 1].name}`);
-      $('objValue').textContent = `${fmt(run.produced)} / ${fmt(obj)}`;
+      setTxt($('objLabel'), isFinal() ? (EN ? "Collapse threshold" : 'Seuil d\'effondrement') : (EN ? `Goal → ${PALIERS[meta.pal + 1].name}` : `Objectif → ${PALIERS[meta.pal + 1].name}`));
+      setTxt($('objValue'), `${fmt(run.produced)} / ${fmt(obj)}`);
       $('objBar').style.width = (prog * 100).toFixed(1) + '%';
       const eta = etaText(obj); let note = eta;
       if (meta.pal === 0) { const nx = ORDER.slice(0, 5).find(x => !meta.ownedList.includes(x)); if (nx) note = (EN ? `Next element: ${ELEMENTS[nx].name} at ${fmt(RUN1_UNLOCK[nx])} energy produced. ` : `Prochain élément : ${ELEMENTS[nx].name} à ${fmt(RUN1_UNLOCK[nx])} d'énergie produite. `); }
@@ -2817,6 +2872,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   function selectTab(id) {
     if (!PANELS.includes(id)) id = 'home';
     ui.tab = id;
+    buildPanel(id);
     document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
     PANELS.forEach(x => $('p-' + x).hidden = x !== id);
     $('t-' + id).querySelector('.ping')?.remove();
@@ -2834,7 +2890,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   // Réglages
   const openSheet = open => { $('sheet').hidden = !open; $('menuBtn').setAttribute('aria-expanded', String(open)); if (open) { refresh(true); $('sheetClose').focus(); } };
   $('menuBtn').addEventListener('click', () => { saveInfo(); openSheet(true); });
-  buildNotes();
+  buildNotes(); buildCredits();
   notifMode = store.get('singularity-notif') || 'all';
   const notifUi = () => $('notifSet').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === notifMode)));
   $('notifSet').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; notifMode = b.dataset.v; store.set('singularity-notif', notifMode); notifUi(); if (notifMode === 'none') $('toasts').replaceChildren(); });
@@ -2889,7 +2945,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     const cv = $('gen'), ctx = cv.getContext('2d');
     const bg = $('bg'), bx = bg.getContext('2d');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let W = 400, BW = 0, BH = 0;
+    let W = 400, BW = 0, BH = 0, lite = store.get('singularity-fx') === 'lite', frameN = 0, liteBg = false;
     const TAU = Math.PI * 2;
     const rings = [{ r: 0.24, k: 1.8, b: 0.6, a: 0 }, { r: 0.335, k: 0.9, b: 0.4, a: 2.1 }, { r: 0.43, k: 0.62, b: 0.25, a: 4.2 }];
     const TRAIL = 0.33, waves = [], sparks = [], flashes = [], floats = [], inflow = [];
@@ -2899,7 +2955,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     const stars = Array.from({ length: 170 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
     const diskStreaks = Array.from({ length: 46 }, () => ({ r: Math.random(), len: 0.25 + Math.random() * 0.9, off: Math.random() * TAU, w: 0.6 + Math.random() * 1.4 }));
     function resize() {
-      const w = cv.parentElement.getBoundingClientRect().width, dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = cv.parentElement.getBoundingClientRect().width, dpr = Math.min(1.5, window.devicePixelRatio || 1);
       W = Math.max(200, w); cv.width = W * dpr; cv.height = W * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     function resizeBg() {
@@ -2908,7 +2964,21 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     }
     new ResizeObserver(resize).observe(cv.parentElement); resize();
     window.addEventListener('resize', resizeBg); resizeBg();
-    const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, a))})`; };
+    const RGB = {};
+    const rgba = (hex, a) => { let c = RGB[hex]; if (!c) { const n = parseInt(hex.slice(1), 16); c = RGB[hex] = `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},`; } return c + Math.max(0, Math.min(1, a)).toFixed(3) + ')'; };
+    // Halos précalculés : un flou d'ombre (shadowBlur) coûte cher à chaque image, une image toute faite presque rien
+    const GLOW = {};
+    function glowDot(fill, shadow, r, blur) {
+      r = Math.max(1, Math.round(r)); const k = fill + shadow + r + '|' + blur; let g = GLOW[k];
+      if (!g) {
+        const size = 2 * (r + blur) + 4, c = document.createElement('canvas'); c.width = c.height = size * 2;
+        const x = c.getContext('2d'); x.scale(2, 2); x.shadowColor = shadow; x.shadowBlur = blur * 2; x.fillStyle = fill;
+        x.beginPath(); x.arc(size / 2, size / 2, r, 0, TAU); x.fill();
+        g = GLOW[k] = { c, size };
+      }
+      return g;
+    }
+    const drawGlow = (fill, shadow, x, y, r, blur) => { const g = glowDot(fill, shadow, r, blur); ctx.drawImage(g.c, x - g.size / 2, y - g.size / 2, g.size, g.size); };
     const ringColor = i => run.fused[i] ? EL_COLOR[run.fused[i]] : ['#52e4f0', '#9b6bff', '#e9edf8'][i];
     const pal = () => meta.pal;
     const pulse = (color, s = 1) => waves.push({ t: 0, color, s });
@@ -2953,32 +3023,44 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       }
       return oc;
     }
-    function drawGalaxy(dt, cx, cy) {
-      if ((meta.galaxy || 1) < 2) return;
-      if (galFor !== meta.galaxy) { galImg = buildGalaxyImg(meta.galaxy); galFor = meta.galaxy; }
+    const gbg = $('galbg'), gx = gbg.getContext('2d');
+    let galT = 1;
+    function drawGalaxy(dt) {
+      const g = meta.galaxy || 1;
       if (!reduce) galRot += dt * 0.012;
+      galT += dt; if (galT < 0.2 && galFor === g) return; galT = 0;
+      // demi-résolution : c'est une lueur floue, quatre fois moins de pixels à peindre
+      const gw = Math.ceil(BW / 2), gh = Math.ceil(BH / 2);
+      if (gbg.width !== gw || gbg.height !== gh) { gbg.width = gw; gbg.height = gh; gx.setTransform(0.5, 0, 0, 0.5, 0, 0); }
+      gx.clearRect(0, 0, BW, BH);
+      if (g < 2) { galFor = g; return; }
+      if (galFor !== g) { galImg = buildGalaxyImg(g); galFor = g; }
       const sz = Math.max(BW, BH) * 0.95;
-      bx.save(); bx.globalAlpha = 0.55; bx.translate(cx, cy); bx.rotate(galRot); bx.drawImage(galImg, -sz / 2, -sz / 2, sz, sz); bx.restore();
+      gx.save(); gx.globalAlpha = 0.55; gx.translate(BW * 0.5, BH * 0.42); gx.rotate(galRot); gx.drawImage(galImg, -sz / 2, -sz / 2, sz, sz); gx.restore();
     }
     // --- Fond : champ d'étoiles qui s'étire avec la vitesse du temps ---
     function drawStars(dt) {
+      // effets légers : fond figé, plus de traînées d'étoiles
+      if (lite) { if (!liteBg) { bx.clearRect(0, 0, BW, BH); liteBg = true; } drawGalaxy(0); return; }
+      liteBg = false;
       bx.clearRect(0, 0, BW, BH);
-      drawGalaxy(dt, BW * 0.5, BH * 0.42);
+      drawGalaxy(dt);
       if (warpT > 0) warpT -= dt;
       const sp = speed(), v = (0.02 + 0.055 * Math.log2(1 + sp)) * (reduce ? 0 : 1) * (warpT > 0 ? 1 + 7 * warpK * Math.min(1, warpT) : 1);
       const f = Math.max(BW, BH) * 0.55, cx = BW * 0.5, cy = BH * 0.42;
-      const acc = PAL_ACCENT[Math.min(6, meta.pal)];
+      const acc = PAL_ACCENT[Math.min(6, meta.pal)], NB = 8, paths = [];
       for (const s of stars) {
         const pz = s.z; s.z -= v * dt;
         if (s.z <= 0.03) { s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; s.z = 1; continue; }
         const x = cx + s.x / s.z * f, y = cy + s.y / s.z * f;
         if (x < -20 || x > BW + 20 || y < -20 || y > BH + 20) { s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; s.z = 1; continue; }
         const tail = Math.min(1, pz + v * 0.12 * (1 + sp / 24));
-        const x0 = cx + s.x / tail * f, y0 = cy + s.y / tail * f;
-        const b = Math.min(1, (1 - s.z) * 1.2);
-        bx.strokeStyle = rgba(s.z < 0.35 ? '#ffffff' : acc, b * 0.4);
-        bx.lineWidth = 0.6 + (1 - s.z) * 1.4;
-        bx.beginPath(); bx.moveTo(x0, y0); bx.lineTo(x, y); bx.stroke();
+        const q = Math.min(NB - 1, Math.floor(s.z * NB)), pth = paths[q] || (paths[q] = new Path2D());
+        pth.moveTo(cx + s.x / tail * f, cy + s.y / tail * f); pth.lineTo(x, y);
+      }
+      for (let q = 0; q < NB; q++) {
+        if (!paths[q]) continue; const z = (q + 0.5) / NB;
+        bx.strokeStyle = rgba(z < 0.35 ? '#ffffff' : acc, Math.min(1, (1 - z) * 1.2) * 0.4); bx.lineWidth = 0.6 + (1 - z) * 1.4; bx.stroke(paths[q]);
       }
     }
     // --- Disque d'accrétion (palier 3+), dessiné en deux moitiés pour passer devant et derrière le cœur ---
@@ -3025,6 +3107,10 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
     }
     function frame(now) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      // un panneau ouvert couvre l'étoile et le fond : on ne dessine rien d'invisible
+      if (document.body.classList.contains('panel-open')) { requestAnimationFrame(frame); return; }
+      // effets légers : 30 images par seconde suffisent
+      if (lite && (frameN++ & 1)) { requestAnimationFrame(frame); return; }
       const time = (now - t0) / 1000, p = P(), L = Math.log10(1 + p), c = W / 2, pl = pal();
       const vis = 1 + 0.12 * meta.pal;
       drawStars(dt);
@@ -3103,10 +3189,10 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
           for (let k = 1; k < 7; k++) { const t = k / 7, j = (Math.random() - 0.5) * W * 0.03; pts.push([c + (mx - c) * t - Math.sin(a) * j, c + (my - c) * t + Math.cos(a) * j]); }
           pts.push([mx, my]); arcs.push({ pts, col: EL_COLOR[x] });
         }
-        ctx.save(); ctx.shadowColor = EL_COLOR[x]; ctx.shadowBlur = 16; ctx.fillStyle = EL_COLOR[x]; ctx.beginPath(); ctx.arc(mx, my, W * 0.022, 0, TAU); ctx.fill(); ctx.restore();
+        drawGlow(EL_COLOR[x], EL_COLOR[x], mx, my, W * 0.022, 16);
       });
       ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineWidth = 1.6;
-      for (const ar of arcs) { ctx.strokeStyle = rgba(ar.col, 0.75); ctx.shadowColor = ar.col; ctx.shadowBlur = 10; ctx.beginPath(); ar.pts.forEach(([x, y], k) => k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); }
+      for (const ar of arcs) { ctx.beginPath(); ar.pts.forEach(([x, y], k) => k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.lineWidth = 6; ctx.strokeStyle = rgba(ar.col, 0.16); ctx.stroke(); ctx.lineWidth = 1.6; ctx.strokeStyle = rgba(ar.col, 0.75); ctx.stroke(); }
       ctx.restore();
       if (pl >= 5) drawJets(c, cr, time, coreCol);
       // cœur, ou horizon des événements au palier final
@@ -3117,8 +3203,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
         const lens = ctx.createRadialGradient(c, c, rh * 0.9, c, c, rh * 2.6);
         lens.addColorStop(0, rgba('#ffffff', 0.9)); lens.addColorStop(0.12, rgba('#ffd9a0', 0.55)); lens.addColorStop(0.4, rgba(coreCol, 0.18)); lens.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = lens; ctx.beginPath(); ctx.arc(c, c, rh * 2.6, 0, TAU); ctx.fill();
-        ctx.save(); ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 22; ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(c, c, rh * 1.06, 0, TAU); ctx.stroke(); ctx.restore();
+        ctx.beginPath(); ctx.arc(c, c, rh * 1.06, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 10; ctx.stroke(); ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = '#000000'; ctx.beginPath(); ctx.arc(c, c, rh, 0, TAU); ctx.fill();
       } else {
         const g2 = ctx.createRadialGradient(c, c, 0, c, c, cr * 1.9);
@@ -3159,7 +3245,7 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
         tg.addColorStop(0, 'rgba(217,246,255,0.9)'); tg.addColorStop(1, 'rgba(159,232,255,0)');
         ctx.strokeStyle = tg; ctx.lineWidth = 3; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - Math.cos(ang) * tl, y - Math.sin(ang) * tl); ctx.stroke();
-        ctx.save(); ctx.shadowColor = '#9fe8ff'; ctx.shadowBlur = 14; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x, y, 3.5, 0, TAU); ctx.fill(); ctx.restore();
+        drawGlow('#ffffff', '#9fe8ff', x, y, 3.5, 14);
         cometPos.push([x, y]);
       }
       const tier = Math.floor(Math.log10(Math.max(1, p)) / 3);
@@ -3182,7 +3268,8 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-    return { pulse, fuse, unlock, singularity, flash, warp, comet, hitComet, nova };
+    const setLite = v => { lite = v; liteBg = false; };
+    return { pulse, fuse, unlock, singularity, flash, warp, comet, hitComet, nova, setLite };
   })();
 
   // ---------- Réglages ----------
@@ -3193,6 +3280,9 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
   }
   $('langSet').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.l === 'en') === EN)));
   $('langSet').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || (b.dataset.l === 'en') === EN) return; store.set('singularity-lang', b.dataset.l); save(); location.reload(); });
+  const fxUi = () => $('fxSet').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.v === 'lite') === (store.get('singularity-fx') === 'lite'))));
+  $('fxSet').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; store.set('singularity-fx', b.dataset.v); fx.setLite(b.dataset.v === 'lite'); fxUi(); });
+  fxUi();
   $('notation').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setNotation(b.dataset.n); });
   $('speed')?.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
@@ -3337,22 +3427,6 @@ if (typeof module !== 'undefined') module.exports = { SAT_FROM, lastPal, RELIC_F
 })();
 </script>
 
-<script>
-(function () {
-  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
-  if (!('serviceWorker' in navigator) || !(location.protocol === 'https:' || location.hostname === 'localhost')) return;
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').then(function (reg) {
-      reg.addEventListener('updatefound', function () {
-        var w = reg.installing; if (!w) return;
-        w.addEventListener('statechange', function () {
-          if (w.state === 'installed' && navigator.serviceWorker.controller) window.dispatchEvent(new CustomEvent('singularity:update'));
-        });
-      });
-    }).catch(function () {});
-  });
-})();
-</script>
 <script>
 (function () {
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
